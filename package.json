@@ -17,6 +17,7 @@
     "hexo-generator-archive": "^2.0.0",
     "hexo-generator-category": "^2.0.0",
     "hexo-generator-index": "^4.0.0",
+    "hexo-generator-json-content": "^4.2.3",
     "hexo-generator-tag": "^2.0.0",
     "hexo-renderer-ejs": "^2.0.0",
     "hexo-renderer-marked": "^7.0.1",
@@ -26,5 +27,6 @@
     "hexo-theme-volantis": "^6.0.2",
     "probe-image-size": "^7.2.3",
     "stylus": "^0.64.0"
-  }
+  },
+  "packageManager": "pnpm@10.25.0+sha512.5e82639027af37cf832061bcc6d639c219634488e0f2baebe785028a793de7b525ffcd3f7ff574f5e9860654e098fe852ba8ac5dd5cefe1767d23a020a92f501"
 }
