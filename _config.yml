@@ -114,3 +114,9 @@ post_asset_folder: true
 marked:
   prependRoot: true
   postAsset: true
+
+heimu:
+  title: "你知道的太多了"
+
+scripts:
+  - scripts/heimu.js
