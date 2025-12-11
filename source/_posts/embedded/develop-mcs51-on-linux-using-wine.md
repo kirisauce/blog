@@ -28,7 +28,7 @@ tags: [linux,嵌入式,wine]
 
 报错信息非常直观。STC-ISP是32位可执行文件，这时候只要从已安装的Windows系统里复制`C:\Windows\SysWOW64\mfc42.dll`过来放在Wine的`C:\windows\SysWOW64`文件夹下面，或者通过`winetricks`下载对应的动态库就好了。
 
-{% heimu "冷知识：64位Windows里System32存的是64位库，SysWOW64里存的是32位库。巨硬牌石山这块（" %}
+{% heimu --title 何意味 冷知识：64位Windows里System32存的是64位库，SysWOW64里存的是32位库。巨硬牌石山这块（ %}
 
 ## ~~不~~常见问题
 
