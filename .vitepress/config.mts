@@ -13,6 +13,18 @@ export default defineConfig<ThemeConfig>({
   themeConfig: {
     author: 'kirisauce',
     authorProfiles: data.authors,
+
+    page: {
+      home: {
+        showImagePlaceholder: true,
+      },
+    },
+
+    layout: {
+      footer: {
+        copyright: 'Copyright © 2026-{currentYear} kirisauce',
+      },
+    },
   },
 
   extends: (await getDefaultConfig()) as any,
