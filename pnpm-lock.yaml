@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  vitepress-theme-matterial: link:../vitepress-theme-matterial
+  vitepress-theme-matterial: link:matterial
 
 importers:
 
@@ -27,8 +27,8 @@ importers:
         specifier: 2.0.0-alpha.16
         version: 2.0.0-alpha.16(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)
       vitepress-theme-matterial:
-        specifier: link:../vitepress-theme-matterial
-        version: link:../vitepress-theme-matterial
+        specifier: link:matterial
+        version: link:matterial
       vue:
         specifier: ^3.5.28
         version: 3.5.28

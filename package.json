@@ -5,11 +5,12 @@
     "@iconify-json/mingcute": "^1.2.7",
     "sass-embedded": "^1.97.3",
     "vitepress": "2.0.0-alpha.16",
-    "vitepress-theme-matterial": "link:../vitepress-theme-matterial",
-    "vue": "^3.5.28"
+    "vue": "^3.5.28",
+    "vitepress-theme-matterial": "link:matterial"
   },
   "scripts": {
     "dev": "vitepress dev",
+    "build:dep": "cd ./matterial && pnpm install && pnpm build:lib",
     "build": "vitepress build",
     "preview": "vitepress preview"
   }

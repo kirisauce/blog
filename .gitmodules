@@ -1,0 +1,3 @@
+[submodule "matterial"]
+	path = matterial
+	url = https://github.com/kirisauce/vitepress-theme-matterial
