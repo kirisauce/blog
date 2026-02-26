@@ -11,6 +11,9 @@ importers:
 
   .:
     devDependencies:
+      '@fontsource/cascadia-code':
+        specifier: ^5.2.3
+        version: 5.2.3
       '@iconify-json/mdi':
         specifier: ^1.2.3
         version: 1.2.3
@@ -216,6 +219,9 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@fontsource/cascadia-code@5.2.3':
+    resolution: {integrity: sha512-jnKfdZ+0UL25XUqYV7iq9gDlaUMWXxZNA7KnYzO4v8De6jBJmTkLHxDXs+1iZwl/8w7eKlDrTJWcyalOHdE2eg==}
 
   '@iconify-json/mdi@1.2.3':
     resolution: {integrity: sha512-O3cLwbDOK7NNDf2ihaQOH5F9JglnulNDFV7WprU2dSoZu3h3cWH//h74uQAB87brHmvFVxIOkuBX2sZSzYhScg==}
@@ -1155,6 +1161,8 @@ snapshots:
 
   '@esbuild/win32-x64@0.27.3':
     optional: true
+
+  '@fontsource/cascadia-code@5.2.3': {}
 
   '@iconify-json/mdi@1.2.3':
     dependencies:

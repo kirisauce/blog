@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "@fontsource/cascadia-code": "^5.2.3",
     "@iconify-json/mdi": "^1.2.3",
     "@iconify-json/mingcute": "^1.2.7",
     "sass-embedded": "^1.97.3",
