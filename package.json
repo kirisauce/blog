@@ -13,9 +13,12 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^5.0.0",
+    "@astrojs/svelte": "^8.0.0",
     "astro": "^6.0.3",
     "sharp": "^0.34.5",
-    "stylus": "^0.64.0"
+    "stylus": "^0.64.0",
+    "svelte": "^5.53.12",
+    "typescript": "^5.9.3"
   },
   "trustedDependencies": [
     "astro",

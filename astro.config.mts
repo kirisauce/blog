@@ -2,13 +2,15 @@
 import mdx from '@astrojs/mdx';
 import { defineConfig, fontProviders } from 'astro/config';
 
+import svelte from '@astrojs/svelte';
+
 type Variants = NonNullable<
   NonNullable<Parameters<typeof defineConfig>[0]['fonts']>[number]['options']
 >['variants'];
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [mdx()],
+  integrations: [mdx(), svelte()],
 
   fonts: [
     {
