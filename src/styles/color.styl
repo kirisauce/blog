@@ -1,14 +1,31 @@
 hue = var(--color-hue, 0)
+redhue = 25
 
 palette = {
   surface-hover: oklch(92% 16% hue) oklch(24% 14% hue)
   primary:    oklch(55% 85% hue) oklch(90% 70% hue)
+  secondary:  oklch(65% 65% hue) oklch(70% 50% hue)
+  secondary:  oklch(55% 65% hue) oklch(90% 50% hue)
   background: oklch(98% 8% hue)  oklch(10% 5% hue)
   surface:    oklch(96% 12% hue) oklch(15% 5% hue)
   border:     oklch(85% 15% hue) oklch(35% 15% hue)
   text:       oklch(20% 20% hue) oklch(92% 20% hue)
   text-muted: oklch(45% 20% hue) oklch(70% 20% hue)
   nav:        oklch(94% 14% hue) oklch(20% 10% hue)
+
+  primary-container:    oklch(90% 10% hue) oklch(30% 15% hue)
+  on-primary-container: oklch(30% 30% hue) oklch(95% 20% hue)
+  secondary-container:  oklch(85% 8% hue) oklch(25% 12% hue)
+  on-secondary-container: oklch(25% 25% hue) oklch(90% 20% hue)
+  surface-container:    oklch(96% 5% hue) oklch(18% 4% hue)
+  on-surface-container: oklch(20% 20% hue) oklch(90% 15% hue)
+  container:            oklch(98% 2% hue)  oklch(12% 2% hue)
+  on-container:         oklch(20% 20% hue) oklch(90% 15% hue)
+
+  error:            oklch(55% 85% redhue) oklch(90% 70% redhue)
+  error-container:  oklch(90% 10% redhue) oklch(30% 15% redhue)
+  on-error:         oklch(100% 0% redhue) oklch(0% 0% redhue)
+  on-error-container: oklch(30% 30% redhue) oklch(95% 20% redhue)
 
   shadow: oklch(0% 0% hue \/ 0.08) oklch(0% 0% hue \/ 0.3)
 }

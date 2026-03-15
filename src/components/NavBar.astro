@@ -1,22 +1,35 @@
 ---
 import Icon from './Icon.astro';
 import { navbar, site } from '../config';
-
-import {} from 'astro:config/client'
+import MenuButton from './NavBar/MenuButton.svelte';
 ---
 
 <div class="nav-container">
   <nav>
     <div class="nav-part">
       <slot name="left">
-        <a href={Astro.site ?? '/'} class="row">{navbar.icon && <Icon src={navbar.icon} />}{navbar.homeText ?? site.title}</a>
+        <a href={Astro.site ?? '/'} class="row"
+          >{navbar.icon && <Icon src={navbar.icon} />}{
+            navbar.homeText ?? site.title
+          }</a
+        >
       </slot>
     </div>
     <div class="nav-part">
       <slot name="center" />
     </div>
-    <div class="nav-part">
-      <slot name="right" />
+    <div class="nav-part" style="flex-direction: row-reverse;">
+      <slot name="right">
+        <MenuButton client:only target="#nav-color-scheme-switch"
+          ><Icon src="mdi:sun-moon-stars" /></MenuButton
+        >
+      </slot>
+    </div>
+
+    <div class="dropdown-container">
+      <div class="dropdown-right" id="nav-color-scheme-switch" data-toggle-preset="dropdown">
+        123
+      </div>
     </div>
   </nav>
 </div>
@@ -42,6 +55,7 @@ import {} from 'astro:config/client'
     backdrop-filter: blur(16px);
     box-shadow: 0 8px 32px -6px var(--shadow);
     font-family: var(--font-sans-serif);
+    color: var(--secondary);
 
     R = 20px;
     border-bottom-left-radius: R;
@@ -69,19 +83,24 @@ import {} from 'astro:config/client'
     }
   }
 
+  .nav-part {
+    display: flex;
+    flex-direction: row;
+  }
+
   a {
     text-decoration: none;
-    color: var(--primary);
     font-weight: bold;
     font-family: var(--font-monospace);
+    color inherit;
     svg {
-      font-size: 20px;
+      position: relative;
+      top: -0.1em;
     }
   }
 
   svg {
-    position: relative;
-    top: -0.1em;
+    font-size: 20px;
   }
 
   .row {
@@ -89,5 +108,26 @@ import {} from 'astro:config/client'
     flex-direction: row;
     align-items: center;
     gap: 4px;
+  }
+
+  // Dropdown Container
+
+  .dropdown-container { 
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+  }
+
+  .dropdown-right {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  .color-scheme-switch {
+    display: flex;
+    flex-direction: column;
   }
 </style>
