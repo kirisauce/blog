@@ -2,6 +2,7 @@
 import { site } from "../config";
 import HeadBase from "../components/HeadBase.astro";
 import { Image } from "astro:assets";
+import NavBar from "../components/NavBar.astro";
 
 export interface Props {
   coverImage?: ImageMetadata;
@@ -15,6 +16,7 @@ const { coverImage } = Astro.props;
     <HeadBase />
   </head>
   <body>
+    <NavBar />
     <div class="page">
       {
         coverImage && (
@@ -112,7 +114,7 @@ const { coverImage } = Astro.props;
     width: 100%;
     padding: 1.5rem;
     box-sizing: border-box;
-    background-color: var(--surface);
+    background-color: var(--background);
     border: 1px solid var(--border);
     border-radius: 0.75rem;
     box-shadow: 0 -4px 6px -1px var(--shadow);
