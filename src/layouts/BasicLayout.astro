@@ -45,7 +45,7 @@ const { coverImage } = Astro.props;
 <style lang="stylus">
   body {
     background-color: var(--background);
-    font-family: var(--monospace);
+    font-family: var(--font-sans);
     margin: 0;
     min-height: 100vh;
   }
@@ -120,6 +120,8 @@ const { coverImage } = Astro.props;
     box-shadow: 0 -4px 6px -1px var(--shadow);
     margin-top: -@border-radius;
     z-index: 10;
+
+    padding-top: 72px;
   }
 
   .part-left {

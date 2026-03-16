@@ -1,4 +1,4 @@
-import { m3anim } from '../utils/consts';
+import { m3anim, type Animation as CustomAnimation } from '../utils/consts';
 
 const STATE_KEY = 'data-toggler-state';
 const ANIM_ID_KEY = 'data-toggler-anim-id';
@@ -14,6 +14,25 @@ export interface TogglePreset {
   exit: AnimationParamters;
 }
 
+namespace genpreset {
+  export const dropdown = (opts: CustomAnimation) => ({
+    enter: {
+      keyframes: [
+        { opacity: 0, transform: 'translateY(-10%)' },
+        { opacity: 1, transform: 'translateY(0)' },
+      ],
+      options: { ...opts },
+    },
+    exit: {
+      keyframes: [
+        { opacity: 1, transform: 'translateY(0)' },
+        { opacity: 0, transform: 'translateY(-10%)' },
+      ],
+      options: { ...opts },
+    },
+  });
+}
+
 export const PRESETS: Record<string, TogglePreset> = {
   fade: {
     enter: {
@@ -26,27 +45,51 @@ export const PRESETS: Record<string, TogglePreset> = {
     },
   },
 
-  dropdown: {
-    enter: {
-      keyframes: [
-        { opacity: 0, transform: 'translateY(-40%)' },
-        { opacity: 1, transform: 'translateY(0)' },
-      ],
-      options: { ...m3anim.expressiveSlowSpatial },
-    },
-    exit: {
-      keyframes: [
-        { opacity: 1, transform: 'translateY(0)' },
-        { opacity: 0, transform: 'translateY(-40%)' },
-      ],
-      options: { ...m3anim.expressiveSlowSpatial },
-    },
-  },
+  dropdown: genpreset.dropdown(m3anim.expressiveDefaultEffects),
+  'dropdown-fast': genpreset.dropdown(m3anim.expressiveFastEffects),
 } as const;
 
-const generateId = () => Math.random().toString(36).slice(2, 2 + 8);
+const generateId = () =>
+  Math.random()
+    .toString(36)
+    .slice(2, 2 + 8);
 
-export const toggle = (el: HTMLElement, presetName?: string): Animation => {
+const autoCloseHandlerMap = new WeakMap<
+  HTMLElement,
+  { handler: any; eventName: string }
+>();
+
+export interface ToggleOptions {
+  /**
+   * Preset name for the toggle animation.
+   *
+   * This value will override the configured value existing in the DOM element (data-toggle-preset).
+   */
+  presetName?: string;
+
+  /**
+   * Preset. This value overrides all preset name set in other places.
+   */
+  preset?: TogglePreset;
+
+  /**
+   * If `autoClose` is set to true, `toggle` will attach a one-time click listener
+   * to the document element. And when it triggers, it will hide the element.
+   *
+   * In common cases, you should also add a click event listener to the target element,
+   * which calls `Event.stopPropagation()`. This filters out clicks inside the element,
+   * preventing unintented 'auto closing'.
+   */
+  autoCloseWhen?: 'pointerdown' | 'pointerup' | 'pointerout' | 'click';
+}
+
+export const toggle = (el: HTMLElement, options?: ToggleOptions): Animation => {
+  const {
+    presetName,
+    autoCloseWhen: autoCloseWhen,
+    preset: configuredPreset,
+  } = options ?? {};
+
   let currentState = el.getAttribute(STATE_KEY);
   if (!currentState) {
     currentState =
@@ -62,13 +105,19 @@ export const toggle = (el: HTMLElement, presetName?: string): Animation => {
       anim?.commitStyles();
     } catch (err) {}
     anim?.cancel();
+
+    // Remove previous auto-close listener if it exists
+    if (autoCloseHandlerMap.has(el)) {
+      const { handler, eventName } = autoCloseHandlerMap.get(el)!;
+      document.removeEventListener(eventName, handler);
+      autoCloseHandlerMap.delete(el);
+    }
   }
 
   // Decide which preset will be used
-  if (!presetName) {
-    presetName = el.getAttribute(PRESET_KEY) ?? 'fade';
-  }
-  const preset = PRESETS[presetName];
+  const preset =
+    configuredPreset ??
+    PRESETS[presetName ? presetName : (el.getAttribute(PRESET_KEY) ?? 'fade')];
 
   if (currentState === 'show') {
     // From show to hide (exit)
@@ -102,6 +151,16 @@ export const toggle = (el: HTMLElement, presetName?: string): Animation => {
     });
     el.style.display = '';
     el.setAttribute(ANIM_ID_KEY, anim.id);
+
+    // Set up auto close listener
+    if (autoCloseWhen !== undefined) {
+      const handler = () => {
+        toggle(el, { autoCloseWhen: undefined });
+      };
+      document.addEventListener(autoCloseWhen, handler, { once: true });
+
+      autoCloseHandlerMap.set(el, { handler, eventName: autoCloseWhen });
+    }
 
     anim.play();
     return anim;

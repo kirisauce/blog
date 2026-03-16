@@ -35,8 +35,11 @@ const layoutProps = {
     transition: border-color 0.2s ease;
   }
 
+  :global(.page:has(.cover-image) .article-content-card) {
+    margin-top: calc(-1.5rem - 64px - 48px);
+  }
+
   .article-content-card {
-    margin-top: calc(-1.5rem - 48px);
     padding: 32px;
   }
 </style>

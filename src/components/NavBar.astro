@@ -2,6 +2,14 @@
 import Icon from './Icon.astro';
 import { navbar, site } from '../config';
 import MenuButton from './NavBar/MenuButton.svelte';
+import ColorSchemePanel from './NavBar/ColorSchemePanel.svelte';
+
+const cs_switch = (icon: string, text: string) => `
+  <button class="cs-switch">
+    <Icon src="${icon}" />
+    <span style="z-index:1;">${text}</span>
+  </button>
+`;
 ---
 
 <div class="nav-container">
@@ -27,9 +35,7 @@ import MenuButton from './NavBar/MenuButton.svelte';
     </div>
 
     <div class="dropdown-container">
-      <div class="dropdown-right" id="nav-color-scheme-switch" data-toggle-preset="dropdown">
-        123
-      </div>
+      <ColorSchemePanel class="dropdown right" client:only />
     </div>
   </nav>
 </div>
@@ -110,24 +116,28 @@ import MenuButton from './NavBar/MenuButton.svelte';
     gap: 4px;
   }
 
-  // Dropdown Container
+  // Dropdown Panels
 
   .dropdown-container { 
     display: block;
     position: absolute;
-    top: 100%;
+    top: calc(100% + 16px);
     left: 0;
     width: 100%;
   }
 
-  .dropdown-right {
-    position: absolute;
-    right: 0;
-    top: 0;
-  }
+  .dropdown {
+    background-color: var(--primary-container);
+    padding: 12px;
+    border-radius: 12px;
 
-  .color-scheme-switch {
-    display: flex;
-    flex-direction: column;
+    &.right {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: auto;
+      height: auto;
+      margin-right: 16px;
+    }
   }
 </style>

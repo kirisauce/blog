@@ -1,7 +1,3 @@
-<script module lang="ts">
-  export const sym = Symbol('MenuButton.svelte');
-</script>
-
 <script lang="ts">
   import { toggle } from '../../client/toggler';
 
@@ -16,7 +12,8 @@
   function onclick(event: Event) {
     const el = document.querySelector(target) as HTMLElement;
     if (!el) return;
-    toggle(el);
+    toggle(el, { autoCloseWhen: 'pointerdown' });
+    event.stopPropagation();
   }
 </script>
 

@@ -1,6 +1,7 @@
 import type { ColorSchemePreference } from '../../types/client';
 import { computed } from '../../utils/reactive';
 import { StoredPreference, type StoredPreferenceOptions } from '../preference';
+import { mayStartViewTransition } from '../utils';
 
 export const preference = <T>(
   key: string,
@@ -41,8 +42,12 @@ window.__CAKES__ = {
 ((c: typeof window.__CAKES__) => {
   {
     c.colorScheme.addEventListener('change', () => {
-      document.documentElement.classList.remove(c.colorScheme.oldValue);
-      document.documentElement.classList.add(c.colorScheme.value);
+      const newClass = c.colorScheme.value;
+      const oldClass = c.colorScheme.oldValue;
+      mayStartViewTransition(() => {
+        document.documentElement.classList.remove(oldClass);
+        document.documentElement.classList.add(newClass);
+      });
     });
     document.documentElement.classList.add(c.colorScheme.value);
   }
