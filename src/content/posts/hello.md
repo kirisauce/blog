@@ -15,30 +15,9 @@ This is content2.
 
 This is content3.
 
-```ts
-a
-a
-a
-a
-a
-a
-aa
-a
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
+```rs
+fn main() {
+  println!("Hello World!");
+}
 ```

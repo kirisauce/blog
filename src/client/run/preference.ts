@@ -1,4 +1,4 @@
-import type { ColorSchemePreference } from '../../types/client';
+import type { ColorScheme, ColorSchemePreference } from '../../types/client';
 import { computed } from '../../utils/reactive';
 import { StoredPreference, type StoredPreferenceOptions } from '../preference';
 import { mayStartViewTransition } from '../utils';
@@ -41,14 +41,31 @@ window.__CAKES__ = {
 
 ((c: typeof window.__CAKES__) => {
   {
+    const getEcTheme = (newClass: ColorScheme) =>
+      newClass === 'dark'
+        ? window.__CONFIG__.theme.expressiveCode.themeDark
+        : window.__CONFIG__.theme.expressiveCode.themeLight;
+    const doc = document.documentElement;
+
     c.colorScheme.addEventListener('change', () => {
       const newClass = c.colorScheme.value;
       const oldClass = c.colorScheme.oldValue;
       mayStartViewTransition(() => {
-        document.documentElement.classList.remove(oldClass);
-        document.documentElement.classList.add(newClass);
+        doc.classList.remove(oldClass);
+        doc.classList.add(newClass);
+
+        const dataTheme = getEcTheme(newClass);
+        if (dataTheme) {
+          doc.setAttribute('data-theme', dataTheme);
+        }
       });
     });
-    document.documentElement.classList.add(c.colorScheme.value);
+
+    // First-time initialization
+    doc.classList.add(c.colorScheme.value);
+    const dataTheme = getEcTheme(c.colorScheme.value);
+    if (dataTheme) {
+      doc.setAttribute('data-theme', dataTheme);
+    }
   }
 })(window.__CAKES__);

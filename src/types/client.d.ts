@@ -1,5 +1,6 @@
-import { StoredPreference } from "../client/preference";
-import type { Computed } from "../utils/reactive";
+import { StoredPreference } from '../client/preference';
+import type { Computed } from '../utils/reactive';
+import type { ThemeConfig } from './config';
 
 declare class StoredPreference<T> implements EventTarget {}
 
@@ -14,9 +15,14 @@ export type CakesTable = {
   colorScheme: Computed<ColorScheme>;
 };
 
+export type ConfigTable = {
+  readonly theme: ThemeConfig;
+};
+
 declare global {
   interface Window {
     __PREFERENCES__: PreferenceTable;
     __CAKES__: CakesTable;
+    __CONFIG__: ConfigTable;
   }
 }

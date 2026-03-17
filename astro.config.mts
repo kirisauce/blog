@@ -7,7 +7,6 @@ import svelte from '@astrojs/svelte';
 import icon from 'unplugin-icons/vite';
 
 import expressiveCode from 'astro-expressive-code';
-import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 
 type Variants = NonNullable<
   NonNullable<Parameters<typeof defineConfig>[0]['fonts']>[number]['options']

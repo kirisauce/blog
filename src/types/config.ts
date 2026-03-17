@@ -29,3 +29,20 @@ export type NavBarConfigInput = z.input<typeof zNavBarConfig>;
 
 export const defineNavBarConfig = (config: NavBarConfigInput): NavBarConfig =>
   zNavBarConfig.parse(config);
+
+// ----- Theme Config -----
+
+const zEcConfig = z.object({
+  themeDark: z.string().optional(),
+  themeLight: z.string().optional(),
+});
+
+export const zThemeConfig = z.object({
+  expressiveCode: zEcConfig.default({}),
+});
+
+export type ThemeConfig = z.infer<typeof zThemeConfig>;
+export type ThemeConfigInput = z.input<typeof zThemeConfig>;
+
+export const defineThemeConfig = (config: ThemeConfigInput): ThemeConfig =>
+  zThemeConfig.parse(config);

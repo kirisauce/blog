@@ -1,6 +1,6 @@
 ---
-import { site } from "../config";
-import { Font } from "astro:assets";
+import { site, theme } from '../config';
+import { Font } from 'astro:assets';
 ---
 
 <meta charset="utf-8" />
@@ -17,7 +17,13 @@ import { Font } from "astro:assets";
 <!-- Font  -->
 <Font cssVariable="--font-monospace" preload />
 
-<!-- Dark Mode -->
+<script define:vars={{ theme }}>
+  window.__CONFIG__ = {
+    theme,
+  };
+</script>
 <script src="../client/run/preference.ts"></script>
 
-<title>{site.title}{site.titleTemplate ? ` | ${site.titleTemplate}` : ""}</title>
+<title>
+  {site.title}{site.titleTemplate ? ` | ${site.titleTemplate}` : ''}
+</title>
