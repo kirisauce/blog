@@ -125,13 +125,13 @@ export const toggle = (
       anim?.commitStyles();
     } catch (err) {}
     anim?.cancel();
+  }
 
-    // Remove previous auto-close listener if it exists
-    if (autoCloseHandlerMap.has(el)) {
-      const { eventHandler: handler, eventName } = autoCloseHandlerMap.get(el)!;
-      document.removeEventListener(eventName, handler);
-      autoCloseHandlerMap.delete(el);
-    }
+  // Remove previous auto-close listener if it exists
+  if (autoCloseHandlerMap.has(el)) {
+    const { eventHandler: handler, eventName } = autoCloseHandlerMap.get(el)!;
+    document.removeEventListener(eventName, handler);
+    autoCloseHandlerMap.delete(el);
   }
 
   // Decide which preset will be used
