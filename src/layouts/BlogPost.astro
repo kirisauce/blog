@@ -10,13 +10,18 @@ export type Props = {
   post: CollectionEntry<'blog'>;
 };
 
-const { coverImage, author: postAuthor } = Astro.props.post.data;
+const { coverImage, author: postAuthor, title } = Astro.props.post.data;
 
 const author = postAuthor ?? authorConfig.defaultAuthor;
 
 const layoutProps = {
   coverImage,
-};
+  head: {
+    titleText: title,
+    type: 'article',
+    post: Astro.props.post,
+  },
+} satisfies Parameters<typeof BasicLayout>[0];
 ---
 
 <BasicLayout {...layoutProps}>

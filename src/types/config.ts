@@ -28,6 +28,7 @@ export const siteConfig = () =>
   z.object({
     title: z.string(),
     titleTemplate: z.string().optional(),
+    description: z.string().optional(),
     lang: z.string().default('en'),
 
     defaultCover: z.any().optional(),

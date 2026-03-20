@@ -13,7 +13,7 @@ export interface Props {
 
 const { post } = Astro.props;
 
-const { title, updateDate, pubDate, tags } = post.data;
+const { category, description, title, updateDate, pubDate, tags } = post.data;
 
 const { Content, headings } = await render(post);
 
@@ -41,6 +41,14 @@ const customComponents = {
     )
   }
   {
+    category && (
+      <div class="widget-with-icon">
+        <Icon src="mdi:category-outline" />
+        {category}
+      </div>
+    )
+  }
+  {
     tags && (
       <div class="widget-with-icon">
         <Icon src="mdi:tag-multiple-outline" />
@@ -50,6 +58,8 @@ const customComponents = {
       </div>
     )
   }
+  <br />
+  <div class="description">描述：{description}</div>
   <hr />
   <MarkdownWrapper>
     <Content components={customComponents} />
@@ -86,5 +96,10 @@ const customComponents = {
     border-radius: 4px;
     padding: 2px;
     background-color: var(--primary-container);
+  }
+
+  .description {
+    margin-top: 16px;
+    color: var(--text);
   }
 </style>

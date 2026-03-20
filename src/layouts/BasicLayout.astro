@@ -6,9 +6,10 @@ import NavBar from '../components/NavBar.astro';
 
 export interface Props {
   coverImage?: ImageMetadata;
+  head?: Parameters<typeof HeadBase>[0];
 }
 
-const { coverImage: pageCover } = Astro.props;
+const { coverImage: pageCover, head } = Astro.props;
 
 const getCoverImage = () => {
   if (pageCover === undefined || pageCover === null) {
@@ -22,7 +23,7 @@ const coverImage = getCoverImage();
 
 <html lang={site.lang}>
   <head>
-    <HeadBase />
+    <HeadBase  {...head} />
   </head>
   <body>
     <NavBar />
@@ -30,7 +31,7 @@ const coverImage = getCoverImage();
       {
         coverImage && (
           <div class:list={['cover-image', site.coverImageStyle]}>
-            <Image src={coverImage} alt="" />
+            <Image src={coverImage} alt="Cover" />
           </div>
         )
       }

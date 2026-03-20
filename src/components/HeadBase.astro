@@ -1,10 +1,32 @@
 ---
-import { site, theme } from '../config';
-import { Font } from 'astro:assets';
-
 import '../styles/variables.styl';
 import '../styles/markdown/common.styl';
 import '../styles/global.styl';
+
+import { site, theme } from '../config';
+import { Font } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import type { JsxElement } from 'typescript';
+import { AstroError, AstroErrorData } from 'astro/errors';
+
+export interface Props {
+  titleText?: string;
+
+  cover?: ImageMetadata;
+  coverAlt?: string;
+
+  type?: 'website' | 'article';
+
+  post?: CollectionEntry<'blog'>;
+}
+
+const {
+  cover,
+  coverAlt,
+  titleText = site.title,
+  type = 'website',
+  post,
+} = Astro.props;
 ---
 
 <meta charset="utf-8" />
@@ -24,5 +46,98 @@ import '../styles/global.styl';
 <script src="../client/run/preference.ts"></script>
 
 <title>
-  {site.title}{site.titleTemplate ? ` | ${site.titleTemplate}` : ''}
+  {titleText}{site.titleTemplate ? ` | ${site.titleTemplate}` : ''}
 </title>
+
+<!-- Open Graph Protocol -->
+<meta property="og:title" content={titleText} />
+<meta property="og:site_name" content={site.title} />
+<meta property="og:type" content={type} />
+{
+  // Common Tags
+  (() => {
+    const elements: JsxElement[] = [];
+
+    let description: string | undefined;
+    if (type === 'article') {
+      description = post?.data.description;
+    }
+    description = description ?? site.description;
+    if (description)
+      elements.push(<meta property="og:description" content={description} />);
+
+    if (site.lang)
+      elements.push(<meta property="og:locale" content={site.lang} />);
+
+    return elements;
+  })()
+}
+{
+  // Article Tags
+  (() => {
+    if (type !== 'article') {
+      return;
+    } else if (!post) {
+      throw new AstroError(
+        'HeadBase type is article, but no post was provided.',
+      );
+    }
+    const elements: JsxElement[] = [];
+
+    const { author = [], category, pubDate, tags, updateDate } = post.data;
+
+    pubDate &&
+      elements.push(
+        <meta
+          property="article:published_time"
+          content={pubDate.toISOString()}
+        />,
+      );
+
+    updateDate &&
+      elements.push(
+        <meta
+          property="article:modified_time"
+          content={updateDate.toISOString()}
+        />,
+      );
+
+    category &&
+      elements.push(<meta property="article:section" content={category} />);
+
+    tags.forEach((tag) =>
+      elements.push(<meta property="article:tag" content={tag} />),
+    );
+
+    if (typeof author === 'string') {
+      elements.push(<meta property="article:author" content={author} />);
+    } else if (Array.isArray(author)) {
+      author.forEach((author) =>
+        elements.push(<meta property="article:author" content={author} />),
+      );
+    }
+
+    return elements;
+  })()
+}
+{
+  // Image Tags
+  (() => {
+    if (!cover) {
+      return;
+    }
+    const elements: JsxElement[] = [];
+
+    elements.push(
+      <meta property="og:image" content={cover.src} />,
+      <meta property="og:image:url" content={cover.src} />,
+      <meta property="og:image:secure_url" content={cover.src} />,
+    );
+
+    const alt = coverAlt ?? post?.data.coverImageAlt;
+    if (coverAlt)
+      elements.push(<meta property="og:image:alt" content={coverAlt} />);
+
+    return elements;
+  })()
+}
