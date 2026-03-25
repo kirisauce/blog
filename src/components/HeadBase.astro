@@ -7,7 +7,8 @@ import { site, theme } from '../config';
 import { Font } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import type { JsxElement } from 'typescript';
-import { AstroError, AstroErrorData } from 'astro/errors';
+import { AstroError } from 'astro/errors';
+import { ClientRouter } from 'astro:transitions';
 
 export interface Props {
   titleText?: string;
@@ -34,6 +35,8 @@ const {
 <link rel="icon" href="/favicon.ico" />
 <meta name="viewport" content="width=device-width" />
 <meta name="generator" content={Astro.generator} />
+
+<ClientRouter />
 
 <!-- Font  -->
 <Font cssVariable="--font-monospace" preload />

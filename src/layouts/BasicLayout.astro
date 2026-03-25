@@ -25,16 +25,16 @@ const coverImage = (() => {
     <HeadBase {...head} />
   </head>
   <body>
-    <NavBar />
+    <NavBar transition:name="navbar" />
     <div class="page">
       {
         coverImage && (
-          <div class:list={['cover-image', site.coverImageStyle]}>
+          <div transition:name="cover-image" class:list={['cover-image', site.coverImageStyle]}>
             <Image src={coverImage} alt="Cover" />
           </div>
         )
       }
-      <div class:list={['page-content', 'aside-' + layout.basic.aside]}>
+      <div transition:name="page-content" class:list={['page-content', 'aside-' + layout.basic.aside]}>
         <aside class="aside">
           <slot name="aside" />
         </aside>

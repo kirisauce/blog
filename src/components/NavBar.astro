@@ -5,19 +5,14 @@ import MenuButton from './NavBar/MenuButton.svelte';
 import ColorSchemePanel from './NavBar/ColorSchemePanel.svelte';
 import ThemeColorPanel from './NavBar/ThemeColorPanel.svelte';
 
-const cs_switch = (icon: string, text: string) => `
-  <button class="cs-switch">
-    <Icon src="${icon}" />
-    <span style="z-index:1;">${text}</span>
-  </button>
-`;
+const props = Astro.props;
 ---
 
 <div class="nav-container">
-  <nav>
+  <nav {...props}>
     <div class="nav-part">
       <slot name="left">
-        <a href={Astro.site ?? '/'} class="row"
+        <a href={import.meta.env.BASE_URL ?? '/'} class="row"
           >{navbar.icon && <Icon src={navbar.icon} />}{
             navbar.homeText ?? site.title
           }</a

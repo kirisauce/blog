@@ -94,11 +94,15 @@ window.__CAKES__ = {
       });
     });
 
-    // First-time initialization
-    doc.classList.add(c.colorScheme.value);
-    const dataTheme = getEcTheme(c.colorScheme.value);
-    if (dataTheme) {
-      doc.setAttribute('data-theme', dataTheme);
-    }
+    const initDocumentClass = () => {
+      // First-time initialization
+      doc.classList.add(c.colorScheme.value);
+      const dataTheme = getEcTheme(c.colorScheme.value);
+      if (dataTheme) {
+        doc.setAttribute('data-theme', dataTheme);
+      }
+    };
+    initDocumentClass();
+    document.addEventListener('astro:page-load', initDocumentClass);
   }
 })(window.__CAKES__);

@@ -1,16 +1,41 @@
 ---
 import BasicLayout from './BasicLayout.astro';
+import { getCollection } from 'astro:content';
 
 import { author, site } from '../config';
+import { getPostUpdateDateSync, blogurl } from '../utils/other';
 import AuthorCard from '../components/Cards/AuthorCard.astro';
+
+const displayPosts = (await getCollection('blog'))
+  .map((post) => ({
+    updated: getPostUpdateDateSync(post.data, post.filePath),
+    post,
+  }))
+  .sort((a, b) => {
+    if (!a.updated || !b.updated) {
+      return 0;
+    }
+    return b.updated.getTime() - a.updated.getTime();
+  });
 ---
 
 <BasicLayout coverImage={site.defaultCover}>
   <Fragment slot="major">
-    <main class="card"></main>
+    <main transition:name="post-content-card" class="card">
+      {
+        displayPosts.map(({ updated, post }) => {
+          return (
+            <a href={blogurl.with(post.id)}>
+              {updated?.getTime()}&nbsp;{post.id}
+            </a>
+            <br />
+          );
+        })
+      }
+    </main>
   </Fragment>
 
   <Fragment slot="aside">
-    {author.defaultAuthor && <AuthorCard authorId={author.defaultAuthor} />}
+    {author.defaultAuthor && <AuthorCard transition:name="author-card" authorId={author.defaultAuthor} />}
   </Fragment>
 </BasicLayout>

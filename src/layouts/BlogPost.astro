@@ -26,13 +26,13 @@ const layoutProps = {
 
 <BasicLayout {...layoutProps}>
   <Fragment slot="major">
-    <main class="card article-content-card">
+    <main transition:name="post-content-card" class="card article-content-card">
       <PostContent post={Astro.props.post} />
     </main>
   </Fragment>
 
   <Fragment slot="aside">
-    {author && <AuthorCard authorId={author} />}
+    {author && <AuthorCard transition:name="author-card" authorId={author} />}
   </Fragment>
 </BasicLayout>
 
