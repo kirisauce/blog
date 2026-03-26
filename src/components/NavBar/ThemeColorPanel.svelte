@@ -1,13 +1,22 @@
 <script lang="ts">
+  import { onDestroy, onMount } from 'svelte';
   import { getAutoClose } from '../../client/toggler';
 
   const props = $props();
   const prefs = window.__PREFERENCES__;
 
   let displayNumHue = $state(prefs.themeHue.value);
-  prefs.themeHue.addEventListener('change', () => {
+
+  // Preference Synchronization
+  const preferenceChangedListener = () => {
     displayNumHue = prefs.themeHue.value;
     if (elInput) elInput.value = prefs.themeHue.value.toString();
+  };
+  onMount(() => {
+    prefs.themeHue.addEventListener('change', preferenceChangedListener);
+  });
+  onDestroy(() => {
+    prefs.themeHue.removeEventListener('change', preferenceChangedListener);
   });
 
   let elSelf: HTMLDivElement;

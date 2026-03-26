@@ -4,12 +4,24 @@
   import IconAuto from '~icons/mdi/gear-outline?raw';
   import { type ColorSchemePreference } from '../../types/client';
   import { getAutoClose } from '../../client/toggler';
+  import { onDestroy, onMount } from 'svelte';
 
   const props = $props();
   const pref = window.__PREFERENCES__;
   let elSelf: HTMLDivElement;
 
   let currentScheme: ColorSchemePreference = $state(pref.colorScheme.value);
+
+  // Preference Synchronization
+  const preferenceChangedListener = () => {
+    currentScheme = pref.colorScheme.value;
+  };
+  onMount(() => {
+    pref.colorScheme.addEventListener('change', preferenceChangedListener);
+  });
+  onDestroy(() => {
+    pref.colorScheme.removeEventListener('change', preferenceChangedListener);
+  });
 
   const switchColorScheme = (scheme: ColorSchemePreference) => {
     if (pref.colorScheme.value !== scheme) {

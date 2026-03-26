@@ -1,3 +1,7 @@
+const destructor = new FinalizationRegistry((listener: any) => {
+  window.removeEventListener('storage', listener);
+});
+
 type StoredPreferenceOptionsBase<T> = {
   default: () => T;
   serialize: (value: T) => string;
@@ -16,6 +20,7 @@ export class StoredPreference<T> implements EventTarget {
   #serialize: (value: T) => string;
   #deserialize: (stored: string) => T | undefined;
   #ev: EventTarget;
+  storageEventListener: any;
 
   constructor(key: string, options: StoredPreferenceOptions<T>) {
     const {
@@ -38,6 +43,26 @@ export class StoredPreference<T> implements EventTarget {
     this.#serialize = serialize;
     this.#deserialize = deserialize;
     this.#ev = new EventTarget();
+
+    // Listening for preference changes from other tabs
+    const storageEventListener = (e: StorageEvent) => {
+      if (e.key === this.#key) {
+        if (!e.newValue) {
+          return;
+        }
+        const tmp = deserialize(e.newValue);
+        if (tmp == undefined) {
+          return;
+        }
+        if (tmp === this.#currentValue) {
+          return;
+        }
+        this.#currentValue = tmp;
+        this.emitChanged();
+      }
+    };
+    window.addEventListener('storage', storageEventListener);
+    destructor.register(this, storageEventListener)
   }
 
   get value() {
@@ -48,8 +73,12 @@ export class StoredPreference<T> implements EventTarget {
     if (this.#currentValue !== newValue) {
       this.#currentValue = newValue;
       localStorage.setItem(this.#key, this.#serialize(newValue));
-      this.dispatchEvent(new Event('change'));
+      this.emitChanged();
     }
+  }
+
+  emitChanged() {
+    this.dispatchEvent(new Event('change'));
   }
 
   addEventListener(
