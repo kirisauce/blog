@@ -1,0 +1,114 @@
+---
+import BasicLayout from '../../layouts/BasicLayout.astro';
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import { author, site } from '../../config';
+import {
+  getPostUpdateDateSync,
+  getPostPubDateSync,
+  getPostDescription,
+} from '../../utils/other';
+import AuthorCard from '../../components/Cards/AuthorCard.astro';
+import PostLinkCard from '../../components/Cards/PostLinkCard.astro';
+import TagsCard from '../../components/Cards/TagsCard.astro';
+import { tagMap } from '../../utils/page-indices';
+
+export interface Props {
+  tag: string;
+  posts: CollectionEntry<'blog'>[];
+}
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  
+  return tagMap.keys().map((tag) => ({
+    params: { tagname: tag },
+    props: { tag, posts },
+  }));
+}
+
+const { tagname } = Astro.params;
+const { tag, posts } = Astro.props;
+
+type FilteredPost = {
+  updateDate?: Date;
+  pubDate?: Date;
+  description?: string;
+  post: CollectionEntry<'blog'>;
+};
+
+const filteredPosts = posts
+  .filter((post) => post.data.tags && post.data.tags.includes(tagname))
+  .map((post) => ({
+    updateDate: getPostUpdateDateSync(post.data, post.filePath),
+    pubDate: getPostPubDateSync(post.data, post.filePath),
+    description: getPostDescription(post.data, post.body),
+    post,
+  }))
+  .sort((a, b) => {
+    if (!a.updateDate || !b.updateDate) {
+      return 0;
+    }
+    return b.updateDate.getTime() - a.updateDate.getTime();
+  });
+---
+
+<BasicLayout coverImage={site.defaultCover}>
+  <Fragment slot="major">
+    <main transition:name="post-content-card" class="link-cards">
+      <h1>标签：{tagname}</h1>
+      <p>共找到 {filteredPosts.length} 篇相关文章</p>
+
+      {
+        filteredPosts.length > 0 ? (
+          filteredPosts.map((args: FilteredPost) => {
+            return <PostLinkCard {...args} />;
+          })
+        ) : (
+          <p>什么都没有~</p>
+        )
+      }
+    </main>
+  </Fragment>
+
+  <Fragment slot="aside">
+    {
+      author.defaultAuthor && (
+        <AuthorCard
+          transition:name="author-card"
+          authorId={author.defaultAuthor}
+        />
+      )
+    }
+    <TagsCard
+      tags={tagMap
+        .entries()
+        .map(([tag, posts]) => ({
+          name: tag,
+          count: posts.length,
+        }))
+        .toArray()}
+      transition:name="tags-card"
+    />
+  </Fragment>
+</BasicLayout>
+
+<style lang="stylus">
+  .link-cards {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 0.5em;
+      color: var(--accent);
+    }
+
+    p {
+      margin-bottom: 1.5em;
+      color: var(--text-light);
+    }
+  }
+</style>

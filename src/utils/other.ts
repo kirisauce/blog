@@ -1,7 +1,6 @@
 import type { InferEntrySchema } from 'astro:content';
 import fs from 'fs/promises';
 import fsSync from 'fs';
-import path from 'path/posix';
 
 const DESCRIPTION_MAX_LINES = 5;
 
@@ -77,21 +76,3 @@ export const getPostDescription = (
     return undefined;
   }
 };
-
-class UrlPrefixer {
-  #base: string;
-
-  constructor(base: string, subbase?: string) {
-    if (subbase) {
-      this.#base = path.resolve(base, subbase);
-    } else {
-      this.#base = base;
-    }
-  }
-
-  with(target: string): string {
-    return path.resolve(this.#base, target);
-  }
-}
-
-export const blogurl = new UrlPrefixer(import.meta.env.BASE_URL, 'blog');

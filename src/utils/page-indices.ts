@@ -1,0 +1,19 @@
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+export const tagMap = await (async () => {
+  const tagMap = new Map<string, CollectionEntry<'blog'>[]>();
+
+  const posts = await getCollection('blog');
+
+  posts.forEach((post) =>
+    post.data.tags.forEach((tag) => {
+      if (tagMap.has(tag)) {
+        tagMap.get(tag)!.push(post);
+      } else {
+        tagMap.set(tag, [post]);
+      }
+    }),
+  );
+
+  return tagMap;
+})();

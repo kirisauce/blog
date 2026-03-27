@@ -1,0 +1,83 @@
+---
+import { tagurl } from '../../utils/url';
+import Label from '../Label.astro';
+
+export interface DisplayTag {
+  name: string;
+  count: number;
+}
+
+export interface Props {
+  tags: DisplayTag[];
+}
+
+const { tags, ...other } = Astro.props;
+---
+
+<div class="card tags-card" {...other}>
+  <Label style="font-size: 1.6rem; align-self: flex-start; margin-left: -16px;"
+    >标签</Label
+  >
+  <div class="tags-list">
+    {
+      tags.map((tag) => (
+        <a href={tagurl.with(tag.name)} class="tag-item">
+          <span class="tag-name">{tag.name}</span>
+          <span class="tag-count">{tag.count}</span>
+        </a>
+      ))
+    }
+  </div>
+</div>
+
+<style lang="stylus">
+  .tags-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .tags-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .tag-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text);
+    background-color: transparent;
+    transition:
+      transform var(--expressive-default-spatial),
+      background-color var(--expressive-slow-effects);
+
+    &:hover {
+      background-color: var(--primary-container);
+      transform: translateX(4px);
+    }
+  }
+
+  .tag-name {
+    font-size: 1.3rem;
+    font-weight: 500;
+    font-family: var(--font-sans);
+  }
+
+  .tag-count {
+    font-size: 1.1rem;
+    color: var(--secondary);
+    background-color: var(--surface-container);
+    padding: 2px 8px;
+    border-radius: 12px;
+    min-width: 24px;
+    text-align: center;
+  }
+</style>
