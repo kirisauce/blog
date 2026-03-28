@@ -1,4 +1,5 @@
 ---
+import { tagMap } from '../../utils/page-indices';
 import { tagurl } from '../../utils/url';
 import Label from '../Label.astro';
 
@@ -8,10 +9,19 @@ export interface DisplayTag {
 }
 
 export interface Props {
-  tags: DisplayTag[];
+  tags?: DisplayTag[];
 }
 
-const { tags, ...other } = Astro.props;
+const { tags: propTags, ...other } = Astro.props;
+const tags =
+  propTags ??
+  tagMap
+    .entries()
+    .map(([tag, posts]) => ({
+      name: tag,
+      count: posts.length,
+    }))
+    .toArray();
 ---
 
 <div class="card tags-card" {...other}>

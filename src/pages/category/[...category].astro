@@ -84,7 +84,12 @@ const filteredPosts = node
   });
 ---
 
-<BasicLayout coverImage={site.defaultCover}>
+<BasicLayout
+  coverImage={site.defaultCover}
+  head={{
+    titleText: `分类: ${path.join('>')}`,
+  }}
+>
   <Fragment slot="major">
     <main transition:name="post-content-card" class="link-cards">
       <!-- 面包屑导航 -->

@@ -20,7 +20,7 @@ export interface Props {
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
-  
+
   return Array.from(tagMap.keys()).map((tag) => ({
     params: { tagname: tag },
     props: { tag, posts },
@@ -80,16 +80,7 @@ const filteredPosts = posts
         />
       )
     }
-    <TagsCard
-      tags={tagMap
-        .entries()
-        .map(([tag, posts]) => ({
-          name: tag,
-          count: posts.length,
-        }))
-        .toArray()}
-      transition:name="tags-card"
-    />
+    <TagsCard transition:name="tags-card" />
   </Fragment>
 </BasicLayout>
 
