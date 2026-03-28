@@ -1,0 +1,83 @@
+---
+import { categoryurl } from '../../utils/url';
+import Label from '../Label.astro';
+
+export interface DisplayCategory {
+  name: string;
+  count: number;
+}
+
+export interface Props {
+  categories: DisplayCategory[];
+}
+
+const { categories, ...other } = Astro.props;
+---
+
+<div class="card categories-card" {...other}>
+  <Label style="font-size: 1.6rem; align-self: flex-start; margin-left: -16px;"
+    >分类</Label
+  >
+  <div class="categories-list">
+    {
+      categories.map((category) => (
+        <a href={categoryurl.with(category.name)} class="category-item">
+          <span class="category-name">{category.name}</span>
+          <span class="category-count">{category.count}</span>
+        </a>
+      ))
+    }
+  </div>
+</div>
+
+<style lang="stylus">
+  .categories-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .category-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text);
+    background-color: transparent;
+    transition:
+      transform var(--expressive-default-spatial),
+      background-color var(--expressive-slow-effects);
+
+    &:hover {
+      background-color: var(--primary-container);
+      transform: translateX(4px);
+    }
+  }
+
+  .category-name {
+    font-size: 1.3rem;
+    font-weight: 500;
+    font-family: var(--font-sans);
+  }
+
+  .category-count {
+    font-size: 1.1rem;
+    color: var(--secondary);
+    background-color: var(--surface-container);
+    padding: 2px 8px;
+    border-radius: 12px;
+    min-width: 24px;
+    text-align: center;
+  }
+</style>

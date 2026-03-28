@@ -18,3 +18,4 @@ class UrlPrefixer {
 
 export const blogurl = new UrlPrefixer(import.meta.env.BASE_URL, 'blog');
 export const tagurl = new UrlPrefixer(import.meta.env.BASE_URL, 'tag')
+export const categoryurl = new UrlPrefixer(import.meta.env.BASE_URL, 'category')

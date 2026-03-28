@@ -17,3 +17,21 @@ export const tagMap = await (async () => {
 
   return tagMap;
 })();
+
+export const categoryMap = await (async () => {
+  const categoryMap = new Map<string, CollectionEntry<'blog'>[]>();
+
+  const posts = await getCollection('blog');
+
+  posts.forEach((post) => {
+    if (post.data.category) {
+      if (categoryMap.has(post.data.category)) {
+        categoryMap.get(post.data.category)!.push(post);
+      } else {
+        categoryMap.set(post.data.category, [post]);
+      }
+    }
+  });
+
+  return categoryMap;
+})();
