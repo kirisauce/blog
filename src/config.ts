@@ -3,8 +3,6 @@ import * as cfg from './types/config';
 export const site = cfg.defineSiteConfig({
   title: "kirisauce's blog",
   titleTemplate: "kirisauce's blog",
-
-  defaultCover: import('./content/miku.png'),
 });
 
 export const navbar = cfg.defineNavBarConfig({
