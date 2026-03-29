@@ -5,7 +5,10 @@ import Heimu from './Heimu.astro';
 
 import type { CollectionEntry } from 'astro:content';
 import { render } from 'astro:content';
-import { formatInstant } from '../utils/format';
+import { processPostSync } from '../utils/other';
+import TimeMeta from './MetaWidgets/TimeMeta.astro';
+import TagsMeta from './MetaWidgets/TagsMeta.astro';
+import Meta from './MetaWidgets/Meta.astro';
 
 export interface Props {
   post: CollectionEntry<'blog'>;
@@ -13,7 +16,9 @@ export interface Props {
 
 const { post } = Astro.props;
 
-const { category, description, title, updateDate, pubDate, tags } = post.data;
+const { category, description, title, tags } = post.data;
+
+const { updateDate, pubDate } = processPostSync(post);
 
 const { Content, headings } = await render(post);
 
@@ -24,40 +29,12 @@ const customComponents = {
 
 <div class="post-content">
   <h1 data-transite-from-title class="article-title">{title}</h1>
-  {
-    pubDate && (
-      <time datetime={pubDate.toUTCString()} class="widget-with-icon">
-        <Icon src="mdi:calendar" class="padded-icon-svg" />
-        {formatInstant(pubDate)}
-      </time>
-    )
-  }
-  {
-    updateDate && (
-      <time datetime={updateDate.toUTCString()} class="widget-with-icon">
-        <Icon src="mdi:calendar-edit-outline" class="padded-icon-svg" />
-        {formatInstant(updateDate)}
-      </time>
-    )
-  }
-  {
-    category && (
-      <div class="widget-with-icon">
-        <Icon src="mdi:category-outline" class="padded-icon-svg" />
-        {category}
-      </div>
-    )
-  }
-  {
-    tags && (
-      <div class="widget-with-icon">
-        <Icon src="mdi:tag-multiple-outline" class="padded-icon-svg" />
-        {tags.map((tag) => {
-          return <div class="tag">{tag}</div>;
-        })}
-      </div>
-    )
-  }
+  <div class="metas">
+    <TimeMeta icon="mdi:calendar-outline" time={pubDate} />
+    <TimeMeta icon="mdi:calendar-edit-outline" time={updateDate} />
+    <Meta icon="mdi:category-outline" content={category} />
+    <TagsMeta tags={tags} />
+  </div>
   <br />
   <div class="description">描述：{description}</div>
   <hr />
@@ -71,18 +48,13 @@ const customComponents = {
     margin: 0.5rem 0;
   }
 
-  .widget-with-icon {
-    font-family: var(--font-monospace);
-    display: inline flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--text);
-    margin-inline-end: 16px;
-  }
-
   hr {
     margin: 24px -8px
     border-style: dashed;
+  }
+
+  .metas {
+    color: var(--text);
   }
 
   .tag {

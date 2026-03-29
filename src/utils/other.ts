@@ -1,4 +1,4 @@
-import type { InferEntrySchema } from 'astro:content';
+import type { CollectionEntry, InferEntrySchema } from 'astro:content';
 import fs from 'fs/promises';
 import fsSync from 'fs';
 import type { HTMLAttributes } from 'astro/types';
@@ -77,6 +77,22 @@ export const getPostDescription = (
     return undefined;
   }
 };
+
+export interface ProcessedPost {
+  updateDate?: Date;
+  pubDate?: Date;
+  description: string | undefined;
+  data: InferEntrySchema<'blog'>;
+}
+
+export const processPostSync = (post: CollectionEntry<'blog'>): ProcessedPost => {
+  return {
+    updateDate: getPostUpdateDateSync(post.data, post.filePath),
+    pubDate: getPostPubDateSync(post.data, post.filePath),
+    description: getPostDescription(post.data),
+    data: post.data,
+  }
+}
 
 export const flattenClassList = (
   classList: HTMLAttributes<'div'>['class:list'] | null,

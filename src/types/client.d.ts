@@ -1,3 +1,4 @@
+import type { navigate } from 'astro:transitions/client';
 import { StoredPreference } from '../client/preference';
 import type { Computed } from '../utils/reactive';
 import type { ThemeConfig } from './config';
@@ -14,6 +15,8 @@ export type PreferenceTable = {
 
 export type CakesTable = {
   colorScheme: Computed<ColorScheme>;
+
+  navigate: typeof navigate;
 };
 
 export type ConfigTable = {

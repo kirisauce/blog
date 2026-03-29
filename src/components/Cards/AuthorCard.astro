@@ -51,6 +51,10 @@ const { avatar, name, bio, socialLinks } = authorConfig.authors[authorId] ?? {};
     margin-block: 16px;
     aspect-ratio: 1;
     object-fit: cover;
+
+    @media (max-width: 1024px) {
+      width: 70%;
+    }
   }
 
   .name {

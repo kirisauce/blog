@@ -33,7 +33,14 @@ const displayPosts = (await getCollection('blog'))
 
 <BasicLayout coverImage={site.defaultCover}>
   <Fragment slot="major">
-    <main transition:animate={dropdown()} transition:name="home-links" class="link-cards">
+    {site.title && <div class="front-text site-title">{site.title}</div>}
+    {site.description && <div class="front-text site-description">{site.description}</div>}
+
+    <main
+      transition:animate={dropdown()}
+      transition:name="home-links"
+      class="link-cards"
+    >
       {
         displayPosts.map((args) => {
           return <PostLinkCard {...args} />;
@@ -63,5 +70,14 @@ const displayPosts = (await getCollection('blog'))
     flex-direction: column;
     align-items: stretch;
     gap: 1rem;
+    padding: 0 8px;
+  }
+
+  .front-text {
+    font-family: var(--font-monospace);
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    margin: 8px 0 16px 0;
   }
 </style>

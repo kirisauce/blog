@@ -71,6 +71,7 @@ const PAGE_ATTR = 'data-basic-layout-page';
     preservedScroll = el.scrollTop;
     const elCover = el.querySelector('.cover-image');
     if (!elCover) {
+      isOverScroll = true;
       return;
     }
     isOverScroll = preservedScroll > elCover.clientHeight;
@@ -111,6 +112,7 @@ const PAGE_ATTR = 'data-basic-layout-page';
     flex-direction: column;
     overflow-x: hidden;
     overflow-y: auto;
+    background-color: var(--background);
 
     parallax() {
       transform-style: preserve-3d;
@@ -163,31 +165,46 @@ const PAGE_ATTR = 'data-basic-layout-page';
     display: flex;
     flex-direction: row;
     width: 100%;
-    padding: 72px 15%;
+    padding: 72px 0;
+    justify-content: center;
     box-sizing: border-box;
-    background-color: var(--background);
     z-index: 10;
 
-    &.aside-right {
+    &:where(.aside-right) {
       flex-direction: row-reverse;
+    }
+
+    @media (max-width: 1024px) {
+      flex-direction: column-reverse;
+      align-items: center;
+      gap: 32px;
     }
   }
 
   .aside {
-    flex: 1 1 10%;
+    flex: 0 1 280px;
+
+    @media (max-width: 1024px) {
+      max-width: 400px;
+    }
   }
 
   .major {
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    box-sizing: border-box;
 
-    flex: 3 1 50%;
+    flex: 0 1 1000px;
     width: 0;
     padding: 0 1rem;
+
+    @media (max-width: 1024px) {
+      width: 96%;
+    }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     .page-content {
       padding-left: 0;
       padding-right: 0;
@@ -195,10 +212,6 @@ const PAGE_ATTR = 'data-basic-layout-page';
 
     .major {
       padding: 0;
-    }
-
-    .aside {
-      display: none;
     }
   }
 </style>

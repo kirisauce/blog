@@ -179,8 +179,14 @@ const uniqueId = generateId();
     font-family: var(--font-sans);
     gap: 16px;
 
-    &.cover-at-left {
+    &:where(.cover-at-left) {
       flex-direction: row-reverse;
+    }
+
+    @media (max-width: 1024px) {
+      flex-direction: column;
+      height: auto;
+      align-items: stretch;
     }
   }
 
@@ -191,21 +197,31 @@ const uniqueId = generateId();
     align-items: flex-start;
     gap: 8px;
     width: 0;
+
+    @media (max-width: 1024px) {
+      width: 100%;
+    }
   }
 
   .cover {
     position: relative;
     flex-shrink: 0;
     width: auto;
-    max-width: 40%;
+    max-width: 30%;
     display: flex;
     flex-direction: row;
     align-items: stretch;
 
+    @media (max-width: 1024px) {
+      width: 100%;
+      max-height: 50%;
+      max-width: unset;
+    }
+
     >img {
       height: 100%;
       width: 100%;
-      flex: 1 0 auto
+      flex: 1 0 auto;
       object-fit: cover;
       border-radius: 16px;
       border: 1px solid var(--border);
@@ -218,5 +234,9 @@ const uniqueId = generateId();
     width: 100%;
     white-space: pre-line;
     overflow: clip;
+
+    @media (max-width: 1024px) { 
+      height: auto;
+    }
   }
 </style>
