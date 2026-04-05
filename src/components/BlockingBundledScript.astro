@@ -1,0 +1,51 @@
+---
+export interface Props {
+  src: string;
+  blocking?: 'render' | 'async';
+}
+
+const { src, blocking = 'render' } = Astro.props;
+
+const processedUrl = (() => {
+  let relativeUrl: string;
+  if (src.startsWith('/')) {
+    relativeUrl = `..${src}`;
+  } else {
+    throw new Error(
+      `BlockingBundledScript.src only accepts a absolute path whose root path resolves to './src',
+but got '${src}'.`,
+    );
+  }
+
+  if (relativeUrl.includes('?')) {
+    if (relativeUrl.endsWith('&')) {
+      return relativeUrl + 'url';
+    } else {
+      return relativeUrl + '&url';
+    }
+  } else {
+    return relativeUrl + '?url';
+  }
+})();
+
+console.log(processedUrl);
+
+const bundledUrl = (await import(processedUrl)).default;
+
+const blockingProps = (() => {
+  const result: Record<string, string | boolean> = {};
+
+  switch (blocking) {
+    case 'render':
+      result.blocking = 'render';
+      break;
+    case 'async':
+      result.async = true;
+      break;
+  }
+
+  return result;
+})();
+---
+
+<script type="module" src={bundledUrl} {...blockingProps}></script>
