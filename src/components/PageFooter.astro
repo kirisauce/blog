@@ -1,0 +1,108 @@
+---
+import { getDefaultAuthor } from '../utils/configtool';
+import { formatDuration } from '../utils/format';
+import { layout, site, theme } from '../config';
+
+const copyrightAuthor = site.copyrightAuthor ?? getDefaultAuthor()?.name;
+const copyrightYear =
+  site.copyrightBeginYear &&
+  site.copyrightBeginYear !== new Date().getFullYear()
+    ? `${site.copyrightBeginYear}-${new Date().getFullYear()}`
+    : new Date().getFullYear().toString();
+
+const { birthDate } = site;
+
+const {
+  showCopyright,
+  showThemeName,
+  showElapsedSinceBirth,
+  realtimeElapsedSinceBirth,
+} = layout.pageFooter;
+---
+
+<div class="page-footer">
+  {
+    showCopyright && copyrightAuthor && (
+      <div>
+        Copyright &copy; {copyrightAuthor}
+        {copyrightYear}
+      </div>
+    )
+  }
+  {
+    showElapsedSinceBirth && birthDate && (
+      <div>
+        距离本站创建已经过去了
+        <span
+          id="elapsed-since-birth"
+          data-birth={birthDate}
+          data-is-realtime={realtimeElapsedSinceBirth ? 'yes' : 'no'}
+        />
+      </div>
+    )
+  }
+  {
+    showThemeName && (
+      <div>
+        {'Powered by '}
+        <a href="https://astro.build/">Astro</a>
+        {' & '}
+        <a href={theme.themeUrl}>{theme.themeName}</a>
+      </div>
+    )
+  }
+</div>
+
+<script>
+  import { formatDuration } from '../utils/format';
+
+  document.addEventListener('astro:page-load', () => {
+    const el = document.getElementById('elapsed-since-birth');
+    if (!el) {
+      return;
+    }
+
+    const birthDate = el.dataset.birth!;
+
+    const updateText = () => {
+      el.textContent = formatDuration(
+        (Date.now() - new Date(birthDate).getTime()) / 1000,
+      );
+    };
+    updateText();
+
+    if (el.dataset.isRealtime === 'yes') {
+      const taskid = setInterval(updateText, 1000);
+      document.addEventListener(
+        'astro:before-preparation',
+        () => clearInterval(taskid),
+        { once: true },
+      );
+    }
+  });
+</script>
+
+<style lang="stylus">
+  .page-footer {
+    flex: 0 0 256px;
+    background: var(--surface-container);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--on-surface-container);
+    font-family: var(--font-monospace);
+    cursor: default;
+    gap: 6px;
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+</style>

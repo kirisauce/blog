@@ -46,6 +46,16 @@ export const siteConfig = () =>
         ...builtinSites,
         ...userSites,
       })),
+
+    copyrightBeginYear: z.number().optional(),
+    copyrightAuthor: z
+      .string()
+      .optional()
+      .describe(
+        `The author name to be displayed in the copyright notice.\nIf not specified, \`author.defaultAuthor\` will be used instead.`,
+      ),
+
+    birthDate: z.date().optional(),
   });
 
 export type SiteConfigInput = In<typeof siteConfig>;
@@ -73,6 +83,9 @@ export const themeConfig = () =>
   z.object({
     expressiveCode: types.expressiveCodeConfig().default({}),
     defaultHue: z.number().min(0).max(359).default(0),
+
+    themeName: z.string().default('Cakes🍰'),
+    themeUrl: z.string().default('https://github.com/kirisauce/astro-cakes'),
   });
 
 export type ThemeConfigInput = In<typeof themeConfig>;
@@ -102,6 +115,13 @@ export const layoutConfig = () => {
     aside: z.enum(['left', 'right']).default('left'),
   });
 
+  const zPageFooter = z.object({
+    showCopyright: z.boolean().default(true),
+    showThemeName: z.boolean().default(true),
+    showElapsedSinceBirth: z.boolean().default(true),
+    realtimeElapsedSinceBirth: z.boolean().default(true),
+  });
+
   const zHome = z.object({
     latestPostsLimit: z.number().default(20),
   });
@@ -118,6 +138,7 @@ export const layoutConfig = () => {
 
   return z.object({
     basic: optionalObject(zBasic),
+    pageFooter: optionalObject(zPageFooter),
     home: optionalObject(zHome),
     component: optionalObject(zComponent),
   });
