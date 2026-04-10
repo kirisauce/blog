@@ -5,6 +5,7 @@ export const site = cfg.defineSiteConfig({
   titleTemplate: "kirisauce's blog",
 
   coverImageStyle: 'half-parallax',
+  birthDate: new Date('2026-03-12T21:56:47+08:00'),
 });
 
 export const navbar = cfg.defineNavBarConfig({
@@ -30,7 +31,7 @@ export const author = cfg.defineAuthorConfig({
         'rawimage|https://avatars.githubusercontent.com/u/81839503?v=4&size=64',
       socialLinks: {
         github: 'https://github.com/kirisauce',
-        wechat: 'https://wx.qq.com/',
+        bilibili: 'https://space.bilibili.com/398523275',
       },
     },
   },
