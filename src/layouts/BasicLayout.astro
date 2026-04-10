@@ -4,6 +4,7 @@ import HeadBase from '../components/HeadBase.astro';
 import { Image } from 'astro:assets';
 import NavBar from '../components/NavBar.astro';
 import LoadingIndicator from '../components/LoadingIndicator.astro';
+import PageFooter from '../components/PageFooter.astro';
 import { fade } from 'astro:transitions';
 
 export interface Props {
@@ -15,7 +16,7 @@ const { coverImage: pageCover, head } = Astro.props;
 
 const coverImage = (() => {
   if (pageCover === undefined || pageCover === null) {
-    return site.defaultCover;
+    return site.defaultCover as ImageMetadata;
   } else {
     return pageCover;
   }
@@ -34,7 +35,11 @@ const PAGE_ATTR = 'data-basic-layout-page';
   </head>
   <body>
     <LoadingIndicator />
-    <NavBar transition:name="navbar" id="navbar" data-toggle-preset="slide-down" />
+    <NavBar
+      transition:name="navbar"
+      id="navbar"
+      data-toggle-preset="slide-down"
+    />
     <div class="page" id="page" {...{ [PAGE_ATTR]: '' }}>
       {
         coverImage && (
@@ -56,6 +61,8 @@ const PAGE_ATTR = 'data-basic-layout-page';
           <slot name="major" />
         </div>
       </div>
+
+      <PageFooter />
     </div>
   </body>
 </html>
@@ -201,6 +208,8 @@ const PAGE_ATTR = 'data-basic-layout-page';
     }
   }
 
+  // --- page-content START ---
+
   .page-content {
     display: flex;
     flex-direction: row;
@@ -254,4 +263,6 @@ const PAGE_ATTR = 'data-basic-layout-page';
       padding: 0;
     }
   }
+
+  // --- page-content END ---
 </style>

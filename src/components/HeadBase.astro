@@ -39,15 +39,18 @@ const {
 <ClientRouter />
 
 <!-- Font  -->
-<Font cssVariable="--font-monospace" preload />
+<Font cssVariable="--font-monospace" />
 
 <script define:vars={{ theme }}>
   window.__CONFIG__ = {
     theme,
   };
 </script>
-<script src="../client/run/preference.ts"></script>
-<script src="../client/run/utils.ts"></script>
+<!-- @patch async_script -->
+<script>
+  import '../client/run/preference.ts?inline';
+  import '../client/run/utils.ts?inline';
+</script>
 
 <title>
   {titleText}{site.titleTemplate ? ` | ${site.titleTemplate}` : ''}

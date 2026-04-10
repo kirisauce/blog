@@ -2,11 +2,7 @@
 import BasicLayout from '../../layouts/BasicLayout.astro';
 import type { CollectionEntry } from 'astro:content';
 import { author, site } from '../../config';
-import {
-  getPostUpdateDateSync,
-  getPostPubDateSync,
-  getPostDescription,
-} from '../../utils/other';
+import { processPostSync } from '../../server/utils';
 import AuthorCard from '../../components/Cards/AuthorCard.astro';
 import PostLinkCard from '../../components/Cards/PostLinkCard.astro';
 import CategoriesCard from '../../components/Cards/CategoriesCard.astro';
@@ -71,10 +67,8 @@ type FilteredPost = {
 const filteredPosts = node
   .collectValues()
   .map((post) => ({
-    updateDate: getPostUpdateDateSync(post.data, post.filePath),
-    pubDate: getPostPubDateSync(post.data, post.filePath),
-    description: getPostDescription(post.data, post.body),
     post,
+    ...processPostSync(post),
   }))
   .sort((a, b) => {
     if (!a.updateDate || !b.updateDate) {

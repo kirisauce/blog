@@ -5,10 +5,8 @@ import { getCollection } from 'astro:content';
 import { author, site, layout } from '../config';
 import { dropdown } from '../utils/transition';
 import {
-  getPostUpdateDateSync,
-  getPostPubDateSync,
-  getPostDescription,
-} from '../utils/other';
+  processPostSync
+} from '../server/utils';
 import AuthorCard from '../components/Cards/AuthorCard.astro';
 import PostLinkCard from '../components/Cards/PostLinkCard.astro';
 import CategoriesCard from '../components/Cards/CategoriesCard.astro';
@@ -17,10 +15,8 @@ import { fade } from 'astro:transitions';
 
 const displayPosts = (await getCollection('blog'))
   .map((post) => ({
-    updateDate: getPostUpdateDateSync(post.data, post.filePath),
-    pubDate: getPostPubDateSync(post.data, post.filePath),
-    description: getPostDescription(post.data, post.body),
     post,
+    ...processPostSync(post),
   }))
   .sort((a, b) => {
     if (!a.updateDate || !b.updateDate) {
@@ -34,7 +30,11 @@ const displayPosts = (await getCollection('blog'))
 <BasicLayout coverImage={site.defaultCover}>
   <Fragment slot="major">
     {site.title && <div class="front-text site-title">{site.title}</div>}
-    {site.description && <div class="front-text site-description">{site.description}</div>}
+    {
+      site.description && (
+        <div class="front-text site-description">{site.description}</div>
+      )
+    }
 
     <main
       transition:animate={dropdown()}

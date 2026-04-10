@@ -2,6 +2,7 @@
 import mdx from '@astrojs/mdx';
 import { defineConfig, fontProviders } from 'astro/config';
 import svelte from '@astrojs/svelte';
+import { patcher } from './src/astro';
 
 // Vite plugins
 import icon from 'unplugin-icons/vite';
@@ -18,6 +19,7 @@ export default defineConfig({
     expressiveCode(),
     mdx(),
     svelte(),
+    patcher(),
   ],
 
   vite: {
@@ -26,6 +28,17 @@ export default defineConfig({
         compiler: 'svelte',
       }),
     ],
+
+    build: {
+      rollupOptions: {
+        external: [
+          'node:fs',
+          'node:fs/promises',
+          'node:path',
+          'node:path/posix',
+        ],
+      },
+    },
   },
 
   fonts: [

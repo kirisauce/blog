@@ -1,11 +1,10 @@
 ---
 import MarkdownWrapper from './MarkdownWrapper.astro';
-import Icon from './Icon.astro';
 import Heimu from './Heimu.astro';
 
 import type { CollectionEntry } from 'astro:content';
 import { render } from 'astro:content';
-import { processPostSync } from '../utils/other';
+import { processPostSync } from '../server/utils';
 import TimeMeta from './MetaWidgets/TimeMeta.astro';
 import TagsMeta from './MetaWidgets/TagsMeta.astro';
 import Meta from './MetaWidgets/Meta.astro';
