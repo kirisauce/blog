@@ -37,13 +37,21 @@ export const cssLength = (defaultValue?: string | number) =>
     .number()
     .or(z.string())
     .optional()
-    .transform((v) =>
-      typeof v === 'number'
-        ? `${v}px`
-        : typeof v === 'string'
-          ? v
-          : defaultValue,
-    );
+    .transform((v) => {
+      const conv = (iv: typeof v) => {
+        if (typeof iv === 'number') {
+          if (iv === 0) {
+            return '0';
+          } else {
+            return `${iv}px`;
+          }
+        } else if (typeof iv === 'string') {
+          return iv;
+        }
+      };
+
+      return conv(v) ?? conv(defaultValue);
+    });
 
 export type CssLengthInput = In<typeof cssLength>;
 export type CssLength = Out<typeof cssLength>;

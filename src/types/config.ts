@@ -129,9 +129,13 @@ export const layoutConfig = () => {
   const zComponentSub = {
     PostLinkCard: z.object({
       coverPosition: z.enum(['left', 'right']).default('right'),
-      slideLayerInitialPadding: types.cssLength(),
-      slideLayerInitialWidth: types.cssLength(0),
-      slideLayerPosition: z.enum(['left', 'right', 'none']).default('right'),
+      hoverScale: z.number().nullable().default(1.01),
+      slideLayerStyle: z
+        .enum(['uncover', 'squeeze', 'popout', 'none'])
+        .default('popout'),
+      slideLayerInitialWidth: types.cssLength(2),
+      slideLayerPosition: z.enum(['left', 'right']).default('right'),
+      slideLayerOffset: types.cssLength(28),
     }),
   };
 

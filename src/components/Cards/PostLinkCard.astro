@@ -1,7 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { blogurl } from '../../utils/url';
-import { generateId } from '../../utils/other';
+import { generateId, Switcher, apply } from '../../utils/other';
 import { Image } from 'astro:assets';
 import { layout } from '../../config';
 import stylus from 'stylus';
@@ -20,9 +20,11 @@ export interface Props {
 }
 
 const {
+  hoverScale,
   slideLayerInitialWidth,
-  slideLayerInitialPadding,
+  slideLayerStyle,
   slideLayerPosition,
+  slideLayerOffset,
   coverPosition: coverPositionDefault,
 } = layout.component.PostLinkCard;
 
@@ -37,22 +39,30 @@ const { category, tags } = post.data;
 
 const uniqueId = generateId();
 
-const slideLayerCss =
-  slideLayerPosition !== 'none' &&
-  stylus.render(`
+const wrapperHoverTransformRules: string[] = [];
+
+const swslStyle = new Switcher(slideLayerStyle, '');
+const slideLayerStylus =
+  slideLayerStyle !== 'none'
+    ? `
   .card.link-card {
-    transition: padding-${slideLayerPosition} var(--expressive-fast-spatial);
     background-color: transparent;
-    ${
-      slideLayerInitialPadding &&
-      `padding-${slideLayerPosition}: ${slideLayerInitialPadding};`
-    }
+    padding: 0;
+    align-items: ${slideLayerPosition === 'left' ? 'flex-start' : 'flex-end'};
 
     &:hover {
-      padding-${slideLayerPosition}: 60px;
+      ${swslStyle.on(
+        'popout',
+        `&::before { transform: translateX(${
+          slideLayerPosition === 'left' ? '-' : ''
+        }${slideLayerOffset}); }`,
+      )}
 
-      &::after {
-        ${slideLayerPosition}: 28px;
+      >.wrapper {
+        ${swslStyle.on(
+          'squeeze',
+          `margin-${slideLayerPosition}: ${slideLayerOffset};`,
+        )}
       }
     }
 
@@ -76,24 +86,72 @@ const slideLayerCss =
       padding-${slideLayerPosition}: 8px;
       font-family: var(--font-monospace);
       color: var(--text);
+
+      ${swslStyle.on(
+        'popout',
+        'transition: transform var(--expressive-default-effects);',
+      )}
     }
 
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      left: 0;
-      ${slideLayerPosition}: ${slideLayerInitialWidth};
-      bottom: 0;
+    &>.wrapper {
+      position: relative;
+      padding: 24px;
+      margin-${slideLayerPosition}: ${slideLayerInitialWidth};
       background-color: var(--secondary-container);
       border-radius: 14px;
-      z-index: -5;
-      transition: ${slideLayerPosition} var(--expressive-fast-spatial);
+
+      ${apply(
+        swslStyle.onMap({
+          uncover: 'transform',
+          squeeze: `margin-${slideLayerPosition}`,
+        }),
+        (name) =>
+          name ? `transition: ${name} var(--expressive-default-effects);` : '',
+      )}
     }
   }
-`);
+`
+    : '';
+if (slideLayerStyle === 'uncover') {
+  wrapperHoverTransformRules.push(
+    `translateX(${
+      slideLayerPosition === 'left' ? '' : '-'
+    }${slideLayerOffset})`,
+  );
+}
+
+const hoverEffectsStylus = `
+  .card.link-card {
+    ${
+      typeof hoverScale === 'number'
+        ? `
+        &>.wrapper {
+          ${
+            swslStyle.on('uncover', ' ') ||
+            'transition: transform var(--expressive-default-effects);'
+          }
+        }`
+        : ''
+    }
+  }
+`;
+if (typeof hoverScale === 'number') {
+  wrapperHoverTransformRules.push(`scale(${hoverScale})`);
+}
+
+const mergedRulesCss = `
+  .card.link-card { 
+    &:hover {
+      &>.wrapper {
+        ${apply(wrapperHoverTransformRules.join(' '), (rules) => (rules ? `transform: ${rules};` : ''))}
+      }
+    }
+  }
+`;
+
+const configuredCss = await stylus.render(
+  [slideLayerStylus, hoverEffectsStylus, mergedRulesCss].join('\n'),
+);
 ---
 
 <a
@@ -101,25 +159,27 @@ const slideLayerCss =
   class:list={['card', 'link-card', `cover-at-${coverPosition}`]}
   data-unique-id={uniqueId}
 >
-  <div class="content">
-    <Label class="title" style="font-size:28px;">{post.data.title}</Label>
-    <div class="metas">
-      <TimeMeta icon="mdi:calendar-edit-outline" time={updateDate} />
-      <TimeMeta icon="mdi:calendar-outline" time={pubDate} />
-      <Meta icon="mdi:category-outline" content={category} />
-      <TagsMeta tags={tags} />
+  <div class="wrapper">
+    <div class="content">
+      <Label class="title" style="font-size:28px;">{post.data.title}</Label>
+      <div class="metas">
+        <TimeMeta icon="mdi:calendar-edit-outline" time={updateDate} />
+        <TimeMeta icon="mdi:calendar-outline" time={pubDate} />
+        <Meta icon="mdi:category-outline" content={category} />
+        <TagsMeta tags={tags} />
+      </div>
+      <div class="description">{description}</div>
     </div>
-    <div class="description">{description}</div>
-  </div>
-  <div class="cover">
-    {
-      post.data.coverImage && (
-        <Image
-          src={post.data.coverImage}
-          alt={post.data.coverImageAlt ?? 'Cover Image'}
-        />
-      )
-    }
+    <div class="cover">
+      {
+        post.data.coverImage && (
+          <Image
+            src={post.data.coverImage}
+            alt={post.data.coverImageAlt ?? 'Cover Image'}
+          />
+        )
+      }
+    </div>
   </div>
 </a>
 
@@ -236,21 +296,32 @@ const slideLayerCss =
 <style lang="stylus">
   .card.link-card {
     display: flex;
-    flex-direction: row;
-    height: 200px;
+    flex-direction: column;
     text-decoration: none;
     color: var(--text);
     font-family: var(--font-sans);
-    gap: 16px;
     position: relative;
+    justify-content: stretch;
+    align-items: stretch;
 
-    &:where(.cover-at-left) {
+    &:where(.cover-at-left)>.wrapper {
       flex-direction: row-reverse;
     }
 
     @media (max-width: 1024px) {
-      flex-direction: column;
       height: auto;
+    }
+  }
+
+  .wrapper {
+    display: flex;
+    flex-direction: row;
+    flex: 0 0 240px;
+    box-sizing: border-box;
+    gap: 16px;
+
+    @media (max-width: 1024px) {
+      flex-direction: column;
       align-items: stretch;
     }
   }
@@ -272,7 +343,7 @@ const slideLayerCss =
     position: relative;
     flex-shrink: 0;
     width: auto;
-    max-width: 30%;
+    max-width: 35%;
     display: flex;
     flex-direction: row;
     align-items: stretch;
@@ -306,4 +377,4 @@ const slideLayerCss =
   }
 </style>
 
-{slideLayerPosition && <style is:inline set:html={slideLayerCss} />}
+{slideLayerStyle !== 'none' && <style set:html={configuredCss} />}
