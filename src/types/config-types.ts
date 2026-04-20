@@ -31,3 +31,27 @@ export const externalSite = () =>
 
 export type ExternalSiteInput = In<typeof externalSite>;
 export type ExternalSite = Out<typeof externalSite>;
+
+export const cssLength = (defaultValue?: string | number) =>
+  z
+    .number()
+    .or(z.string())
+    .optional()
+    .transform((v) => {
+      const conv = (iv: typeof v) => {
+        if (typeof iv === 'number') {
+          if (iv === 0) {
+            return '0';
+          } else {
+            return `${iv}px`;
+          }
+        } else if (typeof iv === 'string') {
+          return iv;
+        }
+      };
+
+      return conv(v) ?? conv(defaultValue);
+    });
+
+export type CssLengthInput = In<typeof cssLength>;
+export type CssLength = Out<typeof cssLength>;

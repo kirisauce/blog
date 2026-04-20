@@ -22,3 +22,27 @@ export const flattenClassList = (
       .map(([className, enabled]) => className);
   }
 };
+
+export class Switcher<T extends string | number | symbol, D> {
+  #value: T;
+  #defaultValue: D | undefined;
+
+  constructor(value: T, defaultValue?: D) {
+    this.#value = value;
+    this.#defaultValue = defaultValue;
+  }
+
+  on<V>(compareValue: T, v1: V): V | D | undefined {
+    return this.#value === compareValue ? v1 : this.#defaultValue;
+  }
+
+  onMap<M extends Partial<Record<T, any>>>(map: M): M[keyof M] | D | undefined {
+    return (
+      (Object.entries(map).find(([k, v]) => k === this.#value)?.[1] as
+        | M[T]
+        | undefined) ?? this.#defaultValue
+    );
+  }
+}
+
+export const apply = <T, R>(v: T, fn: (v: T) => R) => fn(v);

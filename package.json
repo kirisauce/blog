@@ -12,12 +12,12 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/mdx": "^5.0.0",
-    "@astrojs/svelte": "^8.0.0",
-    "astro": "^6.0.3",
+    "@astrojs/mdx": "^5.0.3",
+    "@astrojs/svelte": "^8.0.5",
+    "astro": "^6.1.8",
     "sharp": "^0.34.5",
     "stylus": "^0.64.0",
-    "svelte": "^5.53.12",
+    "svelte": "^5.55.4",
     "typescript": "^5.9.3"
   },
   "trustedDependencies": [
@@ -28,9 +28,12 @@
     "@expressive-code/plugin-line-numbers": "^0.41.7",
     "@iconify-json/mdi": "^1.2.3",
     "@iconify/utils": "^3.1.0",
-    "@types/node": "^25.5.0",
+    "@types/node": "^25.6.0",
+    "@types/stylus": "^0.48.43",
     "astro-expressive-code": "^0.41.7",
+    "jiti": "^2.6.1",
     "prettier-plugin-stylus": "^0.1.0",
-    "unplugin-icons": "^23.0.1"
+    "unplugin-icons": "^23.0.1",
+    "vite": "^7.3.2"
   }
 }

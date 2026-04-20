@@ -8,6 +8,7 @@ import Label from '../Label.astro';
 import Meta from '../MetaWidgets/Meta.astro';
 import TimeMeta from '../MetaWidgets/TimeMeta.astro';
 import TagsMeta from '../MetaWidgets/TagsMeta.astro';
+import 'virtual:dynamic-style:./PostLinkCard.ts/default.css';
 
 export interface Props {
   post: CollectionEntry<'blog'>;
@@ -18,14 +19,16 @@ export interface Props {
   coverPosition?: 'left' | 'right';
 }
 
-const config = layout.component.PostLinkCard;
+const {
+  coverPosition: coverPositionDefault,
+} = layout.component.PostLinkCard;
 
 const {
   post,
   updateDate,
   pubDate,
   description,
-  coverPosition = config.coverPosition,
+  coverPosition = coverPositionDefault,
 } = Astro.props;
 const { category, tags } = post.data;
 
@@ -37,25 +40,27 @@ const uniqueId = generateId();
   class:list={['card', 'link-card', `cover-at-${coverPosition}`]}
   data-unique-id={uniqueId}
 >
-  <div class="content">
-    <Label class="title" style="font-size:28px;">{post.data.title}</Label>
-    <div class="metas">
-      <TimeMeta icon="mdi:calendar-edit-outline" time={updateDate} />
-      <TimeMeta icon="mdi:calendar-outline" time={pubDate} />
-      <Meta icon="mdi:category-outline" content={category} />
-      <TagsMeta tags={tags} />
+  <div class="wrapper">
+    <div class="content">
+      <Label class="title" style="font-size:28px;">{post.data.title}</Label>
+      <div class="metas">
+        <TimeMeta icon="mdi:calendar-edit-outline" time={updateDate} />
+        <TimeMeta icon="mdi:calendar-outline" time={pubDate} />
+        <Meta icon="mdi:category-outline" content={category} />
+        <TagsMeta tags={tags} />
+      </div>
+      <div class="description">{description}</div>
     </div>
-    <div class="description">{description}</div>
-  </div>
-  <div class="cover">
-    {
-      post.data.coverImage && (
-        <Image
-          src={post.data.coverImage}
-          alt={post.data.coverImageAlt ?? 'Cover Image'}
-        />
-      )
-    }
+    <div class="cover">
+      {
+        post.data.coverImage && (
+          <Image
+            src={post.data.coverImage}
+            alt={post.data.coverImageAlt ?? 'Cover Image'}
+          />
+        )
+      }
+    </div>
   </div>
 </a>
 
@@ -170,22 +175,34 @@ const uniqueId = generateId();
 </script>
 
 <style lang="stylus">
-  .link-card {
+  .card.link-card {
     display: flex;
-    flex-direction: row;
-    height: 200px;
+    flex-direction: column;
     text-decoration: none;
     color: var(--text);
     font-family: var(--font-sans);
-    gap: 16px;
+    position: relative;
+    justify-content: stretch;
+    align-items: stretch;
 
-    &:where(.cover-at-left) {
+    &:where(.cover-at-left)>.wrapper {
       flex-direction: row-reverse;
     }
 
     @media (max-width: 1024px) {
-      flex-direction: column;
       height: auto;
+    }
+  }
+
+  .wrapper {
+    display: flex;
+    flex-direction: row;
+    flex: 0 0 240px;
+    box-sizing: border-box;
+    gap: 16px;
+
+    @media (max-width: 1024px) {
+      flex-direction: column;
       align-items: stretch;
     }
   }
@@ -207,7 +224,7 @@ const uniqueId = generateId();
     position: relative;
     flex-shrink: 0;
     width: auto;
-    max-width: 30%;
+    max-width: 35%;
     display: flex;
     flex-direction: row;
     align-items: stretch;
