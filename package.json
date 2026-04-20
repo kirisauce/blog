@@ -31,6 +31,7 @@
     "@types/node": "^25.6.0",
     "@types/stylus": "^0.48.43",
     "astro-expressive-code": "^0.41.7",
+    "jiti": "^2.6.1",
     "prettier-plugin-stylus": "^0.1.0",
     "unplugin-icons": "^23.0.1",
     "vite": "^7.3.2"
