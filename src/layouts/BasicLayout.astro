@@ -232,9 +232,13 @@ const PAGE_ATTR = 'data-basic-layout-page';
 
   .aside {
     flex: 0 1 280px;
+    min-width: 280px;
 
     @media (max-width: 1024px) {
-      max-width: 400px;
+      max-width: 500px;
+      width: 100%;
+      padding: 0 12px;
+      box-sizing: border-box;
     }
   }
 
@@ -244,12 +248,13 @@ const PAGE_ATTR = 'data-basic-layout-page';
     align-items: stretch;
     box-sizing: border-box;
 
-    flex: 0 1 1000px;
+    flex: 0 1 1250px;
     width: 0;
     padding: 0 1rem;
 
     @media (max-width: 1024px) {
-      width: 96%;
+      width: 100%;
+      padding: 0 12px;
     }
   }
 
@@ -260,7 +265,7 @@ const PAGE_ATTR = 'data-basic-layout-page';
     }
 
     .major {
-      padding: 0;
+      padding: 0 12px;
     }
   }
 

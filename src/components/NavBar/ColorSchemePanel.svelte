@@ -99,6 +99,7 @@
 
         &::after {
           background-color: var(--secondary-container);
+          box-shadow: inset 0 0 0 2px var(--primary);
         }
       }
 
@@ -107,8 +108,13 @@
         z-index: 5;
       }
 
-      &:hover::after {
+      &:hover:not(.active)::after {
         background-color: var(--secondary-container);
+        transform: scale(1.02);
+      }
+
+      &:active:not(.active)::after {
+        transform: scale(0.98);
       }
     }
   }

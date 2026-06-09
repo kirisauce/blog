@@ -1,37 +1,50 @@
 ---
-import { categoryMap, joinCategoryPath } from '../../utils/page-indices';
+import {
+  categoryMap,
+  joinCategoryPath,
+  CategoryMap,
+} from '../../utils/page-indices';
 import { categoryurl } from '../../utils/url';
 import Label from '../Label.astro';
+import TreeList from '../TreeList.svelte';
+import type { TreeNode } from '../TreeList.svelte';
+import type { CollectionEntry } from 'astro:content';
 
 export interface Props {
+  // 当前路径
   path?: string[];
+
+  // 基础路径，生成的列表只会包含基础路径下的子路径
+  basePath?: string[];
 }
 
-const { path = [], ...other } = Astro.props;
-const node = categoryMap.index(path);
+const { basePath = [], path = [], ...other } = Astro.props;
+const node = categoryMap.index(basePath);
+
+function toTreeNodes(
+  map: CategoryMap<CollectionEntry<'blog'>>,
+  basePath: string[],
+): TreeNode[] {
+  if (!map.submap || map.submap.size === 0) return [];
+  return [...map.submap.entries()].map(([name, sub]) => {
+    const nodePath = basePath.concat([name]);
+    return {
+      label: `${name} (${sub.collectValues().length})`,
+      href: categoryurl.with(joinCategoryPath(nodePath)),
+      path: nodePath,
+      children: toTreeNodes(sub, nodePath),
+    };
+  });
+}
+
+const treeItems = node ? toTreeNodes(node, basePath) : [];
 ---
 
 <div class="card categories-card" {...other}>
   <Label style="font-size: 1.6rem; align-self: flex-start; margin-left: -16px;"
-    >{path.length > 0 ? '子分类' : '分类'}</Label
+    >{basePath.length > 0 ? '子分类' : '分类'}</Label
   >
-  <div class="categories-list">
-    {
-      node?.submap?.entries().map(([subcategoryName, subcategory]) => (
-        <a
-          href={categoryurl.with(
-            joinCategoryPath(path.concat([subcategoryName])),
-          )}
-          class="category-item"
-        >
-          <span class="category-name">{subcategoryName}</span>
-          <span class="category-count">
-            {subcategory.collectValues().length}
-          </span>
-        </a>
-      ))
-    }
-  </div>
+  <TreeList items={treeItems} currentPath={path} client:visible transition:persist />
 </div>
 
 <style lang="stylus">
@@ -40,49 +53,5 @@ const node = categoryMap.index(path);
     flex-direction: column;
     gap: 12px;
     margin-top: 32px;
-  }
-
-  .categories-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-  }
-
-  .category-item {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 12px;
-    border-radius: 8px;
-    text-decoration: none;
-    color: var(--text);
-    background-color: transparent;
-    transition:
-      transform var(--expressive-default-spatial),
-      background-color var(--expressive-slow-effects);
-
-    &:hover {
-      background-color: var(--primary-container);
-      transform: translateX(4px);
-    }
-  }
-
-  .category-name {
-    font-size: 1.3rem;
-    font-weight: 500;
-    font-family: var(--font-sans);
-  }
-
-  .category-count {
-    font-size: 1.1rem;
-    font-family: var(--font-monospace);
-    color: var(--secondary);
-    background-color: var(--surface-container);
-    padding: 2px 8px;
-    border-radius: 12px;
-    min-width: 24px;
-    text-align: center;
   }
 </style>

@@ -1,8 +1,11 @@
 import type { CollectionEntry, InferEntrySchema } from 'astro:content';
 import fs from 'node:fs/promises';
 import fsSync from 'node:fs';
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import { toString as markdownToString } from 'mdast-util-to-string';
 
-const DESCRIPTION_MAX_LINES = 5;
+const DESCRIPTION_MAX_LENGTH = 100;
 
 export const getPostPubDate = async (
   post: InferEntrySchema<'blog'>,
@@ -60,6 +63,8 @@ export const getPostUpdateDateSync = (
   return stat.mtime;
 };
 
+const parseMarkdownPipeline = await unified().use(remarkParse);
+
 export const getPostDescription = (
   post: InferEntrySchema<'blog'>,
   content?: string,
@@ -67,27 +72,27 @@ export const getPostDescription = (
   if (post.description !== undefined && post.description !== null) {
     return post.description;
   } else if (content) {
-    return content
-      .split('\n')
-      .filter((line) => line.trim() !== '')
-      .slice(0, DESCRIPTION_MAX_LINES)
-      .join('\n');
+    const processed = parseMarkdownPipeline.parse(content);
+    const rmed = markdownToString(processed).replace(/\s+/g, ' ').trim();
+    return rmed.length > DESCRIPTION_MAX_LENGTH
+      ? rmed.slice(0, DESCRIPTION_MAX_LENGTH) + '...'
+      : rmed;
   } else {
     return undefined;
   }
 };
 
 export interface ProcessedPost {
+  post: CollectionEntry<'blog'>;
   updateDate?: Date;
   pubDate?: Date;
   description: string | undefined;
   data: InferEntrySchema<'blog'>;
 }
 
-export const processPostSync = (
-  post: CollectionEntry<'blog'>,
-): ProcessedPost => {
+export const processPost = (post: CollectionEntry<'blog'>): ProcessedPost => {
   return {
+    post,
     updateDate: getPostUpdateDateSync(post.data, post.filePath),
     pubDate: getPostPubDateSync(post.data, post.filePath),
     description: getPostDescription(post.data, post.body),

@@ -4,9 +4,7 @@ import { getCollection } from 'astro:content';
 
 import { author, site, layout } from '../config';
 import { dropdown } from '../utils/transition';
-import {
-  processPostSync
-} from '../server/utils';
+import { processPost } from '../server/utils';
 import AuthorCard from '../components/Cards/AuthorCard.astro';
 import PostLinkCard from '../components/Cards/PostLinkCard.astro';
 import CategoriesCard from '../components/Cards/CategoriesCard.astro';
@@ -14,17 +12,14 @@ import TagsCard from '../components/Cards/TagsCard.astro';
 import { fade } from 'astro:transitions';
 
 const displayPosts = (await getCollection('blog'))
-  .map((post) => ({
-    post,
-    ...processPostSync(post),
-  }))
+  .map(processPost)
   .sort((a, b) => {
     if (!a.updateDate || !b.updateDate) {
       return 0;
     }
     return b.updateDate.getTime() - a.updateDate.getTime();
   })
-  .slice(0, layout.home.latestPostsLimit);
+  .slice(0, layout.home.latestPostsLimit) as any[];
 ---
 
 <BasicLayout coverImage={site.defaultCover}>

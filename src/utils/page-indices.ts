@@ -146,3 +146,35 @@ export const categoryMap = await (async () => {
 
   return categoryMap;
 })();
+
+export const flattenCategoryMap = await (async () => {
+  // 递归收集所有分类路径
+  const collectAllPaths = (
+    map: typeof categoryMap,
+    currentPath: string[] = [],
+  ): Array<{
+    path: string[];
+    node: CategoryMap<CollectionEntry<'blog'>>;
+  }> => {
+    if (!map.submap || map.submap.size == 0) {
+      return [];
+    }
+
+    const result: ReturnType<typeof collectAllPaths> = [];
+
+    for (const [key, subMap] of map.submap.entries()) {
+      const newPath = [...currentPath, key];
+      // 添加当前路径
+      result.push({
+        path: newPath,
+        node: subMap,
+      });
+      // 递归添加子路径
+      result.push(...collectAllPaths(subMap, newPath));
+    }
+
+    return result;
+  };
+
+  return collectAllPaths(categoryMap)
+})()

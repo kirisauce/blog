@@ -2,13 +2,13 @@
 import BasicLayout from '../../layouts/BasicLayout.astro';
 import type { CollectionEntry } from 'astro:content';
 import { author, site } from '../../config';
-import { processPostSync } from '../../server/utils';
+import { processPost as processPostSync } from '../../server/utils';
 import AuthorCard from '../../components/Cards/AuthorCard.astro';
 import PostLinkCard from '../../components/Cards/PostLinkCard.astro';
 import CategoriesCard from '../../components/Cards/CategoriesCard.astro';
 import {
   CategoryMap,
-  categoryMap,
+  flattenCategoryMap,
   joinCategoryPath,
 } from '../../utils/page-indices';
 import { baseurl, categoryurl } from '../../utils/url';
@@ -19,37 +19,7 @@ export interface Props {
 }
 
 export async function getStaticPaths() {
-  // 递归收集所有分类路径
-  const collectAllPaths = (
-    map: typeof categoryMap,
-    currentPath: string[] = [],
-  ): Array<{
-    path: string[];
-    node: CategoryMap<CollectionEntry<'blog'>>;
-  }> => {
-    if (!map.submap || map.submap.size == 0) {
-      return [];
-    }
-
-    const result: ReturnType<typeof collectAllPaths> = [];
-
-    for (const [key, subMap] of map.submap.entries()) {
-      const newPath = [...currentPath, key];
-      // 添加当前路径
-      result.push({
-        path: newPath,
-        node: subMap,
-      });
-      // 递归添加子路径
-      result.push(...collectAllPaths(subMap, newPath));
-    }
-
-    return result;
-  };
-
-  const allPaths = collectAllPaths(categoryMap);
-
-  return allPaths.map(({ path, node }) => ({
+  return flattenCategoryMap.map(({ path, node }) => ({
     params: { category: joinCategoryPath(path) },
     props: { path, node } satisfies Props,
   }));
@@ -66,10 +36,7 @@ type FilteredPost = {
 
 const filteredPosts = node
   .collectValues()
-  .map((post) => ({
-    post,
-    ...processPostSync(post),
-  }))
+  .map(processPostSync)
   .sort((a, b) => {
     if (!a.updateDate || !b.updateDate) {
       return 0;
@@ -88,19 +55,17 @@ const filteredPosts = node
     <main transition:name="post-content-card" class="link-cards">
       <!-- 面包屑导航 -->
       <h1 class="breadcrumb">
-        <a href={baseurl.with('.')}>分类</a>: {
-          (() => {
-            const base: string[] = [];
-            return path.map((p, index) => {
-              base.push(p);
-              return (
-                <>
-                  {index !== 0 ? '>' : null}
-                  <a href={categoryurl.with(joinCategoryPath(base))}>{p}</a>
-                </>
-              );
-            });
-          })()
+        <a href={baseurl.with('.')}>分类</a>:
+        {
+          path.map((p, index) => {
+            const subPath = path.slice(0, index + 1);
+            return (
+              <>
+                {index !== 0 ? '>' : null}
+                <a href={categoryurl.with(joinCategoryPath(subPath))}>{p}</a>
+              </>
+            );
+          })
         }
       </h1>
 
@@ -127,11 +92,7 @@ const filteredPosts = node
         />
       )
     }
-    {
-      node.submap && node.submap.size > 0 && (
-        <CategoriesCard path={path} transition:name="categories-card" />
-      )
-    }
+    <CategoriesCard {path} transition:name="categories-card" />
   </Fragment>
 </BasicLayout>
 

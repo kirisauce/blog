@@ -9,6 +9,7 @@ import icon from 'unplugin-icons/vite';
 
 import expressiveCode from 'astro-expressive-code';
 import { dynamicStyle } from './src/vite';
+import remarkHeadingAnchor from './src/vite/rehype-heading-anchor';
 
 type Variants = NonNullable<
   NonNullable<Parameters<typeof defineConfig>[0]['fonts']>[number]['options']
@@ -16,6 +17,10 @@ type Variants = NonNullable<
 
 // https://astro.build/config
 export default defineConfig({
+  markdown: {
+    remarkPlugins: [remarkHeadingAnchor],
+  },
+
   integrations: [
     expressiveCode(),
     mdx(),

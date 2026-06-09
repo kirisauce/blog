@@ -4,7 +4,7 @@ import Heimu from './Heimu.astro';
 
 import type { CollectionEntry } from 'astro:content';
 import { render } from 'astro:content';
-import { processPostSync } from '../server/utils';
+import { processPost } from '../server/utils';
 import TimeMeta from './MetaWidgets/TimeMeta.astro';
 import TagsMeta from './MetaWidgets/TagsMeta.astro';
 import Meta from './MetaWidgets/Meta.astro';
@@ -17,7 +17,7 @@ const { post } = Astro.props;
 
 const { category, description, title, tags } = post.data;
 
-const { updateDate, pubDate } = processPostSync(post);
+const { updateDate, pubDate } = processPost(post);
 
 const { Content, headings } = await render(post);
 
@@ -35,7 +35,7 @@ const customComponents = {
     <TagsMeta tags={tags} />
   </div>
   <br />
-  <div class="description">描述：{description}</div>
+  {description?.trim() && <div class="description">描述：{description}</div>}
   <hr />
   <MarkdownWrapper>
     <Content components={customComponents} />
@@ -43,27 +43,43 @@ const customComponents = {
 </div>
 
 <style lang="stylus">
-  .article-title {
-    margin: 0.5rem 0;
-  }
+  .post-content {
+    .article-title {
+      margin: 0.5rem 0;
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
 
-  hr {
-    margin: 24px -8px
-    border-style: dashed;
-  }
+    hr {
+      margin: 24px -8px
+      border-style: dashed;
+      opacity: 0.5;
+    }
 
-  .metas {
-    color: var(--text);
-  }
+    .metas {
+      color: var(--text);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
 
-  .tag {
-    border-radius: 4px;
-    padding: 2px;
-    background-color: var(--primary-container);
-  }
+    .tag {
+      border-radius: 6px;
+      padding: 4px 8px;
+      background-color: var(--primary-container);
+      color: var(--on-primary-container);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
 
-  .description {
-    margin-top: 16px;
-    color: var(--text);
+    .description {
+      margin-top: 16px;
+      color: var(--text-muted);
+      font-style: italic;
+      line-height: 1.6;
+    }
   }
 </style>

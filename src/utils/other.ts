@@ -46,3 +46,14 @@ export class Switcher<T extends string | number | symbol, D> {
 }
 
 export const apply = <T, R>(v: T, fn: (v: T) => R) => fn(v);
+
+export const asyncMap = async <T, R>(
+  arr: Iterable<T>,
+  fn: (v: T) => Promise<R>,
+): Promise<R[]> => {
+  const result = [];
+  for (const v of arr) {
+    result.push(await fn(v));
+  }
+  return result;
+};

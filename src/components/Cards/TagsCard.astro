@@ -10,10 +10,11 @@ export interface DisplayTag {
 
 export interface Props {
   tags?: DisplayTag[];
+  limit?: number;
 }
 
-const { tags: propTags, ...other } = Astro.props;
-const tags =
+const { tags: propTags, limit: propLimit = 10, ...other } = Astro.props;
+const allTags =
   propTags ??
   tagMap
     .entries()
@@ -21,12 +22,16 @@ const tags =
       name: tag,
       count: posts.length,
     }))
-    .toArray();
+    .toArray()
+    .sort((a, b) => b.count - a.count);
+
+const tags = allTags.slice(0, propLimit);
+const hasMore = allTags.length > propLimit;
 ---
 
 <div class="card tags-card" {...other}>
   <Label style="font-size: 1.6rem; align-self: flex-start; margin-left: -16px;"
-    >标签</Label
+    ><a class="nodefault" href="/tag/">标签</a></Label
   >
   <div class="tags-list">
     {
@@ -38,6 +43,11 @@ const tags =
       ))
     }
   </div>
+  {hasMore && (
+    <a href="/tag/" class="nodefault tags-more">
+      ...
+    </a>
+  )}
 </div>
 
 <style lang="stylus">
@@ -90,5 +100,20 @@ const tags =
     border-radius: 12px;
     min-width: 24px;
     text-align: center;
+  }
+
+  .tags-more {
+    display: block;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    margin-top: 8px;
+    font-family: var(--font-monospace);
+    transition: color var(--expressive-default-effects);
+
+    &:hover {
+      color: var(--primary);
+      text-decoration: underline;
+    }
   }
 </style>

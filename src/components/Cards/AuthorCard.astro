@@ -16,24 +16,28 @@ const { avatar, name, bio, socialLinks } = authorConfig.authors[authorId] ?? {};
 
 <div class="card author-card" {...other}>
   <Label style="font-size: 1.6rem; align-self: flex-start; margin-left: -16px;">作者</Label>
-  <CustomImage src={avatar} alt="Author Avatar" class="avatar" />
-  <div class="name">{name}</div>
-  {bio && <div class="bio" set:html={bio} />}
-  <div class="links">
-    {
-      Object.entries(socialLinks).map(([site, link]) => {
-        const extSite = siteConfig.externalSites[site];
-        let icon: JsxElement;
-        if (extSite) {
-          icon = (
-            <CustomImage src={extSite.icon} alt={extSite.name} prefer="icon" />
-          );
-        } else {
-          icon = <Icon src="mdi:question-mark" alt="Unknown" />;
-        }
-        return <a class="link" href={link} target="_blank">{icon}</a>;
-      })
-    }
+  <div class="author-content">
+    <CustomImage src={avatar} alt="Author Avatar" class="avatar" />
+    <div class="info">
+      <div class="name">{name}</div>
+      {bio && <div class="bio" set:html={bio} />}
+    </div>
+    <div class="links">
+      {
+        Object.entries(socialLinks).map(([site, link]) => {
+          const extSite = siteConfig.externalSites[site];
+          let icon: JsxElement;
+          if (extSite) {
+            icon = (
+              <CustomImage src={extSite.icon} alt={extSite.name} prefer="icon" />
+            );
+          } else {
+            icon = <Icon src="mdi:question-mark" alt="Unknown" />;
+          }
+          return <a class="link" href={link} target="_blank">{icon}</a>;
+        })
+      }
+    </div>
   </div>
 </div>
 
@@ -42,52 +46,154 @@ const { avatar, name, bio, socialLinks } = authorConfig.authors[authorId] ?? {};
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 16px;
+    padding: 2rem 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
+
+    @media (max-width: 1024px) {
+      padding: 1.2rem;
+      gap: 12px;
+    }
+  }
+
+  .author-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    flex-wrap: wrap;
+
+    @media (max-width: 1024px) {
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 20px;
+    }
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+
+    @media (max-width: 1024px) {
+      align-items: flex-start;
+      gap: 2px;
+      flex: 1 1 auto;
+      align-self: flex-start;
+    }
   }
 
   .avatar {
-    width: 100%;
+    width: auto;
+    height: 224px;
     border-radius: 16px;
     display: block;
-    margin-block: 16px;
-    aspect-ratio: 1;
     object-fit: cover;
+    border: 2px solid var(--primary);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    flex-shrink: 0;
+    aspect-ratio: 1;
+
+    &:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+    }
 
     @media (max-width: 1024px) {
-      width: 70%;
+      width: 112px;
+      height: 112px;
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+
+      &:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+      }
     }
   }
 
   .name {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     font-weight: bold;
     font-family: var(--font-monospace);
+    color: var(--text);
+    text-align: center;
+
+    @media (max-width: 1024px) {
+      font-size: 1.15rem;
+      text-align: left;
+    }
   }
 
   .bio {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.5;
+
+    @media (max-width: 1024px) {
+      font-size: 0.85rem;
+      text-align: left;
+    }
   }
 
   .links {
-    margin-top: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: row;
+    flex-wrap: wrap;
     gap: 12px;
-    font-size: 32px;
+    font-size: 28px;
+
+    @media (max-width: 1024px) {
+      gap: 8px;
+      margin-left: auto;
+    }
   }
 
   .link {
     color: var(--secondary);
-    border-radius: 8px;
+    border-radius: 12px;
     background-color: var(--secondary-container);
     display: flex;
     flex-direction: row;
-    padding: 6px;
-    transition: background-color var(--expressive-slow-effects);
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    transition: 
+      background-color 0.3s ease,
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 
     &:hover {
       background-color: var(--primary-container);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    @media (max-width: 1024px) {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+
+      svg,
+      img {
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    svg,
+    img {
+      width: 24px;
+      height: 24px;
     }
   }
 </style>
