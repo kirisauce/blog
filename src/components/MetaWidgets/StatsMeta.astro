@@ -1,0 +1,30 @@
+---
+import Meta from './Meta.astro';
+import { calcReadingTime, calcWordCount } from '../../utils/format';
+
+export interface Props {
+  content: string;
+}
+
+const { content } = Astro.props;
+
+const readingTime = calcReadingTime(content);
+const wordCount = calcWordCount(content);
+---
+
+<div class="meta-row">
+  <Meta icon="mdi:clock-outline" content={`${readingTime} 分钟`} />
+  <Meta
+    icon="mdi:text-box-outline"
+    content={`${wordCount.toLocaleString()} 字`}
+  />
+</div>
+
+<style lang="stylus">
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+</style>

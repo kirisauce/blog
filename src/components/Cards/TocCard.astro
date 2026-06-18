@@ -1,0 +1,37 @@
+---
+import TableOfContents from '../TableOfContents.svelte';
+import type { TocHeading } from '../TableOfContents.svelte';
+import Label from '../Label.astro';
+
+export interface Props {
+  headings: TocHeading[];
+  autoScroll?: boolean;
+  title?: string;
+}
+
+const { headings, autoScroll = true, title = '目录', ...other } = Astro.props;
+---
+
+<div class="card toc-card" {...other}>
+  <Label style="font-size: 1.6rem; align-self: flex-start; margin-left: -16px;"
+    >{title}</Label
+  >
+  <TableOfContents {headings} {autoScroll} client:visible />
+</div>
+
+<style lang="stylus">
+  .toc-card {
+    position: sticky;
+    top: 10vh;
+    max-height: 80vh;
+    overflow: clip;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .toc-card :global(.toc-root) {
+    flex: 1;
+    min-height: 0;
+  }
+</style>

@@ -176,5 +176,5 @@ export const flattenCategoryMap = await (async () => {
     return result;
   };
 
-  return collectAllPaths(categoryMap)
-})()
+  return collectAllPaths(categoryMap);
+})();

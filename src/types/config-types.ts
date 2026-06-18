@@ -55,3 +55,12 @@ export const cssLength = (defaultValue?: string | number) =>
 
 export type CssLengthInput = In<typeof cssLength>;
 export type CssLength = Out<typeof cssLength>;
+
+export const licensePreset = () =>
+  z.object({
+    name: z.string(),
+    url: z.string(),
+  });
+
+export type LicensePresetInput = In<typeof licensePreset>;
+export type LicensePreset = Out<typeof licensePreset>;

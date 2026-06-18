@@ -27,6 +27,29 @@ const builtinSites: Record<string, types.ExternalSite> = {
   },
 };
 
+const builtinLicensePresets = {
+  'CC-BY-4.0': {
+    name: 'CC BY 4.0',
+    url: 'https://creativecommons.org/licenses/by/4.0/',
+  },
+  'CC-BY-SA-4.0': {
+    name: 'CC BY-SA 4.0',
+    url: 'https://creativecommons.org/licenses/by-sa/4.0/',
+  },
+  'CC-BY-NC-4.0': {
+    name: 'CC BY-NC 4.0',
+    url: 'https://creativecommons.org/licenses/by-nc/4.0/',
+  },
+  'CC-BY-NC-SA-4.0': {
+    name: 'CC BY-NC-SA 4.0',
+    url: 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
+  },
+  'CC0-1.0': {
+    name: 'CC0 1.0',
+    url: 'https://creativecommons.org/publicdomain/zero/1.0/',
+  },
+} as const;
+
 export const siteConfig = () =>
   z.object({
     title: z.string(),
@@ -53,6 +76,19 @@ export const siteConfig = () =>
       .optional()
       .describe(
         `The author name to be displayed in the copyright notice.\nIf not specified, \`author.defaultAuthor\` will be used instead.`,
+      ),
+
+    defaultLicense: z
+      .string()
+      .optional()
+      .describe(
+        'The default license preset key for blog posts.\nCan be overridden per-post via frontmatter `license` field.',
+      ),
+    licensePresets: z
+      .record(z.string(), types.licensePreset())
+      .default(builtinLicensePresets)
+      .describe(
+        'License presets. Built-in presets include CC-BY-4.0, CC-BY-SA-4.0, CC-BY-NC-4.0, CC-BY-NC-SA-4.0, CC0-1.0.\nUsers can add, remove, or override entries here.',
       ),
 
     birthDate: z.date().optional(),

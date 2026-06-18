@@ -86,9 +86,7 @@ const slideLayerStylus =
 `
     : '';
 if (slideLayerStyle === 'uncover') {
-  wrapperHoverTransformRules.push(
-    `translateX(${rightneg}${slideLayerOffset})`,
-  );
+  wrapperHoverTransformRules.push(`translateX(${rightneg}${slideLayerOffset})`);
   wrapperTransitionProperties.add('transform');
 } else if (slideLayerStyle === 'squeeze') {
   wrapperTransitionProperties.add(`margin-${slideLayerPosition}`);

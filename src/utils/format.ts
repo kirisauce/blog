@@ -120,3 +120,20 @@ export const formatDuration = (
 
   return (isNegative ? '-' : '') + output;
 };
+
+export const calcWordCount = (content: string): number => {
+  const chineseChars = content.match(/[\u4e00-\u9fff]/g)?.length ?? 0;
+  const englishWords = content
+    .replace(/[\u4e00-\u9fff]/g, '')
+    .split(/\s+/)
+    .filter((w) => w.length > 0).length;
+  return chineseChars + englishWords;
+};
+
+export const calcReadingTime = (
+  content: string,
+  wordsPerMinute = 400,
+): number => {
+  const wordCount = calcWordCount(content);
+  return Math.max(1, Math.ceil(wordCount / wordsPerMinute));
+};

@@ -1,4 +1,4 @@
-import path from "path/posix";
+import path from 'path/posix';
 
 class UrlPrefixer {
   #base: string;
@@ -18,5 +18,8 @@ class UrlPrefixer {
 
 export const baseurl = new UrlPrefixer(import.meta.env.BASE_URL);
 export const blogurl = new UrlPrefixer(import.meta.env.BASE_URL, 'blog');
-export const tagurl = new UrlPrefixer(import.meta.env.BASE_URL, 'tag')
-export const categoryurl = new UrlPrefixer(import.meta.env.BASE_URL, 'category')
+export const tagurl = new UrlPrefixer(import.meta.env.BASE_URL, 'tag');
+export const categoryurl = new UrlPrefixer(
+  import.meta.env.BASE_URL,
+  'category',
+);

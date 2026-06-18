@@ -70,24 +70,10 @@
   a
     text-decoration: none
     color: var(--secondary)
-    position: relative
     transition: color var(--expressive-fast-effects)
 
     &:hover
       color: var(--primary)
-      
-    &::after
-      content: ''
-      position: absolute
-      width: 0
-      height: 2px
-      bottom: -2px
-      left: 0
-      background-color: var(--secondary)
-      transition: width var(--expressive-default-effects)
-
-    &:hover::after
-      width: 100%
 
   // 内联代码
   code

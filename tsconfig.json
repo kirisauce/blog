@@ -1,9 +1,7 @@
 {
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
-    "types": [
-      "unplugin-icons/types/svelte"
-    ]
+    "types": ["unplugin-icons/types/svelte"]
   },
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"]

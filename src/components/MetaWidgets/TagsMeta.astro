@@ -1,50 +1,44 @@
 ---
 import { tagurl } from '../../utils/url';
-import Icon from '../Icon.astro';
 
 export interface Props {
-  icon?: string;
   tags?: string[];
 }
 
-const { icon = 'mdi:tag-multiple-outline', tags } = Astro.props;
+const { tags } = Astro.props;
 ---
 
 {
-  tags && (
-    <div class="meta">
-      <Icon class="padded-icon-svg" src={icon} />
+  tags && tags.length > 0 && (
+    <div class="tags-row">
       {tags.map((tag) => (
-        <div
+        <span
           class="tag"
           onclick={`window.__CAKES__.navigate(\`${tagurl.with(tag)}\`); event.preventDefault();`}
         >
-          {tag}
-        </div>
+          # {tag}
+        </span>
       ))}
     </div>
   )
 }
 
 <style lang="stylus">
-  @import './meta.styl';
-
-  .meta {
+  .tags-row {
+    display: flex;
     flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
   }
 
   .tag {
-    background-color: var(--primary-container);
-    padding: 2px 4px;
-    border-radius: 6px;
-    text-wrap: nowrap;
-    color: var(--text-muted);
+    color: var(--primary);
+    font-size: 0.95rem;
     cursor: pointer;
-
-    transition: color var(--expressive-default-effects);
+    transition: opacity var(--expressive-default-effects);
 
     &:hover {
-      color: var(--text);
+      opacity: 0.8;
     }
   }
 </style>

@@ -26,3 +26,6 @@ pnpm-debug.log*
 # VSCode preferences
 .vscode
 .kilocode
+**/.codewhale/*
+!**/.codewhale/constitution.json
+.deepseek/

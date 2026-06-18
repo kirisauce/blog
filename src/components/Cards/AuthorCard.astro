@@ -15,7 +15,9 @@ const { avatar, name, bio, socialLinks } = authorConfig.authors[authorId] ?? {};
 ---
 
 <div class="card author-card" {...other}>
-  <Label style="font-size: 1.6rem; align-self: flex-start; margin-left: -16px;">作者</Label>
+  <Label style="font-size: 1.6rem; align-self: flex-start; margin-left: -16px;"
+    >作者</Label
+  >
   <div class="author-content">
     <CustomImage src={avatar} alt="Author Avatar" class="avatar" />
     <div class="info">
@@ -29,12 +31,20 @@ const { avatar, name, bio, socialLinks } = authorConfig.authors[authorId] ?? {};
           let icon: JsxElement;
           if (extSite) {
             icon = (
-              <CustomImage src={extSite.icon} alt={extSite.name} prefer="icon" />
+              <CustomImage
+                src={extSite.icon}
+                alt={extSite.name}
+                prefer="icon"
+              />
             );
           } else {
             icon = <Icon src="mdi:question-mark" alt="Unknown" />;
           }
-          return <a class="link" href={link} target="_blank">{icon}</a>;
+          return (
+            <a class="link" href={link} target="_blank">
+              {icon}
+            </a>
+          );
         })
       }
     </div>

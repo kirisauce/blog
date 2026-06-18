@@ -43,11 +43,13 @@ const hasMore = allTags.length > propLimit;
       ))
     }
   </div>
-  {hasMore && (
-    <a href="/tag/" class="nodefault tags-more">
-      ...
-    </a>
-  )}
+  {
+    hasMore && (
+      <a href="/tag/" class="nodefault tags-more">
+        ...
+      </a>
+    )
+  }
 </div>
 
 <style lang="stylus">

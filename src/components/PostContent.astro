@@ -1,13 +1,15 @@
 ---
 import MarkdownWrapper from './MarkdownWrapper.astro';
 import Heimu from './Heimu.astro';
+import CopyrightNotice from './CopyrightNotice.astro';
+import CategoryBreadcrumb from './MetaWidgets/CategoryBreadcrumb.astro';
 
 import type { CollectionEntry } from 'astro:content';
 import { render } from 'astro:content';
 import { processPost } from '../server/utils';
 import TimeMeta from './MetaWidgets/TimeMeta.astro';
 import TagsMeta from './MetaWidgets/TagsMeta.astro';
-import Meta from './MetaWidgets/Meta.astro';
+import StatsMeta from './MetaWidgets/StatsMeta.astro';
 
 export interface Props {
   post: CollectionEntry<'blog'>;
@@ -27,59 +29,66 @@ const customComponents = {
 ---
 
 <div class="post-content">
-  <h1 data-transite-from-title class="article-title">{title}</h1>
-  <div class="metas">
-    <TimeMeta icon="mdi:calendar-outline" time={pubDate} />
-    <TimeMeta icon="mdi:calendar-edit-outline" time={updateDate} />
-    <Meta icon="mdi:category-outline" content={category} />
+  <div class="article-header">
+    <CategoryBreadcrumb data-transite-from-category category={category} />
+    <h1 data-transite-from-title class="article-title">{title}</h1>
     <TagsMeta tags={tags} />
+    <div class="meta-row">
+      <TimeMeta icon="mdi:calendar-outline" time={pubDate} label="发布于" />
+      <TimeMeta
+        icon="mdi:calendar-edit-outline"
+        time={updateDate}
+        label="更新于"
+      />
+    </div>
+    <StatsMeta content={post.body ?? ''} />
+    {description?.trim() && <div class="description">{description}</div>}
   </div>
-  <br />
-  {description?.trim() && <div class="description">描述：{description}</div>}
   <hr />
   <MarkdownWrapper>
     <Content components={customComponents} />
   </MarkdownWrapper>
+  <hr />
+  <CopyrightNotice post={post} />
 </div>
 
 <style lang="stylus">
   .post-content {
+    .article-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 24px 0;
+    }
+
     .article-title {
-      margin: 0.5rem 0;
+      margin: 0;
       font-size: 2.5rem;
       font-weight: 700;
       line-height: 1.2;
       letter-spacing: -0.02em;
+      text-align: center;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
     }
 
     hr {
-      margin: 24px -8px
+      margin: 24px -8px;
       border-style: dashed;
       opacity: 0.5;
     }
 
-    .metas {
-      color: var(--text);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .tag {
-      border-radius: 6px;
-      padding: 4px 8px;
-      background-color: var(--primary-container);
-      color: var(--on-primary-container);
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-
     .description {
-      margin-top: 16px;
       color: var(--text-muted);
-      font-style: italic;
       line-height: 1.6;
+      text-align: center;
+      max-width: 80%;
     }
   }
 </style>

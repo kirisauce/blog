@@ -10,6 +10,7 @@ import PostLinkCard from '../components/Cards/PostLinkCard.astro';
 import CategoriesCard from '../components/Cards/CategoriesCard.astro';
 import TagsCard from '../components/Cards/TagsCard.astro';
 import { fade } from 'astro:transitions';
+import WebSite from '../components/json-ld/WebSite.astro';
 
 const displayPosts = (await getCollection('blog'))
   .map(processPost)
@@ -23,6 +24,10 @@ const displayPosts = (await getCollection('blog'))
 ---
 
 <BasicLayout coverImage={site.defaultCover}>
+  <Fragment slot="head-extra">
+    <WebSite />
+  </Fragment>
+
   <Fragment slot="major">
     {site.title && <div class="front-text site-title">{site.title}</div>}
     {

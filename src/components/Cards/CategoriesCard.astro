@@ -44,7 +44,12 @@ const treeItems = node ? toTreeNodes(node, basePath) : [];
   <Label style="font-size: 1.6rem; align-self: flex-start; margin-left: -16px;"
     >{basePath.length > 0 ? '子分类' : '分类'}</Label
   >
-  <TreeList items={treeItems} currentPath={path} client:visible transition:persist />
+  <TreeList
+    items={treeItems}
+    currentPath={path}
+    client:visible
+    transition:persist
+  />
 </div>
 
 <style lang="stylus">

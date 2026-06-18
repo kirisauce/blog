@@ -6,6 +6,7 @@ export const site = cfg.defineSiteConfig({
 
   coverImageStyle: 'half-parallax',
   birthDate: new Date('2026-03-12T21:56:47+08:00'),
+  defaultLicense: 'CC-BY-4.0',
 });
 
 export const navbar = cfg.defineNavBarConfig({

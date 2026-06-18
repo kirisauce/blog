@@ -4,6 +4,7 @@ import { blogurl } from '../../utils/url';
 import { generateId } from '../../utils/other';
 import { Image } from 'astro:assets';
 import { layout } from '../../config';
+import CategoryBreadcrumb from '../MetaWidgets/CategoryBreadcrumb.astro';
 import Label from '../Label.astro';
 import Meta from '../MetaWidgets/Meta.astro';
 import TimeMeta from '../MetaWidgets/TimeMeta.astro';
@@ -19,9 +20,7 @@ export interface Props {
   coverPosition?: 'left' | 'right';
 }
 
-const {
-  coverPosition: coverPositionDefault,
-} = layout.component.PostLinkCard;
+const { coverPosition: coverPositionDefault } = layout.component.PostLinkCard;
 
 const {
   post,
@@ -43,13 +42,15 @@ const uniqueId = generateId();
   <div class="wrapper">
     <div class="content">
       <Label class="title" style="font-size:24px;">{post.data.title}</Label>
-      <div class="metas">
+      <div class="description">{description}</div>
+      <div class="time-row">
         <TimeMeta icon="mdi:calendar-edit-outline" time={updateDate} />
         <TimeMeta icon="mdi:calendar-outline" time={pubDate} />
-        <Meta icon="mdi:category-outline" content={category} />
-        <TagsMeta tags={tags} />
       </div>
-      <div class="description">{description}</div>
+      <div class="tags-category-row">
+        <TagsMeta tags={tags} />
+        <CategoryBreadcrumb class="category" category={category} />
+      </div>
     </div>
     <div class="cover">
       {
@@ -66,7 +67,7 @@ const uniqueId = generateId();
 
 <script>
   let clickedCardUid: string | null = null;
-  const transitionParts = ['cover', 'title'];
+  const transitionParts = ['cover', 'title', 'category'];
 
   const restoreAfterTransition = new Map<HTMLElement, string>();
   const setRestore = (element: HTMLElement, value: string) => {
@@ -108,14 +109,14 @@ const uniqueId = generateId();
           `[data-transite-from-${part}]`,
         ) as HTMLElement | null;
         if (!transiteFrom) {
-          return;
+          continue;
         }
 
         const transiteId = transiteFrom.getAttribute(
           `data-transite-from-${part}`,
         );
         if (!transiteId) {
-          return;
+          continue;
         }
 
         setRestore(transiteFrom, transiteFrom.style.viewTransitionName);
@@ -131,7 +132,7 @@ const uniqueId = generateId();
           `[data-transite-from-${part}]`,
         ) as HTMLElement | null;
         if (!transiteTo) {
-          return;
+          continue;
         }
 
         // Save status
@@ -152,7 +153,7 @@ const uniqueId = generateId();
           `[data-transite-from-${part}]`,
         ) as HTMLElement | null;
         if (!transiteFrom) {
-          return;
+          continue;
         }
 
         const transiteId = transiteFrom.getAttribute(
@@ -162,7 +163,7 @@ const uniqueId = generateId();
           `.card.link-card[data-unique-id="${transiteId}"] .${part}`,
         ) as HTMLElement | null;
         if (!transiteTo) {
-          return;
+          continue;
         }
 
         setRestore(transiteTo, transiteTo.style.viewTransitionName);
@@ -231,14 +232,28 @@ const uniqueId = generateId();
       gap: 12px;
     }
 
-    .metas {
+    .time-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px 0;
+      gap: 6px 8px;
       align-items: center;
 
       @media (max-width: 1024px) {
-        gap: 4px 0;
+        gap: 4px 6px;
+      }
+    }
+
+    .tags-category-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      gap: 8px;
+
+      @media (max-width: 1024px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
       }
     }
 

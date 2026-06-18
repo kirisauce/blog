@@ -2,6 +2,7 @@
 import mdx from '@astrojs/mdx';
 import { defineConfig, fontProviders } from 'astro/config';
 import svelte from '@astrojs/svelte';
+import { unified } from '@astrojs/markdown-remark';
 import { patcher } from './src/astro';
 
 // Vite plugins
@@ -10,6 +11,7 @@ import icon from 'unplugin-icons/vite';
 import expressiveCode from 'astro-expressive-code';
 import { dynamicStyle } from './src/vite';
 import remarkHeadingAnchor from './src/vite/rehype-heading-anchor';
+import { remarkInlineIcon, remarkGithubCard } from './src/server/mdext';
 
 type Variants = NonNullable<
   NonNullable<Parameters<typeof defineConfig>[0]['fonts']>[number]['options']
@@ -18,15 +20,12 @@ type Variants = NonNullable<
 // https://astro.build/config
 export default defineConfig({
   markdown: {
-    remarkPlugins: [remarkHeadingAnchor],
+    processor: unified({
+      remarkPlugins: [remarkHeadingAnchor, remarkInlineIcon, remarkGithubCard],
+    }),
   },
 
-  integrations: [
-    expressiveCode(),
-    mdx(),
-    svelte(),
-    patcher(),
-  ],
+  integrations: [expressiveCode(), mdx(), svelte(), patcher()],
 
   vite: {
     plugins: [

@@ -1,0 +1,80 @@
+---
+import { categoryurl } from '../../utils/url';
+import { parseCategoryIndex, joinCategoryPath } from '../../utils/page-indices';
+import Icon from '../Icon.astro';
+
+export interface Props {
+  category?: string;
+  class?: string;
+}
+
+const { category, class: className, ...otherProps } = Astro.props;
+const categoryPath = category ? parseCategoryIndex(category) : [];
+---
+
+{
+  categoryPath.length > 0 && (
+    <div class:list={['category-breadcrumb', className]} {...otherProps}>
+      <Icon src="mdi:folder-outline" width="16" height="16" />
+      {categoryPath.map((seg, index) => {
+        const subPath = categoryPath.slice(0, index + 1);
+        const href = categoryurl.with(joinCategoryPath(subPath));
+        return (
+          <>
+            {index !== 0 && <span class="separator">/</span>}
+            <span class="category-link" data-href={href}>
+              {seg}
+            </span>
+          </>
+        );
+      })}
+    </div>
+  )
+}
+
+<script>
+  document.addEventListener('click', (e) => {
+    const categoryLink = (e.target as Element).closest('.category-link');
+    if (categoryLink) {
+      e.preventDefault();
+      e.stopPropagation();
+      const href = categoryLink.getAttribute('data-href');
+      if (href) {
+        window.location.href = href;
+      }
+    }
+  });
+</script>
+
+<style lang="stylus">
+  .category-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background-color: var(--primary-container);
+    color: var(--on-primary-container);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-family: var(--font-monospace);
+
+    :global(.icon) {
+      display: flex;
+      align-items: center;
+    }
+
+    .category-link {
+      cursor: pointer;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.8;
+        text-decoration: underline;
+      }
+    }
+
+    .separator {
+      opacity: 0.6;
+    }
+  }
+</style>

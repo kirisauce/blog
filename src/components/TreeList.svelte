@@ -2,6 +2,7 @@
   export interface TreeNode {
     label: string;
     href?: string;
+    slug?: string;
     path?: string[];
     children?: TreeNode[];
   }
@@ -21,33 +22,85 @@
     items,
     depth = 0,
     currentPath,
+    // 受控模式 props（TOC 用）
+    expanded: externalExpanded,
+    onToggle,
+    activeSlug,
+    onLinkClick,
   }: {
     items: TreeNode[];
     depth?: number;
     currentPath?: string[];
+    /** 外部传入的展开状态（slug 为 key），传入时进入受控模式 */
+    expanded?: Record<string, boolean>;
+    /** 受控模式下的展开回调 */
+    onToggle?: (slug: string) => void;
+    /** 受控模式下当前活跃的标题 slug */
+    activeSlug?: string;
+    /** 受控模式下链接点击回调 */
+    onLinkClick?: (e: MouseEvent, slug: string) => void;
   } = $props();
 
-  let expanded = $state<Record<number, boolean>>({});
+  /** 是否处于受控模式 */
+  const controlled = $derived(externalExpanded !== undefined);
 
-  function toggle(index: number) {
-    expanded[index] = !expanded[index];
+  // 非受控模式：内部状态
+  let internalExpanded = $state<Record<number, boolean>>({});
+
+  function toggleInternal(index: number) {
+    internalExpanded[index] = !internalExpanded[index];
+  }
+
+  /** 统一判断节点是否展开 */
+  function isItemExpanded(item: TreeNode, index: number): boolean {
+    if (controlled && item.slug) {
+      return !!externalExpanded?.[item.slug];
+    }
+    return !!internalExpanded[index];
+  }
+
+  /** 统一处理展开操作 */
+  function handleToggle(item: TreeNode, index: number) {
+    if (controlled && item.slug && onToggle) {
+      onToggle(item.slug);
+    } else {
+      toggleInternal(index);
+    }
+  }
+
+  /** 判断节点是否为当前活跃项 */
+  function isItemActive(item: TreeNode): boolean {
+    if (controlled && activeSlug !== undefined) {
+      return item.slug === activeSlug;
+    }
+    return pathsEqual(item.path, currentPath);
+  }
+
+  /** 判断节点链接是否应渲染为普通文本（当前页） */
+  function isCurrentPage(item: TreeNode): boolean {
+    if (controlled) return false; // 受控模式下不隐藏链接
+    return pathsEqual(item.path, currentPath);
   }
 </script>
 
 <ul class="tree-list" class:root={depth === 0} style="--depth: {depth}">
   {#each items as item, i (item.label + i)}
-    <li class="tree-item" class:has-children={item.children && item.children.length > 0}>
+    {@const isExpanded = isItemExpanded(item, i)}
+    <li
+      class="tree-item"
+      class:has-children={item.children && item.children.length > 0}
+    >
       <div class="item-row">
         {#if item.children && item.children.length > 0}
           <button
             class="expand-btn"
-            aria-label={expanded[i] ? 'Collapse' : 'Expand'}
-            aria-expanded={!!expanded[i]}
-            onclick={() => toggle(i)}
+            aria-label={isExpanded ? 'Collapse' : 'Expand'}
+            aria-expanded={isExpanded}
+            onclick={() => handleToggle(item, i)}
           >
             <svg
               class="chevron"
-              class:expanded={!!expanded[i]}
+              class:expanded={isExpanded}
               width="16"
               height="16"
               viewBox="0 0 16 16"
@@ -66,20 +119,34 @@
           <span class="indent-spacer"></span>
         {/if}
 
-        {#if item.href && !pathsEqual(item.path, currentPath)}
-          <a href={item.href} class="item-label link">
+        {#if item.href && !isCurrentPage(item)}
+          <a
+            href={item.href}
+            class="item-label link"
+            class:active={isItemActive(item)}
+            onclick={(e) =>
+              onLinkClick && item.slug ? onLinkClick(e, item.slug) : undefined}
+          >
             {item.label}
           </a>
         {:else}
-          <span class="item-label" class:active={pathsEqual(item.path, currentPath)}>
+          <span class="item-label" class:active={isItemActive(item)}>
             {item.label}
           </span>
         {/if}
       </div>
 
-      {#if item.children && item.children.length > 0 && expanded[i]}
+      {#if item.children && item.children.length > 0 && isExpanded}
         <div transition:slide={{ duration: 200 }}>
-          <TreeList items={item.children} depth={depth + 1} {currentPath} />
+          <TreeList
+            items={item.children}
+            depth={depth + 1}
+            {currentPath}
+            expanded={externalExpanded}
+            {onToggle}
+            {activeSlug}
+            {onLinkClick}
+          />
         </div>
       {/if}
     </li>

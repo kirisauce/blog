@@ -1,8 +1,11 @@
 ---
 import '../styles/variables.styl';
 import '../styles/markdown/common.styl';
+import '../styles/markdown/github-card.styl';
 import '../styles/global.styl';
 
+import { loadIconSvg } from '../server/icon-loader';
+import type { IconResult } from '../server/icon-loader';
 import { site, theme } from '../config';
 import { Font } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
@@ -28,6 +31,25 @@ const {
   type = 'website',
   post,
 } = Astro.props;
+
+// 构建时获取卡片用到的 SVG 图标
+function renderSvg(icon: IconResult, size = 16): string {
+  const attrs = Object.entries(icon.attribs)
+    .filter(([k]) => k !== 'width' && k !== 'height')
+    .map(([k, v]) => `${k}="${v}"`)
+    .join(' ');
+  return `<svg ${attrs} fill="currentColor" width="${size}" height="${size}">${icon.body}</svg>`;
+}
+
+const [gitIcon, starIcon, forkIcon] = await Promise.all([
+  loadIconSvg('mdi:github'),
+  loadIconSvg('mdi:star-outline'),
+  loadIconSvg('mdi:source-fork'),
+]);
+
+const githubIconSvg = renderSvg(gitIcon);
+const starIconSvg = renderSvg(starIcon, 14);
+const forkIconSvg = renderSvg(forkIcon, 14);
 ---
 
 <meta charset="utf-8" />
@@ -41,15 +63,21 @@ const {
 <!-- Font  -->
 <Font cssVariable="--font-monospace" />
 
-<script define:vars={{ theme }}>
+<script define:vars={{ theme, githubIconSvg, starIconSvg, forkIconSvg }}>
   window.__CONFIG__ = {
     theme,
+    icons: {
+      github: githubIconSvg,
+      star: starIconSvg,
+      fork: forkIconSvg,
+    },
   };
 </script>
 <!-- @patch async_script -->
 <script>
   import '../client/run/preference.ts?inline';
   import '../client/run/utils.ts?inline';
+  import '../client/run/github-card.ts?inline';
 </script>
 
 <title>

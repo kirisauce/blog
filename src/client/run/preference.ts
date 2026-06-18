@@ -59,7 +59,7 @@ window.__PREFERENCES__ = {
 const matchDarkColorScheme = window.matchMedia('(prefers-color-scheme: dark)');
 
 window.__CAKES__ = {
-  ...window.__CAKES__ ?? {},
+  ...(window.__CAKES__ ?? {}),
 
   colorScheme: computed(
     () => {

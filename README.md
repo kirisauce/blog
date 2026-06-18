@@ -27,22 +27,25 @@
 有三种方式可以基于 Cakes 创建新项目。
 
 1. 使用 [degit](https://github.com/Rich-Harris/degit) 搭建项目：
-  ```bash
-  bun create degit kirisauce/astro-cakes my-astro-blog
-  cd my-astro-blog
-  bun install
-  ```
-  ~~大D老师写的我也不知道对不对（~~
+
+```bash
+bun create degit kirisauce/astro-cakes my-astro-blog
+cd my-astro-blog
+bun install
+```
+
+~~大D老师写的我也不知道对不对（~~
 
 2. 使用 **Template**/**Fork** 生成新仓库。
-  （看到右上角那个绿色的按钮/叉子按钮了吗？就是它！）
+   （看到右上角那个绿色的按钮/叉子按钮了吗？就是它！）
 
 3. 直接Clone仓库：
-  ```bash
-  git clone https://github.com/kirisauce/astro-cakes.git my-astro-blog
-  cd my-astro-blog
-  bun install
-  ```
+
+```bash
+git clone https://github.com/kirisauce/astro-cakes.git my-astro-blog
+cd my-astro-blog
+bun install
+```
 
 ### 3. 开发
 

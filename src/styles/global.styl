@@ -15,9 +15,6 @@ a.nodefault
 
 .padded-icon-svg
   font-size: 24px;
-  background-color: var(--primary-container);
-  padding: 5px;
-  border-radius: 8px;
 
 :root::selection
   color: var(--selection-text)
@@ -35,7 +32,8 @@ a.nodefault
   animation-duration: 500ms
   z-index: 2000
 
-::view-transition-group(clicked-title)
+::view-transition-group(clicked-title),
+::view-transition-group(clicked-category)
   z-index: 2001
 
 ::view-transition-old(clicked-title)

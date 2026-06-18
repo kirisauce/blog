@@ -62,7 +62,7 @@ export class StoredPreference<T> implements EventTarget {
       }
     };
     window.addEventListener('storage', storageEventListener);
-    destructor.register(this, storageEventListener)
+    destructor.register(this, storageEventListener);
   }
 
   get value() {

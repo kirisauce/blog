@@ -1,6 +1,5 @@
 ---
-import { loadNodeIcon } from '@iconify/utils/lib/loader/node-loader';
-import { parseSVGContent } from '@iconify/utils/lib/svg/parse';
+import { loadIconSvg } from '../server/icon-loader';
 
 export interface Props {
   src: string;
@@ -8,37 +7,7 @@ export interface Props {
 }
 
 const { src } = Astro.props;
-
-const parseSrc = (src: string): [string, string] => {
-  const splited = src.split(':', 2);
-
-  if (splited.length !== 2) {
-    throw new Error('Invalid src');
-  }
-
-  return splited as [string, string];
-};
-
-const loadIcon = async (src: string): Promise<string> => {
-  const [provider, iconName] = parseSrc(src);
-  const icon = await loadNodeIcon(provider, iconName);
-
-  if (!icon) {
-    throw new Error('Icon not found');
-  }
-
-  return icon;
-};
-
-const parseIcon = (svg: string) => {
-  const parsed = parseSVGContent(svg);
-  if (!parsed) {
-    throw new Error('Invalid icon');
-  }
-  return parsed;
-};
-
-const { attribs, body } = parseIcon(await loadIcon(src));
+const { attribs, body } = await loadIconSvg(src);
 
 const mergedAttributes = {
   ...attribs,
@@ -48,5 +17,4 @@ const mergedAttributes = {
 };
 ---
 
-<svg {...mergedAttributes} set:html={body}>
-</svg>
+<svg {...mergedAttributes} set:html={body} />

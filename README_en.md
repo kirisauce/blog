@@ -11,9 +11,10 @@
 ### 1.Prerequisites
 
 To deplay/develop a astro project, one of the following JavaScript runtime is required:
- - [NodeJS](https://nodejs.org/)
- - [Deno](https://deno.land/)
- - [Bun](https://bun.sh/)
+
+- [NodeJS](https://nodejs.org/)
+- [Deno](https://deno.land/)
+- [Bun](https://bun.sh/)
 
 Here I use [Bun](https://bun.sh/) to develop this project, so I recommend it first.
 
@@ -25,6 +26,7 @@ Also, we recommend you to choose a suitable code editor, for editing markdown fi
 We have three options to create a new project based on Cakes.
 
 1. Use [degit](https://github.com/Rich-Harris/degit) to scaffold the project:
+
    ```bash
    bun create degit kirisauce/astro-cakes my-astro-blog
    cd my-astro-blog
@@ -65,6 +67,7 @@ bun run preview
 ## Configuration
 
 Edit `src/config.ts` to customize:
+
 - Site metadata (title, description, author)
 - Social media links
 - Navigation menu
@@ -75,6 +78,7 @@ Edit `src/config.ts` to customize:
 Create Markdown/MDX files in `src/content/posts/` directory:
 
 **Frontmatter example:**
+
 ```yaml
 ---
 title: 'Your Post Title'
@@ -98,21 +102,27 @@ Cakes can be deployed to various static hosting platforms:
 ## Customization
 
 ### General Configuration
+
 Edit `src/config.ts` to customize:
- - Site metadata (title, description, author)
- - Social media links
- - Other layout options
+
+- Site metadata (title, description, author)
+- Social media links
+- Other layout options
 
 ### Theming
+
 Edit `src/styles/color.styl` to customize the color palette. Colors are defined using OKLCH color space for consistent perceptual appearance.
 
 ### Components
+
 Components are organized by functionality:
+
 - `Cards/` - Card components for posts and content
 - `MetaWidgets/` - Metadata display widgets
 - `NavBar/` - Navigation components
 
 ### Adding Features
+
 Install Astro integrations via `astro add` or manually configure in `astro.config.mts`.
 
 ## License
@@ -125,4 +135,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Built with [Astro](https://astro.build)
 - Icons by [Iconify](https://iconify.design)
 - Font by [Maple Font](https://github.com/subframe7536/Maple-font)
-- Code highlighting by [Expressive Code](https://expressive-code.com) 
+- Code highlighting by [Expressive Code](https://expressive-code.com)

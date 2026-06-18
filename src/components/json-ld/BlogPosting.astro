@@ -1,0 +1,71 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { author as authorConfig, site } from '../../config';
+
+export interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+const {
+  title,
+  description,
+  pubDate,
+  updateDate,
+  tags,
+  category,
+  coverImage,
+  author: postAuthor,
+} = post.data;
+
+const authorId = postAuthor ?? authorConfig.defaultAuthor;
+const authorData = authorId ? authorConfig.authors[authorId] : undefined;
+
+const siteUrl = Astro.url.origin;
+const postUrl = `${siteUrl}/blog/${post.id}`;
+
+const rawAvatar = authorData?.avatar?.src ?? authorData?.avatar;
+const avatarUrl =
+  typeof rawAvatar === 'string'
+    ? rawAvatar.replace(/^rawimage\|/, '')
+    : rawAvatar;
+
+const person = authorData
+  ? {
+      '@type': 'Person' as const,
+      name: authorData.name,
+      description: authorData.bio,
+      image: avatarUrl,
+      sameAs: Object.values(authorData.socialLinks ?? {}),
+    }
+  : undefined;
+
+const jsonLd: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  url: postUrl,
+  inLanguage: site.lang,
+  datePublished: pubDate?.toISOString(),
+  dateModified: (updateDate ?? pubDate)?.toISOString(),
+  keywords: tags.length > 0 ? tags.join(', ') : undefined,
+  articleSection: category,
+  author: person,
+  publisher: person
+    ? { ...person, '@type': 'Organization' as const, name: site.title }
+    : { '@type': 'Organization' as const, name: site.title },
+};
+
+if (coverImage) {
+  const imgSrc = typeof coverImage === 'string' ? coverImage : coverImage.src;
+  const imgUrl = imgSrc.startsWith('http') ? imgSrc : `${siteUrl}${imgSrc}`;
+  jsonLd.image = {
+    '@type': 'ImageObject',
+    url: imgUrl,
+    alt: post.data.coverImageAlt ?? title,
+  };
+}
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd, null, 0)} />

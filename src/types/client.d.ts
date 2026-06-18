@@ -21,6 +21,7 @@ export type CakesTable = {
 
 export type ConfigTable = {
   readonly theme: ThemeConfig;
+  readonly icons: Record<string, string>;
 };
 
 declare global {
