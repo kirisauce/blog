@@ -19,6 +19,7 @@ type Variants = NonNullable<
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://kirisauce.netlify.app/',
   markdown: {
     processor: unified({
       remarkPlugins: [remarkHeadingAnchor, remarkInlineIcon, remarkGithubCard],
