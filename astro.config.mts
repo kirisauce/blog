@@ -79,7 +79,7 @@ export default defineConfig({
               }
             }
             return {
-              src: [`./fonts/MapleMono-${variantName}.ttf.woff2`],
+              src: [`./fonts/MapleMono/MapleMono-${variantName}.ttf.woff2`],
               weight: (index + 1) * 100,
               style: style.toLowerCase(),
             } as const;
