@@ -4,6 +4,7 @@ import { defineConfig, fontProviders } from 'astro/config';
 import svelte from '@astrojs/svelte';
 import { unified } from '@astrojs/markdown-remark';
 import { patcher } from './src/astro';
+import { cnFontSplit } from './src/astro/cn-font';
 
 // Vite plugins
 import icon from 'unplugin-icons/vite';
@@ -26,7 +27,13 @@ export default defineConfig({
     }),
   },
 
-  integrations: [expressiveCode(), mdx(), svelte(), patcher()],
+  integrations: [
+    expressiveCode(),
+    mdx(),
+    svelte(),
+    patcher(),
+    cnFontSplit({ name: 'Yozai', input: 'fonts/Yozai-Medium.ttf' }),
+  ],
 
   vite: {
     plugins: [
