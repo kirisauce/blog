@@ -23,6 +23,7 @@
   },
   "trustedDependencies": [
     "astro",
+    "cn-font-split",
     "sharp"
   ],
   "devDependencies": {
@@ -32,6 +33,7 @@
     "@types/node": "^25.9.3",
     "@types/stylus": "^0.48.43",
     "astro-expressive-code": "^0.42.0",
+    "cn-font-split": "^7.4.3",
     "jiti": "^2.7.0",
     "mdast-util-to-string": "^4.0.0",
     "prettier-plugin-astro": "^0.14.1",
