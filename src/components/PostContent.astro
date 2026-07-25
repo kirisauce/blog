@@ -1,6 +1,5 @@
 ---
 import MarkdownWrapper from './MarkdownWrapper.astro';
-import Heimu from './Heimu.astro';
 import CopyrightNotice from './CopyrightNotice.astro';
 import CategoryBreadcrumb from './MetaWidgets/CategoryBreadcrumb.astro';
 
@@ -23,9 +22,7 @@ const { updateDate, pubDate } = processPost(post);
 
 const { Content, headings } = await render(post);
 
-const customComponents = {
-  Heimu,
-};
+const customComponents = {};
 ---
 
 <div class="post-content">
