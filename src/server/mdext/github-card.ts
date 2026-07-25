@@ -1,20 +1,15 @@
-import { visit } from 'unist-util-visit';
-import type { Root, Text, Html } from 'mdast';
-import { parseCommands } from './command-parser';
-
-/** 本插件关心的命令名 */
-const COMMAND = 'github';
-
 /**
- * 简易 HTML 转义：防止 XSS，同时保留 GitHub repo 名中的合法字符。
+ * Remark 插件：`::github[owner/repo]` GitHub 仓库卡片语法。
+ *
+ * ```markdown
+ * ::github[kirisauce/astro-cakes]
+ * ```
+ *
+ * 构建时注入占位 HTML（仓库名 + N/A + GitHub 链接），
+ * 客户端脚本在元素滚动到视口内时懒加载完整卡片数据。
  */
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
+
+import { createCommandPlugin, escapeHtml } from './plugin-factory';
 
 /** 仓库图标 SVG（GitHub Primer octicon "repo"） */
 const REPO_ICON =
@@ -43,64 +38,4 @@ function buildPlaceholder(repo: string): string {
   ].join('');
 }
 
-/**
- * Remark 插件：`::github[owner/repo]` GitHub 仓库卡片语法。
- *
- * ```markdown
- * ::github[kirisauce/astro-cakes]
- * ```
- *
- * 构建时注入占位 HTML（仓库名 + N/A + GitHub 链接），
- * 客户端脚本在元素滚动到视口内时懒加载完整卡片数据。
- */
-export default function remarkGithubCard() {
-  return (tree: Root) => {
-    visit(
-      tree,
-      'text',
-      (node: Text, index: number | undefined, parent: any) => {
-        if (parent == null || index == null) return;
-
-        const matches = parseCommands(node.value).filter(
-          (m) => m.cmd === COMMAND,
-        );
-        if (matches.length === 0) return;
-
-        const text = node.value;
-        const parts: Array<{ type: 'text' | 'html'; value: string }> = [];
-        let lastIndex = 0;
-
-        for (const m of matches) {
-          if (m.startIndex > lastIndex) {
-            parts.push({
-              type: 'text',
-              value: text.slice(lastIndex, m.startIndex),
-            });
-          }
-
-          const placeholder = buildPlaceholder(m.arg);
-          if (placeholder) {
-            parts.push({ type: 'html', value: placeholder });
-          } else {
-            parts.push({ type: 'text', value: m.fullMatch });
-          }
-
-          lastIndex = m.endIndex;
-        }
-
-        if (lastIndex < text.length) {
-          parts.push({ type: 'text', value: text.slice(lastIndex) });
-        }
-
-        if (parts.length > 0) {
-          const newNodes = parts.map((part) =>
-            part.type === 'html'
-              ? ({ type: 'html', value: part.value } satisfies Html)
-              : ({ type: 'text', value: part.value } satisfies Text),
-          );
-          parent.children.splice(index, 1, ...newNodes);
-        }
-      },
-    );
-  };
-}
+export default createCommandPlugin('github', buildPlaceholder);

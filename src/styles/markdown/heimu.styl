@@ -1,0 +1,20 @@
+// 黑幕文本样式（由 ::heimu[text] 语法生成）
+//
+// 默认文字不可见（opacity: 0），鼠标悬停时显现，
+// 单击可固定/取消固定可见状态。
+
+.markdown
+  .heimu
+    background: #000
+    color: whitesmoke
+
+    &:hover > .heimu-content
+      opacity: 1
+
+  .heimu-content
+    opacity: 0
+    transition: opacity var(--expressive-slow-effects)
+    cursor: pointer
+
+    &.visible
+      opacity: 1

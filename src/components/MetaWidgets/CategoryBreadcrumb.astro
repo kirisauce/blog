@@ -15,7 +15,7 @@ const categoryPath = category ? parseCategoryIndex(category) : [];
 {
   categoryPath.length > 0 && (
     <div class:list={['category-breadcrumb', className]} {...otherProps}>
-      <Icon src="mdi:folder-outline" width="16" height="16" />
+      <Icon src="mingcute:folder-2-line" width="16" height="16" />
       {categoryPath.map((seg, index) => {
         const subPath = categoryPath.slice(0, index + 1);
         const href = categoryurl.with(joinCategoryPath(subPath));

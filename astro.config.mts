@@ -12,7 +12,7 @@ import icon from 'unplugin-icons/vite';
 import expressiveCode from 'astro-expressive-code';
 import { dynamicStyle } from './src/vite';
 import remarkHeadingAnchor from './src/vite/rehype-heading-anchor';
-import { remarkInlineIcon, remarkGithubCard } from './src/server/mdext';
+import { remarkInlineIcon, remarkGithubCard, remarkHeimu } from './src/server/mdext';
 
 type Variants = NonNullable<
   NonNullable<Parameters<typeof defineConfig>[0]['fonts']>[number]['options']
@@ -23,7 +23,7 @@ export default defineConfig({
   site: 'https://kirisauce.netlify.app/',
   markdown: {
     processor: unified({
-      remarkPlugins: [remarkHeadingAnchor, remarkInlineIcon, remarkGithubCard],
+      remarkPlugins: [remarkHeadingAnchor, remarkInlineIcon, remarkGithubCard, remarkHeimu],
     }),
   },
 

@@ -30,19 +30,19 @@ export const formatInstant = (date: Date, options?: FormatInstantOptions) => {
     part1.push(`${date.getMonth() + 1}`);
   }
   if (nPrecision <= precisionTable[FormatTimePrecision.day]) {
-    part1.push(`${date.getDay()}`);
+    part1.push(`${date.getDate()}`);
   }
 
   const part2: string[] = [];
 
   if (nPrecision <= precisionTable[FormatTimePrecision.hour]) {
-    part1.push(`${date.getHours()}`);
+    part2.push(`${date.getHours()}`);
   }
   if (nPrecision <= precisionTable[FormatTimePrecision.minute]) {
-    part1.push(`${date.getMinutes()}`);
+    part2.push(`${date.getMinutes()}`);
   }
   if (nPrecision <= precisionTable[FormatTimePrecision.second]) {
-    part1.push(`${date.getSeconds()}`);
+    part2.push(`${date.getSeconds()}`);
   }
 
   return part1.join('-') + (part2.length ? ` ${part2.join(':')}` : '');

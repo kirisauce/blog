@@ -3,15 +3,17 @@
 @import './color'
 
 :root
-  for name, color-list in palette
-    {'--' + name}: color-list[0]
   color-scheme: light
+  &>body
+    for name, color-list in palette
+      {'--' + name}: color-list[0]
 :root.dark
-  for name, color-list in palette
-    {'--' + name}: color-list[1]
   color-scheme: dark
+  &>body
+    for name, color-list in palette
+      {'--' + name}: color-list[1]
 
-:root
+:root>body
   --font-sans: 'Yozai Medium', 'Roboto', 'Noto Sans', sans-serif
   font: var(--font-sans)
 

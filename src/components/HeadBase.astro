@@ -2,6 +2,7 @@
 import '../styles/variables.styl';
 import '../styles/markdown/common.styl';
 import '../styles/markdown/github-card.styl';
+import '../styles/markdown/heimu.styl';
 import '../styles/global.styl';
 
 import { loadIconSvg } from '../server/icon-loader';
@@ -42,8 +43,8 @@ function renderSvg(icon: IconResult, size = 16): string {
 }
 
 const [gitIcon, starIcon, forkIcon] = await Promise.all([
-  loadIconSvg('mdi:github'),
-  loadIconSvg('mdi:star-outline'),
+  loadIconSvg('mingcute:github-line'),
+  loadIconSvg('mingcute:star-line'),
   loadIconSvg('mdi:source-fork'),
 ]);
 

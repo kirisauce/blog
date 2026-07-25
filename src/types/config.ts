@@ -11,19 +11,27 @@ const optionalObject = <Obj extends z.ZodObject>(obj: Obj) =>
 const builtinSites: Record<string, types.ExternalSite> = {
   github: {
     name: 'GitHub',
-    icon: 'mdi:github',
+    icon: 'mingcute:github-line',
   },
   twitter: {
     name: 'Twitter',
-    icon: 'mdi:twitter',
+    icon: 'mingcute:twitter-line',
+  },
+  x: {
+    name: 'X',
+    icon: 'mingcute:social-x-line',
   },
   qq: {
     name: 'QQ',
-    icon: 'mdi:penguin',
+    icon: 'mingcute:qq-line',
   },
   wechat: {
     name: 'WeChat',
-    icon: 'mdi:wechat',
+    icon: 'mingcute:wechat-line',
+  },
+  bilibili: {
+    name: 'BiliBili',
+    icon: 'mingcute:bilibili-line',
   },
 };
 

@@ -43,7 +43,7 @@ window.__PREFERENCES__ = {
   // Theme Color Hue Initialization
   {
     const updateHtmlHue = () => {
-      document.documentElement.style.setProperty(
+      document.body.style.setProperty(
         '--color-hue',
         prefs.themeHue.value.toString(),
       );
@@ -107,7 +107,7 @@ window.__CAKES__ = {
         doc.setAttribute('data-theme', dataTheme);
       }
     };
-    initDocumentClass(document.documentElement);
+    initDocumentClass(doc);
     document.addEventListener('astro:before-swap', (event) => {
       initDocumentClass(event.newDocument.documentElement);
     });
