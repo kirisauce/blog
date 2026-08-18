@@ -65,6 +65,15 @@
     font-family: var(--font-monospace);
     gap: 4px;
 
+    > div:first-child {
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 0.08em;
+      padding: 2px 6px 8px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+    }
+
     .cs-switch {
       position: relative;
       display: flex;
@@ -96,6 +105,7 @@
 
       &.active {
         cursor: default;
+        color: var(--on-secondary-container);
 
         &::after {
           background-color: var(--secondary-container);

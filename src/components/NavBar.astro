@@ -32,12 +32,12 @@ const props = Astro.props;
         >
       </slot>
     </div>
-
-    <div class="dropdown-container">
-      <ColorSchemePanel class="dropdown right" client:only />
-      <ThemeColorPanel class="dropdown right" client:only />
-    </div>
   </nav>
+
+  <div class="dropdown-container">
+    <ColorSchemePanel class="dropdown right" client:only />
+    <ThemeColorPanel class="dropdown right" client:only />
+  </div>
 </div>
 
 <style lang="stylus">
@@ -59,8 +59,10 @@ const props = Astro.props;
     flex: 0 0 56px;
     width: 80%;
     backdrop-filter: blur(12px);
-    box-shadow: 0 8px 32px -6px var(--shadow);
-    font-family: var(--font-sans-serif);
+    box-shadow:
+      0 8px 32px -6px var(--shadow),
+      0 1px 3px 0 var(--shadow);
+    font-family: var(--font-sans);
     color: var(--secondary);
 
     R = 20px;
@@ -74,6 +76,11 @@ const props = Astro.props;
     padding: 0 24px;
     box-sizing: border-box;
 
+    @media (max-width: 640px) {
+      width: 92%;
+      padding: 0 16px;
+    }
+
     &::before {
       content: "";
       position: absolute;
@@ -84,6 +91,8 @@ const props = Astro.props;
       opacity: 0.80;
       z-index: -1;
       background-color: var(--nav);
+      border-bottom: 1px solid var(--border);
+      box-sizing: border-box;
       border-bottom-left-radius: R;
       border-bottom-right-radius: R;
     }
@@ -118,23 +127,30 @@ const props = Astro.props;
 
   // Dropdown Panels
 
-  .dropdown-container { 
-    display: block;
-    position: absolute;
-    top: calc(100% + 16px);
-    left: 0;
-    width: 100%;
+  .dropdown-container {
+    position: relative;
+    width: 80%;
+    height: 0;
+    overflow: visible;
+
+    @media (max-width: 640px) {
+      width: 92%;
+    }
   }
 
   .dropdown {
-    background-color: var(--primary-container);
+    background-color: unquote("color-mix(in oklch, var(--primary-container) 72%, transparent)");
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     padding: 12px;
     border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 32px -8px var(--shadow), 0 2px 6px -2px var(--shadow);
 
     &.right {
       position: absolute;
       right: 0;
-      top: 0;
+      top: 16px;
       width: auto;
       height: auto;
       margin-right: 16px;
