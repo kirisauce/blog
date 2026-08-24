@@ -10,9 +10,16 @@ import { fade } from 'astro:transitions';
 export interface Props {
   coverImage?: ImageMetadata;
   head?: Parameters<typeof HeadBase>[0];
+  /**
+   * Width of the major (main content) track on wide screens.
+   * Accepts any CSS width value; pages with narrower main content
+   * (e.g. the 800px article card) can shrink the track so the aside
+   * sits closer to the content. Defaults to 1000px.
+   */
+  majorWidth?: string;
 }
 
-const { coverImage: pageCover, head } = Astro.props;
+const { coverImage: pageCover, head, majorWidth } = Astro.props;
 
 const coverImage = (() => {
   if (pageCover === undefined || pageCover === null) {
@@ -53,7 +60,10 @@ const PAGE_ATTR = 'data-basic-layout-page';
           </div>
         )
       }
-      <div class:list={['page-content', 'aside-' + layout.basic.aside]}>
+      <div
+        class:list={['page-content', 'aside-' + layout.basic.aside]}
+        style={majorWidth && `--basic-layout-major-width: ${majorWidth}`}
+      >
         <aside class="aside">
           <slot name="aside" />
         </aside>
@@ -227,8 +237,8 @@ const PAGE_ATTR = 'data-basic-layout-page';
 
     @media (min-width: 1640px) {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1000px) minmax(0, 1fr);
-      column-gap: 32px;
+      grid-template-columns: minmax(0, 1fr) minmax(0, var(--basic-layout-major-width, 1000px)) minmax(0, 1fr);
+      column-gap: 16px;
       align-items: start;
       padding: 72px 0;
     }
@@ -282,6 +292,10 @@ const PAGE_ATTR = 'data-basic-layout-page';
   @media (max-width: 1024px) {
     .page-content {
       padding: 72px 16px;
+    }
+
+    .major {
+      padding: 0;
     }
   }
 
