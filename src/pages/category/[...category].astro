@@ -73,9 +73,11 @@ const filteredPosts = node
 
       {
         filteredPosts.length > 0 ? (
-          filteredPosts.map((args: FilteredPost) => {
-            return <PostLinkCard {...args} />;
-          })
+          <div class="post-grid">
+            {filteredPosts.map((args: FilteredPost) => (
+              <PostLinkCard {...args} />
+            ))}
+          </div>
         ) : (
           <p>什么都没有~</p>
         )
@@ -127,5 +129,12 @@ const filteredPosts = node
       margin-bottom: 1.5em;
       color: var(--text-light);
     }
+  }
+
+  .post-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    align-items: stretch;
   }
 </style>

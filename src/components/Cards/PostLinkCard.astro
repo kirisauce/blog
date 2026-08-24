@@ -3,32 +3,19 @@ import type { CollectionEntry } from 'astro:content';
 import { blogurl } from '../../utils/url';
 import { generateId } from '../../utils/other';
 import { Image } from 'astro:assets';
-import { layout } from '../../config';
 import CategoryBreadcrumb from '../MetaWidgets/CategoryBreadcrumb.astro';
 import Label from '../Label.astro';
-import Meta from '../MetaWidgets/Meta.astro';
 import TimeMeta from '../MetaWidgets/TimeMeta.astro';
 import TagsMeta from '../MetaWidgets/TagsMeta.astro';
-import 'virtual:dynamic-style:./PostLinkCard.ts/default.css';
 
 export interface Props {
   post: CollectionEntry<'blog'>;
   updateDate?: Date;
   pubDate?: Date;
   description?: string;
-
-  coverPosition?: 'left' | 'right';
 }
 
-const { coverPosition: coverPositionDefault } = layout.component.PostLinkCard;
-
-const {
-  post,
-  updateDate,
-  pubDate,
-  description,
-  coverPosition = coverPositionDefault,
-} = Astro.props;
+const { post, updateDate, pubDate, description } = Astro.props;
 const { category, tags } = post.data;
 
 const uniqueId = generateId();
@@ -36,12 +23,24 @@ const uniqueId = generateId();
 
 <a
   href={blogurl.with(post.id)}
-  class:list={['card', 'link-card', `cover-at-${coverPosition}`]}
+  class:list={['card', 'link-card']}
   data-unique-id={uniqueId}
 >
   <div class="wrapper">
+    <div class="cover">
+      {
+        post.data.coverImage ? (
+          <Image
+            src={post.data.coverImage}
+            alt={post.data.coverImageAlt ?? 'Cover Image'}
+          />
+        ) : (
+          <div class="cover-placeholder" />
+        )
+      }
+    </div>
     <div class="content">
-      <Label class="title" style="font-size:24px;">{post.data.title}</Label>
+      <Label class="title" style="font-size:20px;">{post.data.title}</Label>
       <div class="description">{description}</div>
       <div class="time-row">
         <TimeMeta icon="mdi:calendar-edit-outline" time={updateDate} />
@@ -51,16 +50,6 @@ const uniqueId = generateId();
         <TagsMeta tags={tags} />
         <CategoryBreadcrumb class="category" category={category} />
       </div>
-    </div>
-    <div class="cover">
-      {
-        post.data.coverImage && (
-          <Image
-            src={post.data.coverImage}
-            alt={post.data.coverImageAlt ?? 'Cover Image'}
-          />
-        )
-      }
     </div>
   </div>
 </a>
@@ -183,144 +172,80 @@ const uniqueId = generateId();
     color: var(--text);
     font-family: var(--font-sans);
     position: relative;
-    justify-content: stretch;
-    align-items: stretch;
     background-color: transparent;
     padding: 0;
-
-    @media (min-width: 1024px) {
-      &:where(.cover-at-left)>.wrapper {
-        flex-direction: row-reverse;
-      }
-    }
-
-    @media (max-width: 1024px) {
-      height: auto;
-    }
   }
 
   .wrapper {
     display: flex;
-    flex-direction: row;
-    flex: 0 0 140px;
+    flex-direction: column;
     box-sizing: border-box;
-    gap: 16px;
+    height: 100%;
     background-color: var(--secondary-container);
     border-radius: 14px;
+    overflow: hidden;
     position: relative;
+  }
 
-    @media (max-width: 1024px) {
-      flex-direction: column-reverse;
-      align-items: stretch;
-      flex: none;
-      gap: 0;
+  .cover {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    flex-shrink: 0;
+
+    > img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
   }
 
+  .cover-placeholder {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(
+      135deg,
+      var(--primary-container),
+      var(--secondary-container)
+    );
+  }
+
   .content {
-    flex: 1 1 0;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
-    width: 0;
-    margin: 20px 5px;
-
-    @media (max-width: 1024px) {
-      width: auto;
-      margin: 16px;
-      gap: 12px;
-    }
+    padding: 16px;
 
     .time-row {
       display: flex;
       flex-wrap: wrap;
       gap: 6px 8px;
       align-items: center;
-
-      @media (max-width: 1024px) {
-        gap: 4px 6px;
-      }
     }
 
     .tags-category-row {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
       width: 100%;
       gap: 8px;
-
-      @media (max-width: 1024px) {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-      }
-    }
-
-    .title {
-      @media (max-width: 1024px) {
-        font-size: 17px !important;
-        line-height: 1.4;
-      }
-    }
-
-    .padded-icon-svg {
-      @media (max-width: 1024px) {
-        font-size: 16px;
-        padding: 4px;
-        border-radius: 6px;
-      }
-    }
-  }
-
-  :where(.cover) {
-    padding: 20px;
-  }
-
-  .cover {
-    position: relative;
-    flex-shrink: 0;
-    width: auto;
-    max-width: 25%;
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-
-    @media (max-width: 1024px) {
-      width: 100%;
-      max-width: unset;
-      padding: 16px 16px 0;
-    }
-
-    >img {
-      height: 100%;
-      width: 100%;
-      flex: 1 0 auto;
-      object-fit: cover;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-
-      @media (max-width: 1024px) {
-        height: auto;
-        aspect-ratio: 16 / 9;
-        max-height: 45vh;
-        border-radius: 8px;
-      }
     }
   }
 
   .description {
-    flex: 1 0 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
     width: 100%;
-    white-space: pre-line;
-    height: auto;
     font-size: 0.85rem;
     line-height: 1.6;
     color: var(--text-muted);
-
-    @media (max-width: 1024px) {
-      font-size: 0.8rem;
-      line-height: 1.5;
-    }
   }
 </style>
