@@ -73,7 +73,9 @@ export const getPostDescription = (
     return post.description;
   } else if (content) {
     const processed = parseMarkdownPipeline.parse(content);
-    const rmed = markdownToString(processed).replace(/\s+/g, ' ').trim();
+    const rmed = markdownToString(processed, { includeHtml: false })
+      .replace(/\s+/g, ' ')
+      .trim();
     return rmed.length > DESCRIPTION_MAX_LENGTH
       ? rmed.slice(0, DESCRIPTION_MAX_LENGTH) + '...'
       : rmed;
