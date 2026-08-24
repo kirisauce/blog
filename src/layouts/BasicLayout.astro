@@ -211,38 +211,59 @@ const PAGE_ATTR = 'data-basic-layout-page';
 
   // --- page-content START ---
 
+  // Collapsed layout (default): main content on top (centered, max 1000px),
+  // aside below it. Wide screens switch to a 3-track grid where the main
+  // content sits exactly on the viewport midline and the aside hangs in
+  // the left whitespace (mirrored for aside-right).
   .page-content {
     display: flex;
-    flex-direction: row;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 32px;
     width: 100%;
-    padding: 72px 0;
-    justify-content: center;
+    padding: 72px 24px;
     box-sizing: border-box;
     z-index: 10;
 
-    &:where(.aside-right) {
-      flex-direction: row-reverse;
+    @media (min-width: 1640px) {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1000px) minmax(0, 1fr);
+      column-gap: 32px;
+      align-items: start;
+      padding: 72px 0;
+    }
+  }
+
+  @media (min-width: 1640px) {
+    .aside {
+      grid-column: 1;
+      grid-row: 1;
+      justify-self: end;
     }
 
-    @media (max-width: 1024px) {
-      flex-direction: column-reverse;
-      align-items: center;
-      gap: 32px;
+    .major {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .page-content:where(.aside-right) .aside {
+      grid-column: 3;
+      justify-self: start;
     }
   }
 
   .aside {
-    flex: 0 1 280px;
-    min-width: 280px;
-
     display: flex;
     flex-direction: column;
+    width: 100%;
+    max-width: 500px;
+    box-sizing: border-box;
 
-    @media (max-width: 1024px) {
-      max-width: 500px;
-      width: 100%;
-      padding: 0 12px;
-      box-sizing: border-box;
+    @media (min-width: 1640px) {
+      flex: 0 1 280px;
+      width: 280px;
+      min-width: 280px;
+      max-width: 280px;
     }
   }
 
@@ -252,24 +273,15 @@ const PAGE_ATTR = 'data-basic-layout-page';
     align-items: stretch;
     box-sizing: border-box;
 
-    flex: 0 1 1250px;
-    width: 0;
+    width: 100%;
+    max-width: 1000px;
+    min-width: 0;
     padding: 0 1rem;
-
-    @media (max-width: 1024px) {
-      width: 100%;
-      padding: 0 12px;
-    }
   }
 
   @media (max-width: 1024px) {
     .page-content {
-      padding-left: 0;
-      padding-right: 0;
-    }
-
-    .major {
-      padding: 0 12px;
+      padding: 72px 16px;
     }
   }
 
