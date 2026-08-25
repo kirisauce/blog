@@ -159,8 +159,21 @@
     requestAnimationFrame(() => {
       if (isHovering) return;
       const activeItem = root.querySelector<HTMLElement>('.item-label.active');
-      if (activeItem) {
-        activeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      if (!activeItem) return;
+      // 只在 toc-root 内滚动高亮项至可见；不能用 scrollIntoView——
+      // 它会连带滚动祖先滚动容器（.page），目录卡不在视口时整页视角会被拉走
+      const rootRect = root.getBoundingClientRect();
+      const itemRect = activeItem.getBoundingClientRect();
+      if (itemRect.top < rootRect.top) {
+        root.scrollTo({
+          top: root.scrollTop + itemRect.top - rootRect.top,
+          behavior: 'smooth',
+        });
+      } else if (itemRect.bottom > rootRect.bottom) {
+        root.scrollTo({
+          top: root.scrollTop + itemRect.bottom - rootRect.bottom,
+          behavior: 'smooth',
+        });
       }
     });
   });
