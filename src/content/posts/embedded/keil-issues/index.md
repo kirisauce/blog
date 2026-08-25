@@ -1,7 +1,7 @@
 ---
-title: 在Linux上通过Wine使用Keil遇到的一些问题
+title: Keil 礦ision的一些神秘小问题
 pubDate: 2026-05-11
-updateDate: 2026-08-24
+updateDate: 2026-08-25
 tags: [
   linux,
   keil,
