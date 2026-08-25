@@ -78,6 +78,7 @@
     font-family: var(--font-monospace);
     font-size: 20px;
     gap: 8px;
+    view-transition-name: nav-panel-theme-color;
 
     .heading {
       display: flex;

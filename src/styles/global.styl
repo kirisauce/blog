@@ -55,8 +55,12 @@ body::selection
 ::view-transition-group(basic-layout-html)
   z-index: -1000
 
-::view-transition-group(page-content)
-  z-index: -100
+::view-transition-group(nav-panel-color-scheme),
+::view-transition-group(nav-panel-theme-color)
+  z-index: 2100
+
+::view-transition-group(loading-indicator)
+  z-index: 2200
 
 ::view-transition-group(home-links)
   z-index: -100

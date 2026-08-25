@@ -64,6 +64,7 @@
     flex-direction: column;
     font-family: var(--font-monospace);
     gap: 4px;
+    view-transition-name: nav-panel-color-scheme;
 
     > div:first-child {
       font-weight: 700;
