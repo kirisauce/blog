@@ -25,7 +25,10 @@
     // 受控模式 props（TOC 用）
     expanded: externalExpanded,
     onToggle,
-    activeSlug,
+    /** 视口内需要高亮的标题 slug 集合，可多项同时成立 */
+    activeSlugs,
+    /** 驱动自动展开与目录内滚动的锚点标题 slug */
+    anchorSlug,
     onLinkClick,
   }: {
     items: TreeNode[];
@@ -35,8 +38,10 @@
     expanded?: Record<string, boolean>;
     /** 受控模式下的展开回调 */
     onToggle?: (slug: string) => void;
-    /** 受控模式下当前活跃的标题 slug */
-    activeSlug?: string;
+    /** 视口内需要高亮的标题 slug 集合 */
+    activeSlugs?: Set<string>;
+    /** 驱动自动展开与目录内滚动的锚点标题 slug */
+    anchorSlug?: string;
     /** 受控模式下链接点击回调 */
     onLinkClick?: (e: MouseEvent, slug: string) => void;
   } = $props();
@@ -68,12 +73,17 @@
     }
   }
 
-  /** 判断节点是否为当前活跃项 */
+  /** 判断节点是否高亮（视口内有多个标题时可同时成立） */
   function isItemActive(item: TreeNode): boolean {
-    if (controlled && activeSlug !== undefined) {
-      return item.slug === activeSlug;
+    if (controlled) {
+      return item.slug !== undefined && (activeSlugs?.has(item.slug) ?? false);
     }
     return pathsEqual(item.path, currentPath);
+  }
+
+  /** 判断节点是否为锚点项（驱动目录内滚动定位） */
+  function isItemAnchor(item: TreeNode): boolean {
+    return controlled && item.slug !== undefined && item.slug === anchorSlug;
   }
 
   /** 判断节点链接是否应渲染为普通文本（当前页） */
@@ -124,13 +134,18 @@
             href={item.href}
             class="item-label link"
             class:active={isItemActive(item)}
+            class:anchor={isItemAnchor(item)}
             onclick={(e) =>
               onLinkClick && item.slug ? onLinkClick(e, item.slug) : undefined}
           >
             {item.label}
           </a>
         {:else}
-          <span class="item-label" class:active={isItemActive(item)}>
+          <span
+            class="item-label"
+            class:active={isItemActive(item)}
+            class:anchor={isItemAnchor(item)}
+          >
             {item.label}
           </span>
         {/if}
@@ -144,7 +159,8 @@
             {currentPath}
             expanded={externalExpanded}
             {onToggle}
-            {activeSlug}
+            {activeSlugs}
+            {anchorSlug}
             {onLinkClick}
           />
         </div>
@@ -217,14 +233,14 @@
     font-size: 1rem;
     color: var(--text);
     line-height: 1.4;
+    transition:
+      background-color var(--expressive-default-effects),
+      color var(--expressive-default-effects);
 
     &.link {
       text-decoration: none;
       padding: 2px 6px;
       border-radius: 4px;
-      transition:
-        background-color var(--expressive-default-effects),
-        color var(--expressive-default-effects);
 
       &:hover {
         background-color: var(--primary-container);
