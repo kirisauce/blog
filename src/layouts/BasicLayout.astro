@@ -152,6 +152,12 @@ const PAGE_ATTR = 'data-basic-layout-page';
   });
 </script>
 
+<script>
+  // 自定义元素注册：不进 HeadBase 内联链——Svelte 运行时体量大，
+  // 会拖慢 preference 初始化导致 client:only Panel 读不到 __PREFERENCES__
+  import '../client/web-components.ts';
+</script>
+
 <style lang="stylus">
   body {
     background-color: var(--background);

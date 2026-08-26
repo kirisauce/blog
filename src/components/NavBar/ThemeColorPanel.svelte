@@ -2,7 +2,7 @@
   import { onDestroy, onMount } from 'svelte';
   import { getAutoClose } from '../../client/toggler';
 
-  let { class: className = '' } = $props();
+  const props = $props();
   const prefs = window.__PREFERENCES__;
 
   let displayNumHue = $state(prefs.themeHue.value);
@@ -46,12 +46,13 @@
 
 <div
   id="nav-theme-color-panel"
+  role="group"
   data-toggle-preset="dropdown"
   data-toggler-state="hide"
   style:display="none"
   bind:this={elSelf}
   onpointerdown={(e) => getAutoClose(elSelf)?.ignore?.(e)}
-  class={className}
+  {...props}
 >
   <div class="heading">
     Hue: {displayNumHue.toString().padStart(3, '0')}

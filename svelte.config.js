@@ -2,9 +2,13 @@ import { vitePreprocess } from '@astrojs/svelte';
 
 export default {
   preprocess: vitePreprocess(),
-  // 配合 GitHubCard.svelte 内的 <svelte:options customElement>，
-  // 缺少此项时 vite-plugin-svelte 抛 options_missing_custom_element 警告
-  compilerOptions: {
-    customElement: true,
+  // 只对 GitHubCard 启用 CE 编译：全局开启会把 unplugin-icons 等虚拟模块
+  // 一并拖进 custom element 检查，产生大量无法修复的警告
+  vitePlugin: {
+    dynamicCompileOptions({ filename }) {
+      if (filename.endsWith('GitHubCard.svelte')) {
+        return { customElement: true };
+      }
+    },
   },
 };

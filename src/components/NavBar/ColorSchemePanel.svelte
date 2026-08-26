@@ -6,7 +6,7 @@
   import { getAutoClose } from '../../client/toggler';
   import { onDestroy, onMount } from 'svelte';
 
-  let { class: className = '' } = $props();
+  const props = $props();
   const pref = window.__PREFERENCES__;
   let elSelf: HTMLDivElement;
 
@@ -45,12 +45,13 @@
 
 <div
   id="nav-color-scheme-switch"
+  role="group"
   data-toggle-preset="dropdown"
   data-toggler-state="hide"
   style:display="none"
   bind:this={elSelf}
   onpointerdown={(e) => getAutoClose(elSelf)?.ignore?.(e)}
-  class={className}
+  {...props}
 >
   <div>Color Scheme</div>
   {@render SwitchButton(IconLight, 'Light', 'light')}
