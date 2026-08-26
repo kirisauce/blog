@@ -35,10 +35,10 @@ astro-cakes/
     │   ├── preference.ts        localStorage 偏好存储（带跨标签页同步）
     │   ├── toggler.ts           通用显隐切换动画系统（支持预设/自动关闭）
     │   ├── utils.ts             视图过渡辅助函数
+    │   ├── web-components.ts    自定义元素注册入口（导入 Svelte 组件即注册，?inline 进 head）
     │   └── run/                 启动时立即执行的脚本
     │       ├── preference.ts    localStorage 偏好初始化
-    │       ├── utils.ts         navigate 桥接
-    │       └── github-card.ts   GitHub 仓库卡片懒加载（IntersectionObserver + API fetch）
+    │       └── utils.ts         navigate 桥接
     ├── components/
     │   ├── Cards/               侧边栏/文章列表卡片
     │   │   ├── AuthorCard       作者信息卡
@@ -86,7 +86,6 @@ astro-cakes/
     │   ├── global.styl          全局样式 + View Transition 规则
     │   └── markdown/            Markdown 渲染样式
     │       ├── common.styl      通用 Markdown 样式
-    │       ├── github-card.styl GitHub 仓库卡片样式（浅色半透明磨砂玻璃）
     │       └── title.css        标题样式
     ├── types/                   TypeScript 类型定义（config 的 Zod schema）
     ├── utils/                   共享工具
@@ -126,7 +125,7 @@ astro-cakes/
 | `src/vite/index.ts`             | `virtual:dynamic-style` 插件（JS 驱动 CSS）                                                            |
 | `src/server/icon-loader.ts`     | 共享图标加载工具（Icon.astro 和 remark 插件共用管道）                                                  |
 | `src/server/mdext/`             | 自定义 Markdown 扩展，提供 `::i[src]{attrs}` 内联图标语法和 `::github[owner/repo]` GitHub 仓库卡片语法 |
-| `src/client/run/github-card.ts` | GitHub 卡片客户端懒加载（IntersectionObserver + fetch API + 三态渲染）                                 |
+| `src/components/GitHubCard.svelte` | GitHub 仓库卡片 Svelte 组件（编译为 `<github-card>` Web Component，懒加载 + 缓存）                    |
 | `src/styles/color.styl`         | OKLCH 调色板（修改主题色）                                                                             |
 | `src/styles/variables.styl`     | CSS 变量和动画曲线定义                                                                                 |
 | `fonts/config.json`             | 字体子集配置文件                                                                                       |
@@ -175,4 +174,4 @@ astro-cakes/
 - **色相可调**：用户可以通过 UI 滑块（0-359）改变主题色相，值存储在 `localStorage` 的 `theme-hue` 键中，覆盖 `src/config.ts` 中的 `theme.defaultHue`。
 - **字体文件**预生成并放在 `fonts/` 目录中，修改 `astro.config.mts` 中的字体配置后要确保对应的 `.woff2` 文件存在。
 - **代码高亮**配置在 `ec.config.mjs` 中，主题色在 `src/styles/color.styl` 中通过 `--color-hue` CSS 变量驱动。
-- **GitHub 卡片 `::github[owner/repo]`** 修改涉及三端：`src/server/mdext/github-card.ts`（remark 插件，生成占位 HTML）、`src/client/run/github-card.ts`（客户端懒加载，三态渲染）、`src/styles/markdown/github-card.styl`（半透明磨砂玻璃样式）。卡片图标（github/star/fork）在 `HeadBase.astro` 的 frontmatter 中通过 `loadIconSvg()` 构建时获取，注入到 `window.__CONFIG__.icons`；客户端通过 `icons?.github` / `icons?.star` / `icons?.fork` 访问，不加 class，颜色由 `fill="currentColor"` 继承父元素。
+- **GitHub 卡片 `::github[owner/repo]`**：`src/server/mdext/github-card.ts`（remark 插件）构建时输出 `<github-card repo="...">` 自定义元素，内部携带无 JS 回退占位（内联样式，图标经 `loadIconSvg()` 构建时预取）；`src/components/GitHubCard.svelte` 通过 `<svelte:options customElement>` 编译为同名 Web Component，由 `src/client/web-components.ts` 导入注册。组件升级挂载时负责清除宿主中的回退节点（Svelte CE mount 不清空 light DOM），并实现懒加载、48h localStorage 缓存（key `gh-card:{repo小写}`）、SWR 后台刷新与错误重试。

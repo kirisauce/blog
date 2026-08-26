@@ -5,37 +5,59 @@
  * ::github[kirisauce/astro-cakes]
  * ```
  *
- * 构建时注入占位 HTML（仓库名 + N/A + GitHub 链接），
- * 客户端脚本在元素滚动到视口内时懒加载完整卡片数据。
+ * 构建时注入 <github-card> 自定义元素，内部携带无 JS 回退占位
+ * （内联样式，不依赖任何脚本或组件样式表），
+ * 客户端 Svelte 组件升级挂载时接管渲染并移除回退内容。
  */
 
+import { loadIconSvg, type IconResult } from '../icon-loader';
 import { createCommandPlugin, escapeHtml } from './plugin-factory';
 
-/** 仓库图标 SVG（GitHub Primer octicon "repo"） */
-const REPO_ICON =
-  '<svg class="gh-card__icon" viewBox="0 0 16 16" fill="currentColor">' +
-  '<path d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 01-.75-.75v-2.5h-7.5a1 1 0 00-1 1v.5A3.5 3.5 0 015.5 12h7.25a.75.75 0 010 1.5H5.5A5 5 0 010 8.5v-1A2.5 2.5 0 012 5h8.5V.75a.75.75 0 011.5 0V5h1a.75.75 0 010 1.5h-1v1.5h2.25a.75.75 0 010 1.5H12v2.5h1a.75.75 0 010 1.5h-1v.75a.75.75 0 01-1.5 0V12H5.5A3.5 3.5 0 012 8.5v-6z"/>' +
-  '</svg>';
+// 模块顶层预取：图标只加载一次，供所有 ::github 占位复用
+const GH_ICON: IconResult = await loadIconSvg('mingcute:github-line');
+
+/** 回退占位图标：过滤原始尺寸属性，内联样式固定大小并继承文字颜色 */
+function renderFallbackIcon(icon: IconResult, size: number): string {
+  const attrs = Object.entries(icon.attribs)
+    .filter(([k]) => k !== 'width' && k !== 'height')
+    .map(([k, v]) => `${k}="${v}"`)
+    .join(' ');
+  return `<svg ${attrs} fill="currentColor" style="width: ${size}px; height: ${size}px; flex-shrink: 0;">${icon.body}</svg>`;
+}
+
+/** 回退占位内联样式：必须在不执行 JS、不加载组件样式的环境下独立生效 */
+const FALLBACK_STYLE = `
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem 1.25rem;
+  margin: 1rem 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-family: var(--font-sans, inherit);
+  text-decoration: none;
+`;
 
 /**
  * 构建占位 HTML。
  *
- * 脚本未运行或加载失败时，用户看到此占位内容——一个可点击的链接卡片，
- * 显示仓库名称和 "N/A"。客户端脚本运行后会在进入视口时替换为完整卡片。
+ * <github-card> 内部放置回退链接：JS 不可用时用户仍能看到可点击的占位卡片；
+ * 组件升级后由 GitHubCard.svelte 清除宿主中的回退节点。
  */
 function buildPlaceholder(repo: string): string {
   const escapedRepo = escapeHtml(repo.trim());
   if (escapedRepo.length === 0) return '';
-
-  return [
-    `<span class="gh-card" data-repo="${escapedRepo}">`,
-    `<a class="gh-card--placeholder" href="https://github.com/${escapedRepo}" target="_blank" rel="noopener noreferrer">`,
-    REPO_ICON,
-    `<span class="gh-card__name">${escapedRepo}</span>`,
-    `<span class="gh-card__meta">N/A</span>`,
-    `</a>`,
-    `</span>`,
-  ].join('');
+  return `<github-card repo="${escapedRepo}">
+    <a href="https://github.com/${escapedRepo}" target="_blank" rel="noopener noreferrer" style="${FALLBACK_STYLE}">
+      ${renderFallbackIcon(GH_ICON, 18)}
+      <span style="flex: 1; font-family: var(--font-monospace, monospace); font-weight: 600; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        ${escapedRepo}
+      </span>
+      <span style="font-size: 0.8rem;">N/A</span>
+    </a>
+  </github-card>`;
 }
 
 export default createCommandPlugin('github', buildPlaceholder);
