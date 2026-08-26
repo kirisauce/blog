@@ -111,12 +111,68 @@
     color: var(--text)
     text-decoration: none
 
+  // 手动强制刷新按钮：hover 卡片显现，触屏常驻
+  .gh-card__refresh
+    position: absolute
+    top: 0.5rem
+    right: 0.5rem
+    display: inline-flex
+    align-items: center
+    justify-content: center
+    width: 32px
+    height: 32px
+    border: 1px solid var(--border)
+    border-radius: 8px
+    background: var(--surface)
+    color: var(--text-muted)
+    cursor: pointer
+    padding: 0
+    opacity: 0
+    transform: translateY(-4px)
+    transition: opacity var(--expressive-slow-effects), transform var(--expressive-slow-effects), color var(--expressive-fast-effects), border-color var(--expressive-fast-effects)
+
+    > svg
+      width: 16px
+      height: 16px
+
+    &:hover
+      color: var(--primary)
+      border-color: var(--primary)
+
+    &:active
+      transform: scale(0.94)
+
+    // 刷新进行中：保持可见 + 图标旋转（复用 spinner 的 keyframes）
+    &[data-spinning]
+      opacity: 1
+      transform: scale(1)
+
+      > svg
+        animation: gh-card-spin 0.8s linear infinite
+
+  .gh-card--loaded:hover .gh-card__refresh,
+  .gh-card__refresh:focus-visible
+    opacity: 1
+    transform: scale(1)
+
+  @media (hover: none)
+    .gh-card__refresh
+      opacity: 0.6
+      transform: none
+
   .gh-card__header
     display: flex
     justify-content: space-between
     align-items: center
     gap: 0.5rem
     margin-bottom: 0.5rem
+
+  // header 右侧 GitHub 图标与刷新按钮同位互换：hover 时让位给刷新按钮
+  .gh-card__header > svg
+    transition: opacity var(--expressive-fast-effects)
+
+  .gh-card--loaded:hover .gh-card__header > svg
+    opacity: 0
 
   .gh-card__icon
     width: 18px
@@ -191,3 +247,112 @@
 
   .gh-card__updated
     margin-left: auto
+
+  // ═══ 错误条状态 ═════════════════════════════════════════════════════
+  // 一行式：警告图标 + 原因文案（+ 重试提示），右侧 GitHub 外链
+  .gh-card--error
+    display: flex
+    align-items: center
+    gap: 0.5rem
+    border: 1px solid var(--error)
+    border-radius: 12px
+    background: var(--error-container)
+    padding: 0.55rem 1rem
+    margin: 1rem 0
+    color: var(--on-error-container)
+    font-family: var(--font-sans)
+    font-size: 0.85rem
+
+  .gh-card__error-main
+    display: flex
+    align-items: center
+    gap: 0.5rem
+    flex: 1
+    min-width: 0
+    background: none
+    border: none
+    padding: 0
+    margin: 0
+    font: inherit
+    color: inherit
+    cursor: pointer
+    text-align: left
+
+    // 警告图标放大（覆盖注入 SVG 的内联 width/height）
+    > svg
+      width: 20px
+      height: 20px
+      flex-shrink: 0
+
+    // 仓库名零网络成本，任何失败态都必须可见
+    .gh-card__name
+      font-weight: 600
+      flex-shrink: 0
+
+    // 404 等不可重试态：主体不表现可点
+    &[data-static]
+      cursor: default
+
+  .gh-card__error-detail
+    display: flex
+    align-items: center
+    gap: 0.5rem
+    flex: 1
+    min-width: 0
+
+  .gh-card__error-text
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
+
+  .gh-card__error-retry
+    display: inline-flex
+    align-items: center
+    justify-content: center
+    flex-shrink: 0
+    margin-left: auto
+    width: 36px
+    height: 36px
+    // color-mix 需 unquote 包裹，否则 Stylus 会把 "in" 当运算符解析
+    border: 1px solid unquote("color-mix(in oklch, var(--on-error-container), transparent 35%)")
+    border-radius: 10px
+    background: unquote("color-mix(in oklch, var(--on-error-container), transparent 92%)")
+    padding: 0
+    color: inherit
+    cursor: pointer
+    transition: background-color var(--expressive-fast-effects), border-color var(--expressive-fast-effects), transform var(--expressive-fast-effects)
+
+    > svg
+      width: 20px
+      height: 20px
+
+    &:hover
+      background: unquote("color-mix(in oklch, var(--on-error-container), transparent 78%)")
+      border-color: var(--on-error-container)
+
+    &:active
+      transform: scale(0.96)
+
+  .gh-card__error-link
+    display: inline-flex
+    align-items: center
+    flex-shrink: 0
+    color: inherit
+    opacity: 0.7
+    transition: opacity var(--expressive-fast-effects)
+
+    > svg
+      width: 18px
+      height: 18px
+
+    &:hover
+      opacity: 1
+
+  // 窄屏（竖屏设备）：错误文案+重试按钮换到第二行，首行保住「图标 + 仓库名 + 外链」
+  @media (max-width: 640px)
+    .gh-card__error-main
+      flex-wrap: wrap
+      row-gap: 0.4rem
+
+    .gh-card__error-detail
+      flex-basis: 100%

@@ -42,15 +42,19 @@ function renderSvg(icon: IconResult, size = 16): string {
   return `<svg ${attrs} fill="currentColor" width="${size}" height="${size}">${icon.body}</svg>`;
 }
 
-const [gitIcon, starIcon, forkIcon] = await Promise.all([
+const [gitIcon, starIcon, forkIcon, alertIcon, refreshIcon] = await Promise.all([
   loadIconSvg('mingcute:github-line'),
   loadIconSvg('mingcute:star-line'),
   loadIconSvg('mdi:source-fork'),
+  loadIconSvg('mdi:alert-circle-outline'),
+  loadIconSvg('mingcute:refresh-1-fill'),
 ]);
 
 const githubIconSvg = renderSvg(gitIcon);
 const starIconSvg = renderSvg(starIcon, 14);
 const forkIconSvg = renderSvg(forkIcon, 14);
+const alertIconSvg = renderSvg(alertIcon);
+const refreshIconSvg = renderSvg(refreshIcon);
 ---
 
 <meta charset="utf-8" />
@@ -64,13 +68,15 @@ const forkIconSvg = renderSvg(forkIcon, 14);
 <!-- Font  -->
 <Font cssVariable="--font-monospace" />
 
-<script define:vars={{ theme, githubIconSvg, starIconSvg, forkIconSvg }}>
+<script define:vars={{ theme, githubIconSvg, starIconSvg, forkIconSvg, alertIconSvg, refreshIconSvg }}>
   window.__CONFIG__ = {
     theme,
     icons: {
       github: githubIconSvg,
       star: starIconSvg,
       fork: forkIconSvg,
+      alert: alertIconSvg,
+      refresh: refreshIconSvg,
     },
   };
 </script>

@@ -123,6 +123,13 @@ function pickData(raw: any): RepoData {
 
 // ── 请求（同页同 repo 共享 in-flight promise） ──────────────────────
 
+type FetchErrorType = 'notfound' | 'ratelimit' | 'network' | 'http';
+
+interface FetchError extends Error {
+  type: FetchErrorType;
+  status?: number;
+}
+
 const inflight = new Map<string, Promise<RepoData>>();
 const swrFailedAt = new Map<string, number>();
 
@@ -132,15 +139,42 @@ function fetchRepo(repo: string): Promise<RepoData> {
 
   const p = fetch(`${GH_API_BASE}/${repo}`)
     .then((res) => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        const err = new Error(`HTTP ${res.status}`) as FetchError;
+        err.status = res.status;
+        err.type =
+          res.status === 404
+            ? 'notfound'
+            : res.status === 403 &&
+                res.headers.get('x-ratelimit-remaining') === '0'
+              ? 'ratelimit'
+              : 'http';
+        throw err;
+      }
       return res.json() as any;
     })
-    .then(pickData);
+    .then(pickData)
+    .catch((e) => {
+      // fetch reject / JSON 解析失败等无类型异常归为网络错误
+      if (!e.type) e.type = 'network';
+      throw e;
+    });
 
   inflight.set(repo, p);
   const settle = () => inflight.delete(repo);
   p.then(settle, settle);
   return p;
+}
+
+function errorText(err: FetchError): string {
+  if (err.type === 'http' && err.status) return `HTTP ${err.status}`;
+  const texts: Record<FetchErrorType, string> = {
+    notfound: 'Repository not found',
+    ratelimit: 'API rate limit exceeded',
+    network: 'Network error',
+    http: 'GitHub API error',
+  };
+  return texts[err.type];
 }
 
 // ── 辅助函数 ──────────────────────────────────────────────────────
@@ -222,10 +256,86 @@ function renderLoaded(el: HTMLElement, data: RepoData): void {
   el.innerHTML =
     `<div class="gh-card--loaded">` +
     `<a class="gh-card__main" href="${escapeHtml(data.html_url)}" target="_blank" rel="noopener noreferrer">${buildCardInner(data)}</a>` +
+    `<button class="gh-card__refresh" type="button" aria-label="Refresh">${window.__CONFIG__?.icons?.refresh ?? '⟳'}</button>` +
     `</div>`;
+
+  el.querySelector('.gh-card__refresh')?.addEventListener('click', (e) => {
+    e.stopPropagation(); // 不触发外层链接导航
+    forceRefresh(el, data.full_name);
+  });
+}
+
+// 手动刷新：无视缓存与 SWR 退避，直接请求；成功重置 48h 计时，失败切错误条
+function forceRefresh(el: HTMLElement, repo: string): void {
+  const btn = el.querySelector('.gh-card__refresh');
+  if (!btn || btn.hasAttribute('data-spinning')) return;
+  btn.setAttribute('data-spinning', '');
+
+  fetchRepo(repo).then(
+    (data) => {
+      writeCache(repo, data);
+      if (el.isConnected) {
+        renderLoaded(el, data);
+        el.dataset.ghState = 'loaded';
+      }
+    },
+    (e) => {
+      if (el.isConnected) {
+        renderError(el, repo, e as FetchError);
+        el.dataset.ghState = 'error';
+      }
+    },
+  );
+}
+
+function renderError(el: HTMLElement, repo: string, err: FetchError): void {
+  const icons = window.__CONFIG__?.icons;
+  // 404 重试无意义：不给重试按钮、主体不可点，仅保留外链
+  const retryable = err.type !== 'notfound';
+
+  el.innerHTML =
+    `<div class="gh-card--error" role="status">` +
+    `<div class="gh-card__error-main"${retryable ? '' : ' data-static'}>` +
+    `${icons?.alert ?? '⚠'}` +
+    `<span class="gh-card__name">${escapeHtml(repo)}</span>` +
+    `<span class="gh-card__error-detail">` +
+    `<span class="gh-card__error-text">${errorText(err)}</span>` +
+    (retryable
+      ? `<button class="gh-card__error-retry" type="button" aria-label="Retry">${icons?.refresh ?? '⟳'}</button>`
+      : '') +
+    `</span>` +
+    `</div>` +
+    `<a class="gh-card__error-link" href="https://github.com/${escapeHtml(repo)}" target="_blank" rel="noopener noreferrer" aria-label="Open on GitHub">${icons?.github ?? '↗'}</a>` +
+    `</div>`;
+
+  if (retryable) {
+    el.querySelector('.gh-card__error-retry')?.addEventListener('click', (e) => {
+      e.stopPropagation(); // 避免冒泡到主体导致双重触发
+      retryCard(el, repo);
+    });
+    el.querySelector('.gh-card__error-main')?.addEventListener('click', () => {
+      retryCard(el, repo);
+    });
+  }
 }
 
 // ── 加载决策 ───────────────────────────────────────────────────────
+
+function retryCard(el: HTMLElement, repo: string): void {
+  el.dataset.ghState = 'pending';
+  renderLoading(el, repo);
+  fetchRepo(repo).then(
+    (data) => {
+      writeCache(repo, data);
+      renderLoaded(el, data);
+      el.dataset.ghState = 'loaded';
+    },
+    (e) => {
+      renderError(el, repo, e as FetchError);
+      el.dataset.ghState = 'error';
+    },
+  );
+}
 
 function swrRefresh(el: HTMLElement, repo: string): void {
   if (Date.now() - (swrFailedAt.get(repo) ?? 0) < SWR_BACKOFF_MS) return;
@@ -264,8 +374,7 @@ function loadCard(el: HTMLElement): void {
     return;
   }
 
-  // 无缓存 → loading → 请求；失败回退占位链接
-  const fallbackHTML = el.innerHTML;
+  // 无缓存 → loading → 请求；失败进入错误条
   renderLoading(el, repo);
   fetchRepo(repo).then(
     (data) => {
@@ -273,8 +382,8 @@ function loadCard(el: HTMLElement): void {
       renderLoaded(el, data);
       el.dataset.ghState = 'loaded';
     },
-    () => {
-      el.innerHTML = fallbackHTML;
+    (e) => {
+      renderError(el, repo, e as FetchError);
       el.dataset.ghState = 'error';
     },
   );
