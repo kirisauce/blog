@@ -34,6 +34,7 @@ const FALLBACK_STYLE = `
   border-radius: 12px;
   padding: 0.75rem 1.25rem;
   margin: 1rem 0;
+  background: color-mix(in oklch, var(--surface), transparent 22%);
   color: var(--text-muted);
   font-size: 0.9rem;
   font-family: var(--font-sans, inherit);

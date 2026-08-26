@@ -12,6 +12,8 @@
   import GithubIcon from '~icons/mingcute/github-line';
   import StarIcon from '~icons/mingcute/star-line';
   import ForkIcon from '~icons/mdi/source-fork';
+  import IssueIcon from '~icons/mdi/bug-outline';
+  import LicenseIcon from '~icons/mdi/license';
   import AlertIcon from '~icons/mdi/alert-circle-outline';
   import RefreshIcon from '~icons/mingcute/refresh-1-fill';
   import ExternalLinkIcon from '~icons/mdi/external-link';
@@ -26,6 +28,8 @@
     html_url: string;
     stargazers_count: number;
     forks_count: number;
+    open_issues_count: number;
+    license: string | null;
     language: string | null;
     updated_at: string;
     owner: { avatar_url: string };
@@ -129,12 +133,15 @@
       throw e;
     }
     const raw = await res.json();
+    const spdx: string | null = raw.license?.spdx_id ?? null;
     return {
       full_name: raw.full_name,
       description: raw.description,
       html_url: raw.html_url,
       stargazers_count: raw.stargazers_count ?? 0,
       forks_count: raw.forks_count ?? 0,
+      open_issues_count: raw.open_issues_count ?? 0,
+      license: spdx && spdx !== 'NOASSERTION' ? spdx : null,
       language: raw.language,
       updated_at: raw.updated_at,
       owner: { avatar_url: raw.owner?.avatar_url ?? '' },
@@ -309,6 +316,12 @@
           {#if data.forks_count > 0}
             <span class="stat"><ForkIcon /> {formatNum(data.forks_count)}</span>
           {/if}
+          {#if data.open_issues_count > 0}
+            <span class="stat"><IssueIcon /> {formatNum(data.open_issues_count)}</span>
+          {/if}
+          {#if data.license}
+            <span class="stat"><LicenseIcon /> {data.license}</span>
+          {/if}
           <span class="updated">Updated {timeAgo(data.updated_at)}</span>
         </div>
       </a>
@@ -389,7 +402,7 @@
   .placeholder,
   .loading,
   .loaded {
-    background: color-mix(in oklch, var(--surface), transparent 40%);
+    background: color-mix(in oklch, var(--surface), transparent 22%);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border: 1px solid var(--border);
