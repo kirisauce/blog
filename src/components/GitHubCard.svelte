@@ -80,20 +80,26 @@
 
   // ── 缓存 ──────────────────────────────────────────────────────────
 
+  interface CachedError { kind: ErrKind; status?: number; }
+  interface CacheEntry { t: number; d?: RepoData; e?: CachedError; }
+
   const cache = {
     key: (r: string) => `gh-card:${r.toLowerCase()}`,
-    get(r: string): { t: number; d: RepoData } | null {
+    get(r: string): CacheEntry | null {
       try {
         const v = JSON.parse(localStorage.getItem(this.key(r)) ?? '');
-        return v?.d ? v : null;
+        return v?.d || v?.e ? (v as CacheEntry) : null;
       } catch { return null; }
     },
     set(r: string, d: RepoData) {
-      try { localStorage.setItem(this.key(r), JSON.stringify({ t: Date.now(), d })); } catch {}
+      try { localStorage.setItem(this.key(r), JSON.stringify({ t: Date.now(), d } satisfies CacheEntry)); } catch {}
     },
-    fresh(r: string): RepoData | null {
+    setError(r: string, e: CardError) {
+      try { localStorage.setItem(this.key(r), JSON.stringify({ t: Date.now(), e: { kind: e.kind, status: e.status } } satisfies CacheEntry)); } catch {}
+    },
+    fresh(r: string): CacheEntry | null {
       const c = this.get(r);
-      return c && Date.now() - c.t < 48 * 36e5 ? c.d : null;
+      return c && Date.now() - c.t < 48 * 36e5 ? c : null;
     },
     stale(r: string): RepoData | null {
       return this.get(r)?.d ?? null;
@@ -160,7 +166,18 @@
     phase = 'loading';
 
     const fresh = cache.fresh(repo);
-    if (fresh) { data = fresh; phase = 'loaded'; return; }
+    if (fresh) {
+      if (fresh.d) { data = fresh.d; phase = 'loaded'; return; }
+      if (fresh.e) {
+        const ce = fresh.e;
+        const er = new Error(ERR_MSG[ce.kind]) as CardError;
+        er.kind = ce.kind;
+        er.status = ce.status;
+        err = er;
+        phase = 'error';
+        return;
+      }
+    }
 
     const stale = cache.stale(repo);
     if (stale) {
@@ -179,7 +196,9 @@
       cache.set(repo, data);
       phase = 'loaded';
     } catch (e) {
-      err = e as CardError;
+      const ce = e as CardError;
+      cache.setError(repo, ce);
+      err = ce;
       phase = 'error';
     }
   }
@@ -193,7 +212,9 @@
       cache.set(repo, data);
       phase = 'loaded';
     } catch (e) {
-      err = e as CardError;
+      const ce = e as CardError;
+      cache.setError(repo, ce);
+      err = ce;
       phase = 'error';
     }
   }
@@ -205,8 +226,11 @@
       data = await fetchRepo(repo);
       cache.set(repo, data);
       phase = 'loaded';
+      err = null;
     } catch (e) {
-      err = e as CardError;
+      const ce = e as CardError;
+      cache.setError(repo, ce);
+      err = ce;
       phase = 'error';
     } finally {
       spinning = false;
