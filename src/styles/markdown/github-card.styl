@@ -9,7 +9,7 @@
 
 .markdown
   // 覆盖 Markdown 外层 <p> 的居中规则（因为卡片包含 <img> 触发了 p:has(img)）
-  p:has(> .gh-card, > .gh-card--loaded)
+  p:has(> .gh-card)
     text-align: initial
 
   // 卡片通用半透明背景
@@ -87,14 +87,15 @@
       transform: rotate(360deg)
 
   // ═══ 完整卡片状态 ═══════════════════════════════════════════════════
+  // 容器 div，内部 .gh-card__main 为可点击链接区
+  // （外层留独立定位空间，供后续刷新按钮等控件使用）
   .gh-card--loaded
     display: block
+    position: relative
     border: 1px solid var(--border)
     border-radius: 12px
     padding: 1rem 1.25rem
     margin: 1rem 0
-    text-decoration: none
-    color: var(--text)
     font-family: var(--font-sans)
     transition: border-color var(--expressive-default-effects), box-shadow var(--expressive-default-effects)
 
@@ -104,6 +105,11 @@
 
     &:active
       transform: scale(0.995)
+
+  .gh-card__main
+    display: block
+    color: var(--text)
+    text-decoration: none
 
   .gh-card__header
     display: flex
