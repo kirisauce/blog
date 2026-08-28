@@ -3,13 +3,13 @@ import BasicLayout from './BasicLayout.astro';
 import { getCollection } from 'astro:content';
 
 import { author, site, layout } from '../config';
-import { dropdown } from '../utils/transition';
 import { processPost } from '../server/utils';
 import AuthorCard from '../components/Cards/AuthorCard.astro';
 import PostLinkCard from '../components/Cards/PostLinkCard.astro';
 import CategoriesCard from '../components/Cards/CategoriesCard.astro';
 import TagsCard from '../components/Cards/TagsCard.astro';
 import { fade } from 'astro:transitions';
+import { m3anim } from '../utils/consts';
 import WebSite from '../components/json-ld/WebSite.astro';
 
 const displayPosts = (await getCollection('blog'))
@@ -37,7 +37,7 @@ const displayPosts = (await getCollection('blog'))
     }
 
     <main
-      transition:animate={dropdown()}
+      transition:animate={fade({ duration: m3anim.standardDefaultSpatial.duration })}
       transition:name="home-links"
       class="link-cards"
     >
@@ -54,7 +54,7 @@ const displayPosts = (await getCollection('blog'))
       author.defaultAuthor && (
         <AuthorCard
           transition:name="author-card"
-          transition:animate={fade({ duration: 800 })}
+          transition:animate={fade({ duration: m3anim.standardSlowSpatial.duration })}
           authorId={author.defaultAuthor}
         />
       )

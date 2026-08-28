@@ -29,12 +29,21 @@ body::selection
     transform: translate(0, 64px)
     opacity: 0
 
+// 静态框架元素（navbar、aside 卡片等）在页面切换时保持原位，
+// 以与封面一致的节奏淡入淡出（时长来自预定义动画变量）
 ::view-transition-group(*)
-  animation-duration: 500ms
+  animation-duration: var(--standard-default-spatial-duration)
   z-index: 2000
 
+// 封面放大是页面切换的主角：弹性曲线 + 预定义时长
+::view-transition-group(clicked-cover)
+  animation-duration: var(--expressive-default-spatial-duration)
+  z-index: 100
+
+// 标题/分类跟随封面过渡，与封面同节奏
 ::view-transition-group(clicked-title),
 ::view-transition-group(clicked-category)
+  animation-duration: var(--standard-default-spatial-duration)
   z-index: 2001
 
 ::view-transition-old(clicked-title)
@@ -47,9 +56,6 @@ body::selection
 ::view-transition-old(clicked-cover),
 ::view-transition-new(clicked-cover)
   height: 100%
-
-::view-transition-group(clicked-cover)
-  z-index: 100
 
 ::view-transition-group(root),
 ::view-transition-group(basic-layout-html)

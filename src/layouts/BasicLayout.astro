@@ -6,6 +6,7 @@ import NavBar from '../components/NavBar.astro';
 import LoadingIndicator from '../components/LoadingIndicator.astro';
 import PageFooter from '../components/PageFooter.astro';
 import { fade } from 'astro:transitions';
+import { m3anim } from '../utils/consts';
 
 export interface Props {
   coverImage?: ImageMetadata;
@@ -34,7 +35,7 @@ const PAGE_ATTR = 'data-basic-layout-page';
 
 <html
   lang={site.lang}
-  transition:animate={fade({ duration: '500ms' })}
+  transition:animate={fade({ duration: m3anim.standardDefaultSpatial.duration })}
   transition:name="basic-layout-html"
 >
   <head>

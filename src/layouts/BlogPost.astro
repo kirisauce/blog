@@ -7,7 +7,8 @@ import BasicLayout from './BasicLayout.astro';
 import type { CollectionEntry } from 'astro:content';
 import { render } from 'astro:content';
 import { author as authorConfig } from '../config';
-import { dropdown } from '../utils/transition';
+import { fade } from 'astro:transitions';
+import { m3anim } from '../utils/consts';
 import BlogPosting from '../components/json-ld/BlogPosting.astro';
 
 export type Props = {
@@ -36,7 +37,7 @@ const layoutProps = {
   </Fragment>
 
   <Fragment slot="major">
-    <main transition:animate={dropdown()} class="card article-content-card">
+    <main transition:animate={fade({ duration: m3anim.standardDefaultSpatial.duration })} class="card article-content-card">
       <PostContent post={Astro.props.post} />
     </main>
   </Fragment>

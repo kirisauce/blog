@@ -17,6 +17,9 @@
   --font-sans: 'Roboto', 'Noto Sans', sans-serif
   font: var(--font-sans)
 
+// 动画 token 定义在 :root 上：view-transition 伪元素挂在 html 上，
+// 若定义在 body 上会继承不到，var() 解析失败导致动画时长退化为 0s
+:root
   // Expressive fast spatial
   --expressive-fast-spatial: 350ms cubic-bezier(0.42, 1.67, 0.21, 0.90)
 
@@ -52,3 +55,17 @@
 
   // Standard slow effects
   --standard-slow-effects: 300ms cubic-bezier(0.34, 0.88, 0.34, 1.00)
+
+  // Duration-only tokens（与 m3anim 对应，供 animation-duration 单独引用）
+  --expressive-fast-spatial-duration: 350ms
+  --expressive-default-spatial-duration: 500ms
+  --expressive-slow-spatial-duration: 650ms
+  --expressive-fast-effects-duration: 150ms
+  --expressive-default-effects-duration: 200ms
+  --expressive-slow-effects-duration: 300ms
+  --standard-fast-spatial-duration: 350ms
+  --standard-default-spatial-duration: 500ms
+  --standard-slow-spatial-duration: 750ms
+  --standard-fast-effects-duration: 150ms
+  --standard-default-effects-duration: 200ms
+  --standard-slow-effects-duration: 300ms

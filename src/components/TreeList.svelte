@@ -16,6 +16,7 @@
 
 <script lang="ts">
   import { slide } from 'svelte/transition';
+  import { m3anim } from '../utils/consts';
   import TreeList from './TreeList.svelte';
 
   const {
@@ -152,7 +153,7 @@
       </div>
 
       {#if item.children && item.children.length > 0 && isExpanded}
-        <div transition:slide={{ duration: 200 }}>
+        <div transition:slide={{ duration: m3anim.expressiveDefaultEffects.duration }}>
           <TreeList
             items={item.children}
             depth={depth + 1}

@@ -1,6 +1,7 @@
 <div id="loading-indicator"></div>
 
 <script>
+  import { m3anim } from '../utils/consts';
   // Astro 打包的 module script 全站只执行一次；不要在 astro:page-load 里重复注册
   // 事件，否则监听器随导航次数累积，多份闭包同时驱动同一元素导致进度条来回抖动
   let widthAnim: Animation | undefined;
@@ -43,7 +44,7 @@
     animateWidth(100, 250, 'ease-in-out', () => {
       const el = indicator();
       if (!el) return;
-      const fade = el.animate([{ opacity: 0 }], { duration: 300, easing: 'ease-in', fill: 'forwards' });
+      const fade = el.animate([{ opacity: 0 }], { duration: m3anim.expressiveSlowEffects.duration, easing: 'ease-in', fill: 'forwards' });
       fade.addEventListener(
         'finish',
         () => {
