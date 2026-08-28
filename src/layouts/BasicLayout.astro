@@ -75,6 +75,45 @@ const PAGE_ATTR = 'data-basic-layout-page';
 
       <PageFooter />
     </div>
+
+    {import.meta.env.DEV && (
+      <script is:inline>
+        (function() {
+          const KEY_PATH = '__cakes_scroll_path__';
+          const KEY_Y = '__cakes_scroll_y__';
+          const page = function() { return document.querySelector('#page'); };
+          function save() {
+            const el = page();
+            if (el) {
+              sessionStorage.setItem(KEY_PATH, location.pathname);
+              sessionStorage.setItem(KEY_Y, String(el.scrollTop));
+            }
+          }
+          window.addEventListener('beforeunload', save);
+          window.addEventListener('pagehide', save);
+          function restore() {
+            const p = sessionStorage.getItem(KEY_PATH);
+            if (p !== location.pathname) {
+              sessionStorage.removeItem(KEY_PATH);
+              sessionStorage.removeItem(KEY_Y);
+              return;
+            }
+            const y = sessionStorage.getItem(KEY_Y);
+            sessionStorage.removeItem(KEY_PATH);
+            sessionStorage.removeItem(KEY_Y);
+            if (y === null) return;
+            const el = page();
+            if (!el) return;
+            requestAnimationFrame(function() {
+              el.scrollTo(0, parseInt(y, 10) || 0);
+            });
+          }
+          document.addEventListener('astro:page-load', restore);
+          if (document.readyState === 'complete') restore();
+          else window.addEventListener('load', restore);
+        })();
+      </script>
+    )}
   </body>
 </html>
 
