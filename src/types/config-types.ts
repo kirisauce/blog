@@ -23,6 +23,14 @@ export const expressiveCodeConfig = () =>
 export type ExpressiveCodeConfigInput = In<typeof expressiveCodeConfig>;
 export type ExpressiveCodeConfig = Out<typeof expressiveCodeConfig>;
 
+export const katexConfig = () =>
+  z.object({
+    enabled: z.boolean().default(true),
+  });
+
+export type KatexConfigInput = In<typeof katexConfig>;
+export type KatexConfig = Out<typeof katexConfig>;
+
 export const externalSite = () =>
   z.object({
     name: z.string(),

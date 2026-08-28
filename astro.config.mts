@@ -4,6 +4,7 @@ import { defineConfig, fontProviders } from 'astro/config';
 import svelte from '@astrojs/svelte';
 import { unified } from '@astrojs/markdown-remark';
 import { patcher } from './src/astro';
+import path from 'node:path';
 
 // Vite plugins
 import icon from 'unplugin-icons/vite';
@@ -11,7 +12,17 @@ import icon from 'unplugin-icons/vite';
 import expressiveCode from 'astro-expressive-code';
 import { dynamicStyle } from './src/vite';
 import remarkHeadingAnchor from './src/vite/rehype-heading-anchor';
-import { remarkInlineIcon, remarkGithubCard, remarkHeimu } from './src/server/mdext';
+import {
+  remarkInlineIcon,
+  remarkGithubCard,
+  remarkHeimu,
+} from './src/server/mdext';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+
+import { theme } from './src/config';
+
+const katexEnabled = theme.katex.enabled;
 
 type Variants = NonNullable<
   NonNullable<Parameters<typeof defineConfig>[0]['fonts']>[number]['options']
@@ -21,13 +32,28 @@ type Variants = NonNullable<
 export default defineConfig({
   markdown: {
     processor: unified({
-      remarkPlugins: [remarkHeadingAnchor, remarkInlineIcon, remarkGithubCard, remarkHeimu],
+      remarkPlugins: [
+        remarkHeadingAnchor,
+        remarkInlineIcon,
+        remarkGithubCard,
+        remarkHeimu,
+        ...(katexEnabled ? [remarkMath] : []),
+      ],
+      rehypePlugins: [...(katexEnabled ? [rehypeKatex] : [])],
     }),
   },
 
   integrations: [expressiveCode(), mdx(), svelte(), patcher()],
 
   vite: {
+    resolve: {
+      alias: {
+        'virtual:katex-css': katexEnabled
+          ? path.resolve('node_modules/katex/dist/katex.min.css')
+          : path.resolve('src/styles/markdown/katex-placeholder.css'),
+      },
+    },
+
     plugins: [
       icon({
         compiler: 'svelte',

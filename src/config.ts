@@ -18,6 +18,9 @@ export const theme = cfg.defineThemeConfig({
     themeDark: 'andromeeda',
     themeLight: 'rose-pine-dawn',
   },
+  katex: {
+    enabled: true,
+  },
   defaultHue: 0,
 });
 
