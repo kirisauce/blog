@@ -371,7 +371,7 @@
 
   .name {
     font-family: var(--font-monospace);
-    font-weight: 600;
+    font-weight: bold;
     color: var(--primary);
   }
 

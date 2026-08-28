@@ -68,7 +68,7 @@
     view-transition-name: nav-panel-color-scheme;
 
     > div:first-child {
-      font-weight: 700;
+      font-weight: bold;
       font-size: 16px;
       letter-spacing: 0.08em;
       padding: 2px 6px 8px;

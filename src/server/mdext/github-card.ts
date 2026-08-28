@@ -53,7 +53,7 @@ function buildPlaceholder(repo: string): string {
   return `<github-card repo="${escapedRepo}">
     <a href="https://github.com/${escapedRepo}" target="_blank" rel="noopener noreferrer" style="${FALLBACK_STYLE}">
       ${renderFallbackIcon(GH_ICON, 18)}
-      <span style="flex: 1; font-family: var(--font-monospace, monospace); font-weight: 600; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+      <span style="flex: 1; font-family: var(--font-monospace, monospace); font-weight: bold; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
         ${escapedRepo}
       </span>
       <span style="font-size: 0.8rem;">N/A</span>

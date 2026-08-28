@@ -253,7 +253,7 @@
       border-radius: 4px;
       color: var(--on-primary-container);
       background-color: var(--primary-container);
-      font-weight: 500;
+      font-weight: normal;
     }
   }
 

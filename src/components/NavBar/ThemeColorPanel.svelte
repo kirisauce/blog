@@ -87,7 +87,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      font-weight: 700;
+      font-weight: bold;
       font-size: 16px;
       letter-spacing: 0.08em;
       padding: 2px 6px 8px;
@@ -102,7 +102,7 @@
       border-radius: 8px;
       padding: 2px 10px;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: bold;
       font-family: inherit;
       letter-spacing: 0.04em;
       cursor: pointer;
