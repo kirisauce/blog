@@ -1,80 +1,60 @@
 <div id="loading-indicator"></div>
 
 <script>
-  const register = () => {
-    let anim: Animation | undefined = undefined;
-    let currentWidth = 0;
+  import { m3anim } from '../utils/consts';
+  // Astro 打包的 module script 全站只执行一次；不要在 astro:page-load 里重复注册
+  // 事件，否则监听器随导航次数累积，多份闭包同时驱动同一元素导致进度条来回抖动
+  let widthAnim: Animation | undefined;
 
-    const setOpacity = (opacity: number) => {
-      const el = document.getElementById('loading-indicator');
-      if (!el) return;
-      el.animate([{ opacity }], { duration: 500, easing: 'ease-in-out' });
-    };
+  const indicator = () => document.getElementById('loading-indicator');
 
-    const setWidth = (width: number) => {
-      const el = document.getElementById('loading-indicator');
-      if (!el) return;
-
-      if (anim !== undefined) {
-        try {
-          anim.commitStyles();
-        } catch (e) {}
-        anim.cancel();
-        anim = undefined;
-      }
-
-      const animateIncrease = () => {
-        currentWidth += 1;
-        const newAnim = el.animate([{ width: `${currentWidth}%` }], {
-          duration: 1500,
-          easing: 'ease-in-out',
-          fill: 'forwards',
-        });
-        newAnim.addEventListener('finish', () => {
-          animateIncrease();
-        });
-        return newAnim;
-      };
-
-      if (currentWidth < width) {
-        currentWidth = width;
-        anim = el.animate([{ width: `${width}%` }], {
-          duration: 1500,
-          easing: 'ease-in-out',
-          fill: 'forwards',
-        });
-        anim.addEventListener('finish', () => {
-          anim = animateIncrease();
-        });
-      } else {
-        anim = animateIncrease();
-      }
-    };
-
-    document.addEventListener('astro:before-preparation', () => {
-      setWidth(60);
-    });
-    document.addEventListener('astro:after-preparation', () => {
-      setWidth(100);
-      setOpacity(0.5);
-    });
-    document.addEventListener('astro:before-swap', () => {
-      anim?.cancel();
-      anim = undefined;
-    });
-    document.addEventListener('astro:after-swap', () => {
-      anim?.cancel();
-      anim = undefined;
-    });
+  // 起点必须在 cancel 旧动画前采样，否则会拿到清零后的基础值导致进度条回跳
+  const currentWidthPct = (el: HTMLElement) => {
+    const px = parseFloat(getComputedStyle(el).width);
+    return (px / document.documentElement.clientWidth) * 100;
   };
-  window.addEventListener(
-    'load',
-    () => {
-      register();
-      document.addEventListener('astro:page-load', register);
-    },
-    { once: true },
-  );
+
+  const animateWidth = (to: number, duration: number, easing: string, onfinish?: () => void) => {
+    const el = indicator();
+    if (!el) return;
+    const from = currentWidthPct(el);
+    widthAnim?.cancel();
+    widthAnim = el.animate([{ width: `${from}%` }, { width: `${to}%` }], {
+      duration,
+      easing,
+      fill: 'forwards',
+    });
+    if (onfinish) widthAnim.addEventListener('finish', onfinish, { once: true });
+  };
+
+  document.addEventListener('astro:before-preparation', () => {
+    const el = indicator();
+    if (!el) return;
+    // 上一轮残留的 fill:forwards 动画不清掉的话，进度条会带着旧宽度直接起跳
+    el.getAnimations().forEach((a) => a.cancel());
+    el.style.width = '0%';
+    el.style.opacity = '';
+    animateWidth(30, 400, 'ease-out', () => {
+      // 等待期缓慢爬升而不是停在原地，避免用户误以为页面卡死
+      animateWidth(90, 8000, 'linear');
+    });
+  });
+
+  document.addEventListener('astro:after-preparation', () => {
+    animateWidth(100, 250, 'ease-in-out', () => {
+      const el = indicator();
+      if (!el) return;
+      const fade = el.animate([{ opacity: 0 }], { duration: m3anim.expressiveSlowEffects.duration, easing: 'ease-in', fill: 'forwards' });
+      fade.addEventListener(
+        'finish',
+        () => {
+          el.getAnimations().forEach((a) => a.cancel());
+          el.style.width = '0%';
+        },
+        { once: true },
+      );
+    });
+  });
 </script>
 
 <style lang="stylus">
@@ -88,5 +68,6 @@
     border-radius: 2px;
     background: linear-gradient(to right, var(--primary-container), var(--primary), var(--secondary));
     z-index: 1000;
+    view-transition-name: loading-indicator;
   }
 </style>

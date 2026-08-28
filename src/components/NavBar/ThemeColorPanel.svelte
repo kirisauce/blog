@@ -10,10 +10,18 @@
   // Preference Synchronization
   const preferenceChangedListener = () => {
     displayNumHue = prefs.themeHue.value;
-    if (elInput) elInput.value = prefs.themeHue.value.toString();
+    if (elInput) {
+      elInput.value = prefs.themeHue.value.toString();
+      const pct = (prefs.themeHue.value / 359) * 100;
+      elInput.style.setProperty('--hue-pct', `${pct}%`);
+    }
   };
   onMount(() => {
     prefs.themeHue.addEventListener('change', preferenceChangedListener);
+    if (elInput) {
+      const pct = (prefs.themeHue.value / 359) * 100;
+      elInput.style.setProperty('--hue-pct', `${pct}%`);
+    }
   });
   onDestroy(() => {
     prefs.themeHue.removeEventListener('change', preferenceChangedListener);
@@ -25,6 +33,8 @@
   let setPreferenceTimeout: ReturnType<typeof setTimeout> | null = null;
 
   const oninput = (e: Event) => {
+    const pct = (Number(elInput.value) / 359) * 100;
+    elInput.style.setProperty('--hue-pct', `${pct}%`);
     if (setPreferenceTimeout === null) {
       setPreferenceTimeout = setTimeout(() => {
         prefs.themeHue.value = Number(elInput.value);
@@ -36,6 +46,7 @@
 
 <div
   id="nav-theme-color-panel"
+  role="group"
   data-toggle-preset="dropdown"
   data-toggler-state="hide"
   style:display="none"
@@ -67,20 +78,109 @@
     flex-direction: column;
     font-family: var(--font-monospace);
     font-size: 20px;
-  }
+    gap: 8px;
+    view-transition-name: nav-panel-theme-color;
 
-  button {
-    background-color: var(--primary-container);
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 2px 8px;
-    font-size: inherit;
-    font-family: inherit;
-    transition: background-color var(--expressive-default-effects);
+    .heading {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-weight: bold;
+      font-size: 16px;
+      letter-spacing: 0.08em;
+      padding: 2px 6px 8px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+    }
 
-    &:hover {
-      background-color: var(--secondary-container-hover);
+    button {
+      background-color: var(--secondary-container);
+      color: var(--on-secondary-container);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2px 10px;
+      font-size: 13px;
+      font-weight: bold;
+      font-family: inherit;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition:
+        background-color var(--expressive-default-effects),
+        transform var(--expressive-default-effects);
+
+      &:hover {
+        background-color: var(--primary-container);
+        color: var(--on-primary-container);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+
+    input[type='range'] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 20px;
+      background: transparent;
+      cursor: pointer;
+      margin: 0;
+      padding: 0;
+
+      &::-webkit-slider-runnable-track {
+        height: 6px;
+        border-radius: 3px;
+        background: linear-gradient(
+          to right,
+          var(--primary) 0%,
+          var(--primary) var(--hue-pct, 0%),
+          var(--secondary-container) var(--hue-pct, 0%)
+        );
+        transition: background var(--expressive-default-effects);
+      }
+
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        margin-top: -5px;
+        border-radius: 50%;
+        background-color: var(--primary);
+        border: 2px solid var(--surface);
+        box-shadow: 0 1px 4px var(--shadow);
+        transition: transform var(--expressive-default-effects);
+
+        &:hover {
+          transform: scale(1.15);
+        }
+      }
+
+      &::-moz-range-track {
+        height: 6px;
+        border-radius: 3px;
+        background-color: var(--secondary-container);
+      }
+
+      &::-moz-range-thumb {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: var(--primary);
+        border: 2px solid var(--surface);
+        box-shadow: 0 1px 4px var(--shadow);
+      }
+
+      &:focus-visible {
+        outline: none;
+
+        &::-webkit-slider-thumb {
+          box-shadow: 0 0 0 3px var(--primary-container), 0 1px 4px var(--shadow);
+        }
+      }
     }
   }
 </style>

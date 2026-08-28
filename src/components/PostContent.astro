@@ -2,6 +2,7 @@
 import MarkdownWrapper from './MarkdownWrapper.astro';
 import CopyrightNotice from './CopyrightNotice.astro';
 import CategoryBreadcrumb from './MetaWidgets/CategoryBreadcrumb.astro';
+import 'virtual:katex-css';
 
 import type { CollectionEntry } from 'astro:content';
 import { render } from 'astro:content';
@@ -62,7 +63,7 @@ const customComponents = {};
     .article-title {
       margin: 0;
       font-size: 2.5rem;
-      font-weight: 700;
+      font-weight: bold;
       line-height: 1.2;
       letter-spacing: -0.02em;
       text-align: center;

@@ -33,16 +33,15 @@ const categoryPath = category ? parseCategoryIndex(category) : [];
 }
 
 <script>
+  import { navigate } from 'astro:transitions/client';
+
   document.addEventListener('click', (e) => {
     const categoryLink = (e.target as Element).closest('.category-link');
-    if (categoryLink) {
-      e.preventDefault();
-      e.stopPropagation();
-      const href = categoryLink.getAttribute('data-href');
-      if (href) {
-        window.location.href = href;
-      }
-    }
+    if (!categoryLink) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const href = categoryLink.getAttribute('data-href');
+    if (href) navigate(href);
   });
 </script>
 

@@ -6,13 +6,21 @@ import NavBar from '../components/NavBar.astro';
 import LoadingIndicator from '../components/LoadingIndicator.astro';
 import PageFooter from '../components/PageFooter.astro';
 import { fade } from 'astro:transitions';
+import { m3anim } from '../utils/consts';
 
 export interface Props {
   coverImage?: ImageMetadata;
   head?: Parameters<typeof HeadBase>[0];
+  /**
+   * Width of the major (main content) track on wide screens.
+   * Accepts any CSS width value; pages with narrower main content
+   * (e.g. the 800px article card) can shrink the track so the aside
+   * sits closer to the content. Defaults to 1000px.
+   */
+  majorWidth?: string;
 }
 
-const { coverImage: pageCover, head } = Astro.props;
+const { coverImage: pageCover, head, majorWidth } = Astro.props;
 
 const coverImage = (() => {
   if (pageCover === undefined || pageCover === null) {
@@ -27,7 +35,7 @@ const PAGE_ATTR = 'data-basic-layout-page';
 
 <html
   lang={site.lang}
-  transition:animate={fade({ duration: '500ms' })}
+  transition:animate={fade({ duration: m3anim.standardDefaultSpatial.duration })}
   transition:name="basic-layout-html"
 >
   <head>
@@ -53,7 +61,10 @@ const PAGE_ATTR = 'data-basic-layout-page';
           </div>
         )
       }
-      <div class:list={['page-content', 'aside-' + layout.basic.aside]}>
+      <div
+        class:list={['page-content', 'aside-' + layout.basic.aside]}
+        style={majorWidth && `--basic-layout-major-width: ${majorWidth}`}
+      >
         <aside class="aside">
           <slot name="aside" />
         </aside>
@@ -65,6 +76,45 @@ const PAGE_ATTR = 'data-basic-layout-page';
 
       <PageFooter />
     </div>
+
+    {import.meta.env.DEV && (
+      <script is:inline>
+        (function() {
+          const KEY_PATH = '__cakes_scroll_path__';
+          const KEY_Y = '__cakes_scroll_y__';
+          const page = function() { return document.querySelector('#page'); };
+          function save() {
+            const el = page();
+            if (el) {
+              sessionStorage.setItem(KEY_PATH, location.pathname);
+              sessionStorage.setItem(KEY_Y, String(el.scrollTop));
+            }
+          }
+          window.addEventListener('beforeunload', save);
+          window.addEventListener('pagehide', save);
+          function restore() {
+            const p = sessionStorage.getItem(KEY_PATH);
+            if (p !== location.pathname) {
+              sessionStorage.removeItem(KEY_PATH);
+              sessionStorage.removeItem(KEY_Y);
+              return;
+            }
+            const y = sessionStorage.getItem(KEY_Y);
+            sessionStorage.removeItem(KEY_PATH);
+            sessionStorage.removeItem(KEY_Y);
+            if (y === null) return;
+            const el = page();
+            if (!el) return;
+            requestAnimationFrame(function() {
+              el.scrollTo(0, parseInt(y, 10) || 0);
+            });
+          }
+          document.addEventListener('astro:page-load', restore);
+          if (document.readyState === 'complete') restore();
+          else window.addEventListener('load', restore);
+        })();
+      </script>
+    )}
   </body>
 </html>
 
@@ -142,6 +192,12 @@ const PAGE_ATTR = 'data-basic-layout-page';
   });
 </script>
 
+<script>
+  // 自定义元素注册：不进 HeadBase 内联链——Svelte 运行时体量大，
+  // 会拖慢 preference 初始化导致 client:only Panel 读不到 __PREFERENCES__
+  import '../client/web-components.ts';
+</script>
+
 <style lang="stylus">
   body {
     background-color: var(--background);
@@ -211,38 +267,59 @@ const PAGE_ATTR = 'data-basic-layout-page';
 
   // --- page-content START ---
 
+  // Collapsed layout (default): main content on top (centered, max 1000px),
+  // aside below it. Wide screens switch to a 3-track grid where the main
+  // content sits exactly on the viewport midline and the aside hangs in
+  // the left whitespace (mirrored for aside-right).
   .page-content {
     display: flex;
-    flex-direction: row;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 32px;
     width: 100%;
-    padding: 72px 0;
-    justify-content: center;
+    padding: 72px 24px;
     box-sizing: border-box;
     z-index: 10;
 
-    &:where(.aside-right) {
-      flex-direction: row-reverse;
+    @media (min-width: 1640px) {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, var(--basic-layout-major-width, 1000px)) minmax(0, 1fr);
+      column-gap: 16px;
+      align-items: stretch;
+      padding: 72px 0;
+    }
+  }
+
+  @media (min-width: 1640px) {
+    .aside {
+      grid-column: 1;
+      grid-row: 1;
+      justify-self: end;
     }
 
-    @media (max-width: 1024px) {
-      flex-direction: column-reverse;
-      align-items: center;
-      gap: 32px;
+    .major {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .page-content:where(.aside-right) .aside {
+      grid-column: 3;
+      justify-self: start;
     }
   }
 
   .aside {
-    flex: 0 1 280px;
-    min-width: 280px;
-
     display: flex;
     flex-direction: column;
+    width: 100%;
+    max-width: 500px;
+    box-sizing: border-box;
 
-    @media (max-width: 1024px) {
-      max-width: 500px;
-      width: 100%;
-      padding: 0 12px;
-      box-sizing: border-box;
+    @media (min-width: 1640px) {
+      flex: 0 1 280px;
+      width: 280px;
+      min-width: 280px;
+      max-width: 280px;
     }
   }
 
@@ -252,24 +329,19 @@ const PAGE_ATTR = 'data-basic-layout-page';
     align-items: stretch;
     box-sizing: border-box;
 
-    flex: 0 1 1250px;
-    width: 0;
+    width: 100%;
+    max-width: 1000px;
+    min-width: 0;
     padding: 0 1rem;
-
-    @media (max-width: 1024px) {
-      width: 100%;
-      padding: 0 12px;
-    }
   }
 
   @media (max-width: 1024px) {
     .page-content {
-      padding-left: 0;
-      padding-right: 0;
+      padding: 72px 16px;
     }
 
     .major {
-      padding: 0 12px;
+      padding: 0;
     }
   }
 

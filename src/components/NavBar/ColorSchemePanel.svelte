@@ -45,6 +45,7 @@
 
 <div
   id="nav-color-scheme-switch"
+  role="group"
   data-toggle-preset="dropdown"
   data-toggler-state="hide"
   style:display="none"
@@ -64,6 +65,16 @@
     flex-direction: column;
     font-family: var(--font-monospace);
     gap: 4px;
+    view-transition-name: nav-panel-color-scheme;
+
+    > div:first-child {
+      font-weight: bold;
+      font-size: 16px;
+      letter-spacing: 0.08em;
+      padding: 2px 6px 8px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+    }
 
     .cs-switch {
       position: relative;
@@ -96,6 +107,7 @@
 
       &.active {
         cursor: default;
+        color: var(--on-secondary-container);
 
         &::after {
           background-color: var(--secondary-container);

@@ -126,6 +126,7 @@ export const defineNavBarConfig = (config: NavBarConfigInput): NavBarConfig =>
 export const themeConfig = () =>
   z.object({
     expressiveCode: types.expressiveCodeConfig().default({}),
+    katex: types.katexConfig().default({ enabled: true }),
     defaultHue: z.number().min(0).max(359).default(0),
 
     themeName: z.string().default('Cakes🍰'),

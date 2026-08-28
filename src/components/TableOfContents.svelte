@@ -78,10 +78,38 @@
 
   const tree = $derived(buildTree(headings));
 
-  let activeSlug = $state('');
-  let autoExpanded = $state<Record<string, boolean>>({});
+  let anchorSlug = $state('');
+  /** 当前与滚动容器可视范围相交的标题集合，可多项同时高亮 */
+  let visibleSlugs = $state<Set<string>>(new Set());
   let manualExpanded = $state<Record<string, boolean>>({});
-  /** 合并后的展开状态：自动展开 + 手动展开 */
+
+  /** 高亮集合：视口内标题 + 它们的各级祖先（上一级跟着亮） */
+  const highlightSlugs = $derived.by(() => {
+    const all = new Set(visibleSlugs);
+    for (const slug of visibleSlugs) {
+      const ancestors = findAncestors(tree, slug);
+      if (!ancestors) continue;
+      for (const a of ancestors) all.add(a);
+    }
+    return all;
+  });
+
+  /** 自动展开视口内标题的祖先链，保证高亮项在目录中可见 */
+  const autoExpanded = $derived.by(() => {
+    const updates: Record<string, boolean> = {};
+    for (const slug of visibleSlugs) {
+      const ancestors = findAncestors(tree, slug);
+      if (!ancestors) continue;
+      for (const a of ancestors) {
+        if (!manualExpanded[a] && nodeHasChildren(tree, a)) {
+          updates[a] = true;
+        }
+      }
+    }
+    return updates;
+  });
+
+  /** 合并后的展开状态：手动状态优先于自动展开 */
   const expanded = $derived({ ...autoExpanded, ...manualExpanded });
 
   let scrollCleanup: (() => void) | null = null;
@@ -99,19 +127,8 @@
   }
 
   function toggleManual(slug: string) {
-    if (manualExpanded[slug]) {
-      const next = { ...manualExpanded };
-      delete next[slug];
-      manualExpanded = next;
-    } else {
-      manualExpanded = { ...manualExpanded, [slug]: true };
-      // 从自动展开中移除，因为用户已手动接管
-      if (autoExpanded[slug]) {
-        const next = { ...autoExpanded };
-        delete next[slug];
-        autoExpanded = next;
-      }
-    }
+    // 固定为相反状态，手动展开/折叠优先于自动行为
+    manualExpanded = { ...manualExpanded, [slug]: !expanded[slug] };
   }
 
   function handleLinkClick(e: MouseEvent, slug: string) {
@@ -129,38 +146,48 @@
     }
   }
 
-  function updateActive(slug: string) {
-    if (slug === activeSlug) return;
-
-    // 清除自动展开状态（保留手动展开）
-    autoExpanded = {};
-    activeSlug = slug;
-
-    // 自动展开当前活跃标题的祖先节点
-    const ancestors = findAncestors(tree, slug);
-    if (ancestors && ancestors.length > 0) {
-      const updates: Record<string, boolean> = {};
-      for (const a of ancestors) {
-        if (!manualExpanded[a] && nodeHasChildren(tree, a)) {
-          updates[a] = true;
-        }
-      }
-      autoExpanded = updates;
-    }
+  function setsEqual(a: Set<string>, b: Set<string>): boolean {
+    if (a.size !== b.size) return false;
+    for (const s of a) if (!b.has(s)) return false;
+    return true;
   }
 
-  // 当 activeSlug 变化时，自动将当前目录项滚动到 toc-root 可视区域内
+  function updateAnchor(slug: string) {
+    if (slug === anchorSlug) return;
+    anchorSlug = slug;
+  }
+
+  /** 仅在集合内容变化时更新，避免滚动事件高频触发无效重渲染 */
+  function setVisible(next: Set<string>) {
+    if (setsEqual(visibleSlugs, next)) return;
+    visibleSlugs = next;
+  }
+
+  // 当锚点变化时，自动将锚点项滚动到 toc-root 可视区域内
   $effect(() => {
     if (!autoScroll) return;
-    const slug = activeSlug;
+    const slug = anchorSlug;
     const root = tocRoot;
     if (!slug || !root) return;
 
     requestAnimationFrame(() => {
       if (isHovering) return;
-      const activeItem = root.querySelector<HTMLElement>('.item-label.active');
-      if (activeItem) {
-        activeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      const anchorItem = root.querySelector<HTMLElement>('.item-label.anchor');
+      if (!anchorItem) return;
+      // 只在 toc-root 内滚动锚点项至可见；不能用 scrollIntoView——
+      // 它会连带滚动祖先滚动容器（.page），目录卡不在视口时整页视角会被拉走
+      const rootRect = root.getBoundingClientRect();
+      const itemRect = anchorItem.getBoundingClientRect();
+      if (itemRect.top < rootRect.top) {
+        root.scrollTo({
+          top: root.scrollTop + itemRect.top - rootRect.top,
+          behavior: 'smooth',
+        });
+      } else if (itemRect.bottom > rootRect.bottom) {
+        root.scrollTo({
+          top: root.scrollTop + itemRect.bottom - rootRect.bottom,
+          behavior: 'smooth',
+        });
       }
     });
   });
@@ -173,18 +200,25 @@
       const containerRect = scrollContainer.getBoundingClientRect();
       const threshold = containerRect.top + 100;
       let current = '';
+      const visible = new Set<string>();
       for (const h of headings) {
         const el = document.getElementById(h.slug);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= threshold) {
-            current = h.slug;
-          }
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= threshold) {
+          current = h.slug;
+        }
+        // 与滚动容器可视范围相交即视为在视图内
+        if (rect.top < containerRect.bottom && rect.bottom > containerRect.top) {
+          visible.add(h.slug);
         }
       }
-      if (current) {
-        updateActive(current);
+      // 屏上没有任何标题（长段落中）时，兜底点亮最后越过的锚点项
+      if (visible.size === 0 && current) {
+        visible.add(current);
       }
+      setVisible(visible);
+      updateAnchor(current);
     };
 
     scrollContainer.addEventListener('scroll', onScroll, {
@@ -217,7 +251,8 @@
       <TreeList
         items={tree}
         {expanded}
-        {activeSlug}
+        activeSlugs={highlightSlugs}
+        {anchorSlug}
         onToggle={toggleManual}
         onLinkClick={handleLinkClick}
       />
