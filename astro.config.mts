@@ -16,6 +16,7 @@ import {
   remarkInlineIcon,
   remarkGithubCard,
   remarkHeimu,
+  remarkSingleLineDisplayMath,
 } from './src/server/mdext';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -37,7 +38,7 @@ export default defineConfig({
         remarkInlineIcon,
         remarkGithubCard,
         remarkHeimu,
-        ...(katexEnabled ? [remarkMath] : []),
+        ...(katexEnabled ? [remarkMath, remarkSingleLineDisplayMath] : []),
       ],
       rehypePlugins: [...(katexEnabled ? [rehypeKatex] : [])],
     }),

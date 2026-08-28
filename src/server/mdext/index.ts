@@ -11,3 +11,4 @@
 export { default as remarkInlineIcon } from './inline-icon';
 export { default as remarkGithubCard } from './github-card';
 export { default as remarkHeimu } from './heimu';
+export { default as remarkSingleLineDisplayMath } from './single-line-display-math';
