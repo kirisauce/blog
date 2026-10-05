@@ -3,7 +3,7 @@ title: 用SSC338Q板子制作基于OpenIPC的FPV图传
 pubDate: 2026-08-25
 updateDate: 2026-08-25
 coverImage: mc800s-shot.webp
-tags: [embedded]
+category: Embedded
 ---
 
 # 前言

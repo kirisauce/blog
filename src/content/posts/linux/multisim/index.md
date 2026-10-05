@@ -1,13 +1,15 @@
 ---
-title: "Multisim 安装&使用小记"
+title: 'Multisim 安装&使用小记'
 pubDate: 2026-06-27
 updateDate: 2026-06-27
 category: Electronic
 coverImage: err-kb2919355.webp
+category: Linux
 tags: [multisim, electronic, wine]
 ---
 
 ## 安装报错没有KB2919355
+
 如果你尝试在Wine下安装Multisim 14.3，那你大概率会看到下面这个错误：
 
 ![err-kb2919355](err-kb2919355.webp)
@@ -148,5 +150,5 @@ Windows上也有这个报错，是因为它无法读写安装目录。但是Wine
 
 # 参考
 
- - `Multisim under Linux` https://lina.moe/MultiSIM.md
- - `为什么我的瓦特计有时候有示数，有时候运行就没示数啊？搞得我好难受 - multisim吧 - 百度贴吧` https://tieba.baidu.com/p/6714510445
+- `Multisim under Linux` https://lina.moe/MultiSIM.md
+- `为什么我的瓦特计有时候有示数，有时候运行就没示数啊？搞得我好难受 - multisim吧 - 百度贴吧` https://tieba.baidu.com/p/6714510445

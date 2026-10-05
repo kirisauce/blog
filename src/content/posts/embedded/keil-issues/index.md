@@ -3,6 +3,7 @@ title: Keil 礦ision的一些神秘小问题
 pubDate: 2026-05-11
 updateDate: 2026-08-25
 coverImage: pack-failed-to-install.webp
+category: Embedded
 tags: [
   linux,
   keil,

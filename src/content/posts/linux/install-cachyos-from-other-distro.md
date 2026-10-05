@@ -2,6 +2,7 @@
 title: 从Manjaro共存安装CachyOS
 pubDate: 2026-05-13
 updateDate: 2026-05-13
+category: Linux
 tags: [Linux]
 ---
 

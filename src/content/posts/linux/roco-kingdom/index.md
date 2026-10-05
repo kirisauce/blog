@@ -3,6 +3,7 @@ title: 在Linux上启动洛克王国（页游）
 pubDate: 2026-03-06
 updateDate: 2026-03-06
 coverImage: ruffle-failed-login.avif
+category: Linux
 tags: [
   linux,
   游戏,
