@@ -3,13 +3,14 @@ title: "Multisim 安装&使用小记"
 pubDate: 2026-06-27
 updateDate: 2026-06-27
 category: Electronic
+coverImage: err-kb2919355.webp
 tags: [multisim, electronic, wine]
 ---
 
 ## 安装报错没有KB2919355
 如果你尝试在Wine下安装Multisim 14.3，那你大概率会看到下面这个错误：
 
-![err-kb2919355](multisim/err-kb2919355.webp)
+![err-kb2919355](err-kb2919355.webp)
 
 上面说我们没有安装KB2919355补丁，因此无法安装`VC2015 Runtime`。但是事实上我们不需要KB2919355也能装msvcrt2015，那为什么会报错呢？
 事实上，multisim的安装程序里自带了一个msvcrt2015的安装包，它在安装的时候会自动运行。但是问题出在：它自带的bundle有个检查程序\(`SystemRequirementsError.exe`\)，会先检查是否有KB2919355。

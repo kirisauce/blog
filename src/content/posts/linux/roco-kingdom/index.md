@@ -1,5 +1,8 @@
 ---
 title: 在Linux上启动洛克王国（页游）
+pubDate: 2026-03-06
+updateDate: 2026-03-06
+coverImage: ruffle-failed-login.avif
 tags: [
   linux,
   游戏,
@@ -13,17 +16,17 @@ tags: [
 
 好了，这是最简单的方案，适用于绝大部分Flash游戏，但是却不适用于洛克。原因如下：
 
-![cors-denied](./roco-kingdom/cors-denied.avif "长期跨域导致的")
+![cors-denied](cors-denied.avif "长期跨域导致的")
 
 腾讯的Nginx没配置好跨域规则。主域名是`17roco.qq.com`，而游戏的`.swf`资源文件放在`res.17roco.qq.com`域名下，导致Ruffle没法获取游戏文件。而当你点击这个按钮后，Ruffle会新开一个标签页运行游戏swf文件，看起来正常了，实际上还是寄：
 
-![fake-success](./roco-kingdom/ruffle-fake-success.avif "假滴")
+![fake-success](ruffle-fake-success.avif "假滴")
 
 狂点"开始"。真是奇怪Le，怎么没反应？实际上是因为开始按钮在正常的网页中会跳转到QQ登录页面，而Ruffle的这个页面实质上只有swf解释器功能，不支持跳转。
 
 那有没有什么方法能把CORS限制关掉？有的兄弟有的，Chromium可关。只需提供两个参数`--disable-web-security`和`--user-data-dir=[你的自定义数据目录]`。把CORS限制关闭之后，我们就可以在`https://17roco.qq.com/`继续登录游戏。但是登录完之后又有个问题，就是游戏没法获取服务器列表了。
 
-![ruffle-failed-login](./roco-kingdom/ruffle-failed-login.avif)
+![ruffle-failed-login](ruffle-failed-login.avif)
 
 经过抓包，似乎是游戏会直接调用`socket`从服务器获取数据，但是浏览器环境下的Ruffle无法创建socket。这就不好办了，单独的Ruffle程序又无法调用登录页面，**所以ruffle这条路是走不通了**。
 
@@ -92,39 +95,39 @@ drwxr-xr-x     - kirisauce  6 3月  13:29 │   ├── LGPL
 
 最终启动命令大概长这样：
 ```sh
-./ungoogled-chromium_87.0.4280.141-1.1_linux.AppImage --no-sandbox --ppapi-flash-path='./pepperflash/libpepflashplayer.so' --ppapi-flash-version='32.0.0.371'
+pepperflash/libpepflashplayer.so' --ppapi-flash-version='32.0.0.371'
 ```
 
 这个版本的Chromium在每次启动时Flash都是默认禁用的。当你打开包含Flash内容的网站时会提示：
-![flash-plugin-denied](./roco-kingdom/flash-plugin-denied.avif)
+![flash-plugin-denied](flash-plugin-denied.avif)
 
 打开这个开关即可
 
-![flash-plugin-chrome-settings](./roco-kingdom/flash-plugin-chrome-settings.avif)
+![flash-plugin-chrome-settings](flash-plugin-chrome-settings.avif)
 
 打开开关后再回到游戏页面，左键一下Flash内容，就会跳出来一个提示，点击允许Flash启动。同时每次页面更新SWF文件时都会提示一次Flash已过期，点击允许一次即可。然后就启动！！！！！
 
-![qd-and-play](./roco-kingdom/qd-and-play.avif "启动！！！！！")
+![qd-and-play](qd-and-play.avif "启动！！！！！")
 
 ## 个人截图
 
 最后附上我的几张截图：
 
-![my-1](./roco-kingdom/my-1.avif)
-![my-2](./roco-kingdom/my-2.avif)
-![my-3](./roco-kingdom/my-3.avif)
-![my-4](./roco-kingdom/my-4.avif)
-![my-5](./roco-kingdom/my-5.avif)
-![my-6](./roco-kingdom/my-6.avif)
-![my-7](./roco-kingdom/my-7.avif)
-![my-8](./roco-kingdom/my-8.avif)
-![my-9](./roco-kingdom/my-9.avif)
+![my-1](my-1.avif)
+![my-2](my-2.avif)
+![my-3](my-3.avif)
+![my-4](my-4.avif)
+![my-5](my-5.avif)
+![my-6](my-6.avif)
+![my-7](my-7.avif)
+![my-8](my-8.avif)
+![my-9](my-9.avif)
 
-![my-10](./roco-kingdom/my-10.avif "你醒啦？菜都熟了，但没人会来偷你的菜了......")
+![my-10](my-10.avif "你醒啦？菜都熟了，但没人会来偷你的菜了......")
 
-![my-11](./roco-kingdom/my-11.avif "都是一次过，但是再也没有以前的新鲜感了")
+![my-11](my-11.avif "都是一次过，但是再也没有以前的新鲜感了")
 
-![my-12](./roco-kingdom/my-12.avif "窗外的小家伙都晃了十几年了（")
+![my-12](my-12.avif "窗外的小家伙都晃了十几年了（")
 
 End.
 
