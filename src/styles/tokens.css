@@ -1,0 +1,177 @@
+/**
+ * Material 3 设计 token（手写，不引 UI 组件库）。
+ *
+ * 主色取 Megumin 红，围绕它推出一整套明暗色板；状态语义色 M3 未定义
+ * success/warning，因此以 --mlink-status-* 前缀作为项目扩展。
+ * 变量一律定义在 :root —— ::view-transition-* 之类挂在 html 上的伪元素
+ * 才能继承到（挂到 body 会解析失败）。
+ */
+
+:root {
+	color-scheme: light dark;
+
+	/* 主色与容器 */
+	--md-sys-color-primary: #9c1f2e;
+	--md-sys-color-on-primary: #ffffff;
+	--md-sys-color-primary-container: #ffdad9;
+	--md-sys-color-on-primary-container: #40000a;
+
+	/* 次要/第三级容器（中性偏红，用于信息性高亮） */
+	--md-sys-color-secondary-container: #f6ddda;
+	--md-sys-color-on-secondary-container: #2b1614;
+	--md-sys-color-tertiary-container: #cee9d9;
+	--md-sys-color-on-tertiary-container: #092017;
+
+	/* 表面层级 */
+	--md-sys-color-surface: #fff8f7;
+	--md-sys-color-surface-container-low: #fdf1ef;
+	--md-sys-color-surface-container: #f8ecea;
+	--md-sys-color-surface-container-high: #f2e4e2;
+	--md-sys-color-on-surface: #201a19;
+	--md-sys-color-on-surface-variant: #534341;
+	--md-sys-color-outline: #857371;
+	--md-sys-color-outline-variant: #d8c2c0;
+
+	/* 错误 */
+	--md-sys-color-error: #ba1a1a;
+	--md-sys-color-on-error: #ffffff;
+	--md-sys-color-error-container: #ffdad6;
+	--md-sys-color-on-error-container: #410002;
+
+	/* 状态语义色（项目扩展） */
+	--mlink-status-ok: #10462c;
+	--mlink-status-ok-container: #cfeadb;
+	--mlink-status-busy: #4f3200;
+	--mlink-status-busy-container: #ffe2b8;
+	--mlink-status-idle: #3c3231;
+	--mlink-status-idle-container: #e6e1df;
+	--mlink-status-error: #7f1d1d;
+	--mlink-status-error-container: #ffdad6;
+
+	--md-sys-elevation-1: 0 1px 2px rgb(0 0 0 / 0.08), 0 1px 3px rgb(0 0 0 / 0.04);
+
+	/* 覆盖层遮罩与标准动效（抽屉滑入/遮罩淡入） */
+	--md-sys-color-scrim: rgb(0 0 0 / 0.32);
+	--md-sys-motion-duration-medium: 400ms;
+	/* 出场比进场短：注意力已经转移，拖长只会显得黏 */
+	--md-sys-motion-duration-exit: 200ms;
+	/* 交互反馈（hover / 按下）要短促，否则点起来发钝 */
+	--md-sys-motion-duration-short: 150ms;
+	/* 进场：强调减速，末段留长拖尾；出场：带初速起步、终点平滑收住（不硬停） */
+	--md-sys-motion-easing-enter: cubic-bezier(0.05, 0.7, 0.1, 1);
+	--md-sys-motion-easing-exit: cubic-bezier(0.3, 0.2, 0.7, 1);
+	/* 尺寸收拢（高度折叠等）：起步慢、末尾速度最大。收东西该是"加速离场"，
+	   exit 的减速收尾放在高度上会显得拖着不收 */
+	--md-sys-motion-easing-accelerate: cubic-bezier(0.3, 0, 1, 1);
+
+	/* 曲线序列色。uPlot 的 stroke 吃不了 CSS 变量，由组件读实际色值。 */
+	--mlink-chart-1: #9c1f2e;
+	--mlink-chart-2: #0b6bcb;
+	--mlink-chart-3: #1d7a4a;
+	--mlink-chart-4: #7a4bbf;
+
+	--md-sys-shape-corner-xs: 4px;
+	--md-sys-shape-corner-sm: 8px;
+	--md-sys-shape-corner-md: 12px;
+	--md-sys-shape-corner-lg: 16px;
+	--md-sys-shape-corner-xl: 28px;
+	--md-sys-shape-corner-full: 999px;
+
+	--md-sys-space-xs: 0.25rem;
+	--md-sys-space-sm: 0.5rem;
+	--md-sys-space-md: 0.75rem;
+	--md-sys-space-lg: 1rem;
+	--md-sys-space-xl: 1.5rem;
+	--md-sys-space-2xl: 2rem;
+
+	/* 字体：先点名真实存在的字体，再按平台通用性补齐 fallback，末尾一律落到
+	   通用族。栈里若全是缺席名字，会由 fontconfig 的 monospace 别名（本机是
+	   新宋体）兜出意外结果。 */
+	--md-sys-typescale-font: 'LXGW WenKai Screen', system-ui, 'Noto Sans SC', 'Noto Sans', 'Segoe UI',
+		Arial, 'Helvetica Neue', sans-serif;
+	--md-sys-typescale-font-mono: 'Maple Mono NF CN', 'LXGW WenKai Mono Screen', ui-monospace,
+		'Noto Sans Mono', 'Liberation Mono', Hack, Consolas, 'Cascadia Mono', 'Courier New', monospace;
+
+	--md-sys-typescale-label-sm: 0.6875rem;
+	--md-sys-typescale-label-md: 0.75rem;
+	--md-sys-typescale-body-sm: 0.8125rem;
+	--md-sys-typescale-body-md: 0.875rem;
+	--md-sys-typescale-title-md: 1rem;
+	--md-sys-typescale-title-lg: 1.25rem;
+	--md-sys-typescale-headline-sm: 1.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--md-sys-color-primary: #ffb3b1;
+		--md-sys-color-on-primary: #5f1120;
+		--md-sys-color-primary-container: #7f1c29;
+		--md-sys-color-on-primary-container: #ffdad9;
+
+		--md-sys-color-secondary-container: #4a3330;
+		--md-sys-color-on-secondary-container: #f6ddda;
+		--md-sys-color-tertiary-container: #2b4c3c;
+		--md-sys-color-on-tertiary-container: #cee9d9;
+
+		--md-sys-color-surface: #1a1110;
+		--md-sys-color-surface-container-low: #221817;
+		--md-sys-color-surface-container: #271d1c;
+		--md-sys-color-surface-container-high: #332726;
+		--md-sys-color-on-surface: #f0dedc;
+		--md-sys-color-on-surface-variant: #d8c2c0;
+		--md-sys-color-outline: #a08c8a;
+		--md-sys-color-outline-variant: #534341;
+
+		--md-sys-color-error: #ffb4ab;
+		--md-sys-color-on-error: #690005;
+		--md-sys-color-error-container: #93000a;
+		--md-sys-color-on-error-container: #ffdad6;
+
+		--mlink-status-ok: #b6ecc9;
+		--mlink-status-ok-container: #17402a;
+		--mlink-status-busy: #ffdf9e;
+		--mlink-status-busy-container: #4a3200;
+		--mlink-status-idle: #d7c1be;
+		--mlink-status-idle-container: #38302f;
+		--mlink-status-error: #ffb4ab;
+		--mlink-status-error-container: #5c1a16;
+
+		--md-sys-elevation-1: 0 1px 2px rgb(0 0 0 / 0.4), 0 1px 3px rgb(0 0 0 / 0.24);
+
+		--mlink-chart-1: #ffb3b1;
+		--mlink-chart-2: #a8c8ff;
+		--mlink-chart-3: #8fd8b0;
+		--mlink-chart-4: #d3bbff;
+	}
+}
+
+/* 基础元素。Svelte island 渲染出的元素不带 Astro 的 scoped 属性，元素级样式
+   规则必须留在全局样式表里，放进 Layout 的 <style> 只能命中 Astro 模板自身
+   渲染的节点；单文件版本（standalone/）也只引这张表，两边因此一致。 */
+html,
+body {
+	margin: 0;
+	min-height: 100%;
+}
+
+body {
+	font-family: var(--md-sys-typescale-font);
+	background: var(--md-sys-color-surface);
+	color: var(--md-sys-color-on-surface);
+	-webkit-font-smoothing: antialiased;
+}
+
+code,
+kbd,
+samp,
+pre {
+	font-family: var(--md-sys-typescale-font-mono);
+}
+
+/* 表单控件靠 width: 100% 或 flex 撑满容器，左右 padding 与 border 必须算进
+   宽度里：否则每个控件都会比自己的列宽宽出一截，压到相邻列并溢出容器边缘。 */
+input,
+select,
+textarea {
+	box-sizing: border-box;
+}
