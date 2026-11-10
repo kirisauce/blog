@@ -163,9 +163,14 @@ export const toggle = (
     const { keyframes, options } = preset.exit;
 
     // Configure the animation
+    if (!options.fill) {
+      options.fill = 'forwards';
+    }
+
     const anim = el.animate(keyframes, options);
     anim.id = generateId();
     anim.addEventListener('finish', (ev) => {
+      anim.commitStyles();
       el.style.display = 'none';
       el.removeAttribute(ANIM_ID_KEY);
     });
@@ -182,9 +187,14 @@ export const toggle = (
     const { keyframes, options } = preset.enter;
 
     // Configure the animation
+    if (!options.fill) {
+      options.fill = 'forwards';
+    }
+
     const anim = el.animate(keyframes, options);
     anim.id = generateId();
     anim.addEventListener('finish', (ev) => {
+      anim.commitStyles();
       el.removeAttribute(ANIM_ID_KEY);
       try {
         anim.commitStyles();

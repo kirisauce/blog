@@ -106,7 +106,10 @@ export default function remarkSingleLineDisplayMath() {
         let upgraded = false;
 
         for (const child of paragraph.children) {
-          if (child.type === 'inlineMath' && isSingleLineDoubleDollar(child, source)) {
+          if (
+            child.type === 'inlineMath' &&
+            isSingleLineDoubleDollar(child, source)
+          ) {
             // flush 当前正文段（丢弃纯空白）
             if (current.length > 0 && !isBlankChildren(current)) {
               nodes.push(makeParagraph(current));

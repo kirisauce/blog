@@ -10,6 +10,7 @@ import { processPost } from '../server/utils';
 import TimeMeta from './MetaWidgets/TimeMeta.astro';
 import TagsMeta from './MetaWidgets/TagsMeta.astro';
 import StatsMeta from './MetaWidgets/StatsMeta.astro';
+import { resolveDisplayDate } from '../utils/format';
 
 export interface Props {
   post: CollectionEntry<'blog'>;
@@ -20,6 +21,7 @@ const { post } = Astro.props;
 const { category, description, title, tags } = post.data;
 
 const { updateDate, pubDate } = processPost(post);
+const { time: displayDate, updated } = resolveDisplayDate(pubDate, updateDate);
 
 const { Content, headings } = await render(post);
 
@@ -32,14 +34,13 @@ const customComponents = {};
     <h1 data-transite-from-title class="article-title">{title}</h1>
     <TagsMeta tags={tags} />
     <div class="meta-row">
-      <TimeMeta icon="mdi:calendar-outline" time={pubDate} label="发布于" />
       <TimeMeta
-        icon="mdi:calendar-edit-outline"
-        time={updateDate}
-        label="更新于"
+        icon={updated ? 'mdi:calendar-edit-outline' : 'mdi:calendar-outline'}
+        time={displayDate}
+        label={updated ? '更新于' : '发布于'}
       />
+      <StatsMeta content={post.body ?? ''} />
     </div>
-    <StatsMeta content={post.body ?? ''} />
     {description?.trim() && <div class="description">{description}</div>}
   </div>
   <hr />

@@ -39,8 +39,7 @@ export class Switcher<T extends string | number | symbol, D> {
   onMap<M extends Partial<Record<T, any>>>(map: M): M[keyof M] | D | undefined {
     return (
       (Object.entries(map).find(([k, v]) => k === this.#value)?.[1] as
-        | M[T]
-        | undefined) ?? this.#defaultValue
+        M[T] | undefined) ?? this.#defaultValue
     );
   }
 }
@@ -56,4 +55,20 @@ export const asyncMap = async <T, R>(
     result.push(await fn(v));
   }
   return result;
+};
+
+export const stripPrefix = (s: string, pattern: string): string => {
+  if (s.startsWith(pattern)) {
+    return s.substring(pattern.length);
+  } else {
+    return s;
+  }
+};
+
+export const stripSuffix = (s: string, pattern: string): string => {
+  if (s.endsWith(pattern)) {
+    return s.substring(0, s.length - pattern.length);
+  } else {
+    return s;
+  }
 };

@@ -10,14 +10,20 @@ export interface Props {
 }
 
 const { headings, autoScroll = true, title = '目录', ...other } = Astro.props;
+// 当目录无标题时不显示卡片
+const hasHeadings = headings && headings.length > 0;
 ---
 
-<div class="card toc-card" {...other}>
-  <Label style="font-size: 1.6rem; align-self: flex-start; margin-left: -16px;"
-    >{title}</Label
-  >
-  <TableOfContents {headings} {autoScroll} client:visible />
-</div>
+{
+  hasHeadings && (
+    <div class="card toc-card" data-enter-item {...other}>
+      <Label style="font-size: 1.6rem; align-self: flex-start; margin-left: -16px;">
+        {title}
+      </Label>
+      <TableOfContents {headings} {autoScroll} client:visible />
+    </div>
+  )
+}
 
 <style lang="stylus">
   .toc-card {

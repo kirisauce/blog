@@ -4,6 +4,7 @@ import fsSync from 'node:fs';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import { toString as markdownToString } from 'mdast-util-to-string';
+import { stripSuffix } from '../utils/other';
 
 const DESCRIPTION_MAX_LENGTH = 100;
 
@@ -100,4 +101,14 @@ export const processPost = (post: CollectionEntry<'blog'>): ProcessedPost => {
     description: getPostDescription(post.data, post.body),
     data: post.data,
   };
+};
+
+/**
+ * 处理文章的url，删除后缀的/index.html/
+ */
+export const processPostUrl = (url: string): string => {
+  url = stripSuffix(url, '/');
+  url = stripSuffix(url, 'index.html');
+  url = stripSuffix(url, '/');
+  return url;
 };

@@ -171,6 +171,12 @@ export const layoutConfig = () => {
     latestPostsLimit: z.number().default(20),
   });
 
+  const zBackToTop = z.object({
+    enabled: z.boolean().default(true),
+    /** 滚动超过多少倍滚动容器可视高度后出现 */
+    threshold: z.number().default(1),
+  });
+
   const zComponentSub = {
     PostLinkCard: z.object({
       coverPosition: z.enum(['left', 'right']).default('left'),
@@ -194,6 +200,7 @@ export const layoutConfig = () => {
     basic: optionalObject(zBasic),
     pageFooter: optionalObject(zPageFooter),
     home: optionalObject(zHome),
+    backToTop: optionalObject(zBackToTop),
     component: optionalObject(zComponent),
   });
 };

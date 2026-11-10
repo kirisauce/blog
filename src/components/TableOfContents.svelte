@@ -74,7 +74,13 @@
   const {
     headings,
     autoScroll = true,
-  }: { headings: TocHeading[]; autoScroll?: boolean } = $props();
+    onNavigate,
+  }: {
+    headings: TocHeading[];
+    autoScroll?: boolean;
+    /** 点击目录条目并完成滚动跳转后的回调（抽屉等场景用于关闭自身） */
+    onNavigate?: (slug: string) => void;
+  } = $props();
 
   const tree = $derived(buildTree(headings));
 
@@ -144,6 +150,7 @@
       }
       history.replaceState(null, '', `#${slug}`);
     }
+    onNavigate?.(slug);
   }
 
   function setsEqual(a: Set<string>, b: Set<string>): boolean {
@@ -209,7 +216,10 @@
           current = h.slug;
         }
         // 与滚动容器可视范围相交即视为在视图内
-        if (rect.top < containerRect.bottom && rect.bottom > containerRect.top) {
+        if (
+          rect.top < containerRect.bottom &&
+          rect.bottom > containerRect.top
+        ) {
           visible.add(h.slug);
         }
       }
@@ -265,7 +275,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
-    scrollbar-color: unquote("color-mix(in srgb, var(--text) 15%, transparent) transparent");
+    scrollbar-color: var(--text-15) transparent;
 
     &::-webkit-scrollbar {
       width: 6px;
@@ -276,7 +286,7 @@
     }
 
     &::-webkit-scrollbar-thumb {
-      background: unquote("color-mix(in srgb, var(--text) 15%, transparent)");
+      background: var(--text-15);
       border-radius: 3px;
     }
   }

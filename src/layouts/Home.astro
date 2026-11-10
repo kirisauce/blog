@@ -29,15 +29,25 @@ const displayPosts = (await getCollection('blog'))
   </Fragment>
 
   <Fragment slot="major">
-    {site.title && <div class="front-text site-title">{site.title}</div>}
+    {
+      site.title && (
+        <div class="front-text site-title" data-enter-item>
+          {site.title}
+        </div>
+      )
+    }
     {
       site.description && (
-        <div class="front-text site-description">{site.description}</div>
+        <div class="front-text site-description" data-enter-item>
+          {site.description}
+        </div>
       )
     }
 
     <main
-      transition:animate={fade({ duration: m3anim.standardDefaultSpatial.duration })}
+      transition:animate={fade({
+        duration: m3anim.standardDefaultSpatial.duration,
+      })}
       transition:name="home-links"
       class="link-cards"
     >
@@ -54,7 +64,9 @@ const displayPosts = (await getCollection('blog'))
       author.defaultAuthor && (
         <AuthorCard
           transition:name="author-card"
-          transition:animate={fade({ duration: m3anim.standardSlowSpatial.duration })}
+          transition:animate={fade({
+            duration: m3anim.standardSlowSpatial.duration,
+          })}
           authorId={author.defaultAuthor}
         />
       )

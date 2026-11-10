@@ -40,7 +40,7 @@ function toTreeNodes(
 const treeItems = node ? toTreeNodes(node, basePath) : [];
 ---
 
-<div class="card categories-card" {...other}>
+<div class="card categories-card" data-enter-item {...other}>
   <Label style="font-size: 1.6rem; align-self: flex-start; margin-left: -16px;"
     >{basePath.length > 0 ? '子分类' : '分类'}</Label
   >

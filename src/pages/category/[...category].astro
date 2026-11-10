@@ -54,7 +54,7 @@ const filteredPosts = node
   <Fragment slot="major">
     <main transition:name="post-content-card" class="link-cards">
       <!-- 面包屑导航 -->
-      <h1 class="breadcrumb">
+      <h1 class="breadcrumb" data-enter-item>
         <a href={baseurl.with('.')}>分类</a>:
         {
           path.map((p, index) => {
@@ -69,7 +69,7 @@ const filteredPosts = node
         }
       </h1>
 
-      <p>共找到 {filteredPosts.length} 篇相关文章</p>
+      <p data-enter-item>共找到 {filteredPosts.length} 篇相关文章</p>
 
       {
         filteredPosts.length > 0 ? (
@@ -79,7 +79,7 @@ const filteredPosts = node
             ))}
           </div>
         ) : (
-          <p>什么都没有~</p>
+          <p data-enter-item>什么都没有~</p>
         )
       }
     </main>

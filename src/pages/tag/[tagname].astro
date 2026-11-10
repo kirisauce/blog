@@ -51,8 +51,8 @@ const filteredPosts = posts
 >
   <Fragment slot="major">
     <main transition:name="post-content-card" class="link-cards">
-      <h1>标签：{tagname}</h1>
-      <p>共找到 {filteredPosts.length} 篇相关文章</p>
+      <h1 data-enter-item>标签：{tagname}</h1>
+      <p data-enter-item>共找到 {filteredPosts.length} 篇相关文章</p>
 
       {
         filteredPosts.length > 0 ? (
@@ -62,7 +62,7 @@ const filteredPosts = posts
             ))}
           </div>
         ) : (
-          <p>什么都没有~</p>
+          <p data-enter-item>什么都没有~</p>
         )
       }
     </main>

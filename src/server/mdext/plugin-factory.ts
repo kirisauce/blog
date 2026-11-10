@@ -36,49 +36,53 @@ export function createCommandPlugin(
 ): () => (tree: Root) => void {
   return () => {
     return (tree: Root) => {
-      visit(tree, 'text', (node: Text, index: number | undefined, parent: any) => {
-        if (parent == null || index == null) return;
+      visit(
+        tree,
+        'text',
+        (node: Text, index: number | undefined, parent: any) => {
+          if (parent == null || index == null) return;
 
-        const matches = parseCommands(node.value).filter(
-          (m) => m.cmd === commandName,
-        );
-        if (matches.length === 0) return;
-
-        const text = node.value;
-        const parts: Array<{ type: 'text' | 'html'; value: string }> = [];
-        let lastIndex = 0;
-
-        for (const m of matches) {
-          if (m.startIndex > lastIndex) {
-            parts.push({
-              type: 'text',
-              value: text.slice(lastIndex, m.startIndex),
-            });
-          }
-
-          const html = buildHtml(m.arg);
-          if (html) {
-            parts.push({ type: 'html', value: html });
-          } else {
-            parts.push({ type: 'text', value: m.fullMatch });
-          }
-
-          lastIndex = m.endIndex;
-        }
-
-        if (lastIndex < text.length) {
-          parts.push({ type: 'text', value: text.slice(lastIndex) });
-        }
-
-        if (parts.length > 0) {
-          const newNodes = parts.map((part) =>
-            part.type === 'html'
-              ? ({ type: 'html', value: part.value } satisfies Html)
-              : ({ type: 'text', value: part.value } satisfies Text),
+          const matches = parseCommands(node.value).filter(
+            (m) => m.cmd === commandName,
           );
-          parent.children.splice(index, 1, ...newNodes);
-        }
-      });
+          if (matches.length === 0) return;
+
+          const text = node.value;
+          const parts: Array<{ type: 'text' | 'html'; value: string }> = [];
+          let lastIndex = 0;
+
+          for (const m of matches) {
+            if (m.startIndex > lastIndex) {
+              parts.push({
+                type: 'text',
+                value: text.slice(lastIndex, m.startIndex),
+              });
+            }
+
+            const html = buildHtml(m.arg);
+            if (html) {
+              parts.push({ type: 'html', value: html });
+            } else {
+              parts.push({ type: 'text', value: m.fullMatch });
+            }
+
+            lastIndex = m.endIndex;
+          }
+
+          if (lastIndex < text.length) {
+            parts.push({ type: 'text', value: text.slice(lastIndex) });
+          }
+
+          if (parts.length > 0) {
+            const newNodes = parts.map((part) =>
+              part.type === 'html'
+                ? ({ type: 'html', value: part.value } satisfies Html)
+                : ({ type: 'text', value: part.value } satisfies Text),
+            );
+            parent.children.splice(index, 1, ...newNodes);
+          }
+        },
+      );
     };
   };
 }

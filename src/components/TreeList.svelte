@@ -19,6 +19,12 @@
   import { m3anim } from '../utils/consts';
   import TreeList from './TreeList.svelte';
 
+  /** display:none 子树里高度不可测，slide 会算出 NaN 关键帧；此时退化为瞬时切换 */
+  function slideWhenRendered(node: HTMLElement, params: { duration: number }) {
+    if (node.getClientRects().length === 0) return { duration: 0 };
+    return slide(node, params);
+  }
+
   const {
     items,
     depth = 0,
@@ -153,7 +159,11 @@
       </div>
 
       {#if item.children && item.children.length > 0 && isExpanded}
-        <div transition:slide={{ duration: m3anim.expressiveDefaultEffects.duration }}>
+        <div
+          transition:slideWhenRendered={{
+            duration: m3anim.expressiveDefaultEffects.duration,
+          }}
+        >
           <TreeList
             items={item.children}
             depth={depth + 1}

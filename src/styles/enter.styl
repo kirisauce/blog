@@ -1,0 +1,4 @@
+// 入场动画的起始状态：等待 client/enter.ts 播放。动画本体不走 CSS，
+// 避免站内换页时新文档里的同名元素被规则重复匹配。
+[data-enter='pending'] [data-enter-item]
+  opacity: 0

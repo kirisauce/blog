@@ -1,7 +1,7 @@
 {
   "name": "astro-cakes",
   "type": "module",
-  "version": "0.3.0",
+  "version": "0.4.1",
   "engines": {
     "node": ">=22.12.0"
   },
@@ -17,18 +17,16 @@
     "@astrojs/svelte": "^8.1.2",
     "astro": "^6.4.7",
     "katex": "^0.16.47",
+    "node-addon-api": "^8.9.2",
+    "node-gyp": "^13.1.0",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
     "sharp": "^0.34.5",
     "stylus": "^0.64.0",
     "svelte": "^5.56.3",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "unist-util-visit": "^5.2.0"
   },
-  "trustedDependencies": [
-    "astro",
-    "cn-font-split",
-    "sharp"
-  ],
   "devDependencies": {
     "@expressive-code/plugin-line-numbers": "^0.43.1",
     "@iconify-json/mdi": "^1.2.3",

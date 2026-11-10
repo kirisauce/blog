@@ -13,6 +13,19 @@
     for name, color-list in palette
       {'--' + name}: color-list[1]
 
+// 低版本浏览器（Chrome<111 / Firefox<113 / Safari<15.4）不支持 oklch()，
+// CSS 自定义属性又不校验值，无效的 oklch 定义会覆盖有效定义，
+// 所以用 @supports not 门控：不支持 oklch 时整块应用 HSL 回退调色板。
+// fallback-palette 的值是字符串字面量（避免 stylus 对 hsl() 求值），
+// 输出时用 unquote() 去除引号，否则自定义属性值无效。
+@supports not (color: oklch(0% 0% 0 / 1))
+  :root>body
+    for name, color-list in fallback-palette
+      {'--' + name}: unquote(color-list[0])
+  :root.dark>body
+    for name, color-list in fallback-palette
+      {'--' + name}: unquote(color-list[1])
+
 :root>body
   --font-sans: 'Yozai Medium', 'Roboto', 'Noto Sans', sans-serif
   font: var(--font-sans)

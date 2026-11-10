@@ -7,6 +7,7 @@ import CategoryBreadcrumb from '../MetaWidgets/CategoryBreadcrumb.astro';
 import Label from '../Label.astro';
 import TimeMeta from '../MetaWidgets/TimeMeta.astro';
 import TagsMeta from '../MetaWidgets/TagsMeta.astro';
+import { resolveDisplayDate } from '../../utils/format';
 
 export interface Props {
   post: CollectionEntry<'blog'>;
@@ -18,6 +19,8 @@ export interface Props {
 const { post, updateDate, pubDate, description } = Astro.props;
 const { category, tags } = post.data;
 
+const { time: displayDate, updated } = resolveDisplayDate(pubDate, updateDate);
+
 const uniqueId = generateId();
 ---
 
@@ -25,6 +28,7 @@ const uniqueId = generateId();
   href={blogurl.with(post.id)}
   class:list={['card', 'link-card']}
   data-unique-id={uniqueId}
+  data-enter-item
 >
   <div class="wrapper">
     <div class="cover">
@@ -42,10 +46,10 @@ const uniqueId = generateId();
     <div class="content">
       <Label class="title" style="font-size:20px;">{post.data.title}</Label>
       <div class="description">{description}</div>
-      <div class="time-row">
-        <TimeMeta icon="mdi:calendar-edit-outline" time={updateDate} />
-        <TimeMeta icon="mdi:calendar-outline" time={pubDate} />
-      </div>
+      <TimeMeta
+        icon={updated ? 'mdi:calendar-edit-outline' : 'mdi:calendar-outline'}
+        time={displayDate}
+      />
       <div class="tags-category-row">
         <TagsMeta tags={tags} />
         <CategoryBreadcrumb class="category" category={category} />
@@ -55,75 +59,84 @@ const uniqueId = generateId();
 </a>
 
 <script>
-  let clickedCardUid: string | null = null;
   const transitionParts = ['cover', 'title', 'category'];
 
-  const restoreAfterTransition = new Map<HTMLElement, string>();
-  const setRestore = (element: HTMLElement, value: string) => {
-    if (!restoreAfterTransition.has(element)) {
-      restoreAfterTransition.set(element, element.style.transform);
+  // 同一个 view-transition-name 在文档里只能出现一次，重名会被浏览器整组忽略，
+  // 因此每轮导航开始都要先还原上一轮挂上的名字，再决定这一轮挂给谁
+  const namedElements = new Map<HTMLElement, string>();
+  const applyTransitionName = (element: HTMLElement, name: string) => {
+    if (!namedElements.has(element)) {
+      namedElements.set(element, element.style.viewTransitionName);
     }
+    element.style.viewTransitionName = name;
   };
-  const restore = () => {
-    for (const [restoreElement, value] of restoreAfterTransition.entries()) {
-      restoreElement.style.viewTransitionName = value;
+  const restoreTransitionNames = () => {
+    for (const [element, name] of namedElements) {
+      element.style.viewTransitionName = name;
     }
-    restoreAfterTransition.clear();
+    namedElements.clear();
   };
 
-  document.addEventListener('click', (e) => {
-    // 卡片内分类链接自行跳转，不算卡片整体点击
-    if ((e.target as Element).closest('.category-link')) {
+  // 被点击卡片的 uid，进入文章页后用它找回对应的封面/标题/分类
+  let clickedCardUid: string | null = null;
+  // 当前导航的取消信号：after-preparation 是普通 Event，只能靠 before-preparation 记下来
+  let pendingNavigation: AbortSignal | undefined;
+
+  const cardOfSource = (source: Element | undefined | null) => {
+    // 卡片内的分类链接自行跳转，不算卡片整体点击
+    if (!source || source.closest('.category-link')) {
+      return null;
+    }
+    return source.closest('.card.link-card') as HTMLElement | null;
+  };
+
+  const cardOfUid = (root: ParentNode, uid: string) =>
+    root.querySelector<HTMLElement>(`.card.link-card[data-unique-id="${uid}"]`);
+
+  document.addEventListener('astro:before-preparation', (event) => {
+    restoreTransitionNames();
+    clickedCardUid = null;
+    pendingNavigation = event.signal;
+
+    const card = cardOfSource(event.sourceElement);
+    if (!card) {
       return;
     }
-    let el = (e.target as Element).closest('.card.link-card');
-    if (!el) {
-      return;
-    }
-    restoreAfterTransition.clear();
 
     for (const part of transitionParts) {
-      const elPart = el.querySelector(`.${part}`) as HTMLElement | null;
-      if (!elPart) {
-        continue;
+      const elPart = card.querySelector<HTMLElement>(`.${part}`);
+      if (elPart) {
+        applyTransitionName(elPart, `clicked-${part}`);
       }
-
-      setRestore(elPart, elPart.style.viewTransitionName);
-      elPart.style.viewTransitionName = `clicked-${part}`;
     }
-    clickedCardUid = el.getAttribute('data-unique-id');
+    clickedCardUid = card.getAttribute('data-unique-id');
   });
 
   document.addEventListener('astro:after-preparation', () => {
-    if (clickedCardUid) {
-    } else {
-      for (const part of transitionParts) {
-        const transiteFrom = document.querySelector(
-          `[data-transite-from-${part}]`,
-        ) as HTMLElement | null;
-        if (!transiteFrom) {
-          continue;
-        }
+    // 被抢占的旧导航不能在这一轮里继续挂名字
+    if (pendingNavigation?.aborted || clickedCardUid) {
+      return;
+    }
 
-        const transiteId = transiteFrom.getAttribute(
-          `data-transite-from-${part}`,
-        );
-        if (!transiteId) {
-          continue;
-        }
-
-        setRestore(transiteFrom, transiteFrom.style.viewTransitionName);
-        transiteFrom.style.viewTransitionName = `clicked-${part}`;
+    // 从文章页离开时列表页没有点击来源，改为由文章页留存的 uid 反查
+    for (const part of transitionParts) {
+      const transiteFrom = document.querySelector<HTMLElement>(
+        `[data-transite-from-${part}]`,
+      );
+      if (!transiteFrom?.getAttribute(`data-transite-from-${part}`)) {
+        continue;
       }
+
+      applyTransitionName(transiteFrom, `clicked-${part}`);
     }
   });
 
-  document.addEventListener('astro:before-swap', (e) => {
+  document.addEventListener('astro:before-swap', (event) => {
     if (clickedCardUid) {
       for (const part of transitionParts) {
-        const transiteTo = e.newDocument.querySelector(
+        const transiteTo = event.newDocument.querySelector<HTMLElement>(
           `[data-transite-from-${part}]`,
-        ) as HTMLElement | null;
+        );
         if (!transiteTo) {
           continue;
         }
@@ -132,39 +145,37 @@ const uniqueId = generateId();
         transiteTo.setAttribute(`data-transite-from-${part}`, clickedCardUid);
 
         // Set view transition name for new cover element
-        setRestore(transiteTo, transiteTo.style.viewTransitionName);
-        transiteTo.style.viewTransitionName = `clicked-${part}`;
+        applyTransitionName(transiteTo, `clicked-${part}`);
       }
-
-      e.viewTransition.finished.then(restore);
 
       clickedCardUid = null;
     } else {
       // Exit from inner page
       for (const part of transitionParts) {
-        const transiteFrom = document.querySelector(
+        const transiteFrom = document.querySelector<HTMLElement>(
           `[data-transite-from-${part}]`,
-        ) as HTMLElement | null;
-        if (!transiteFrom) {
+        );
+        const transiteId = transiteFrom?.getAttribute(
+          `data-transite-from-${part}`,
+        );
+        if (!transiteId) {
           continue;
         }
 
-        const transiteId = transiteFrom.getAttribute(
-          `data-transite-from-${part}`,
-        );
-        const transiteTo = e.newDocument.querySelector(
-          `.card.link-card[data-unique-id="${transiteId}"] .${part}`,
-        ) as HTMLElement | null;
+        const transiteTo = cardOfUid(
+          event.newDocument,
+          transiteId,
+        )?.querySelector<HTMLElement>(`.${part}`);
         if (!transiteTo) {
           continue;
         }
 
-        setRestore(transiteTo, transiteTo.style.viewTransitionName);
-        transiteTo.style.viewTransitionName = `clicked-${part}`;
-
-        e.viewTransition.finished.then(restore);
+        applyTransitionName(transiteTo, `clicked-${part}`);
       }
     }
+
+    // 还原必须等过渡结束：page-load 早于新快照捕获，提前还原会把新文档的名字擦掉
+    event.viewTransition.finished.then(restoreTransitionNames);
   });
 </script>
 
@@ -223,13 +234,6 @@ const uniqueId = generateId();
     align-items: flex-start;
     gap: 10px;
     padding: 16px;
-
-    .time-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px 8px;
-      align-items: center;
-    }
 
     .tags-category-row {
       display: flex;

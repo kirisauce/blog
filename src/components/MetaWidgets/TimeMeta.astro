@@ -10,12 +10,23 @@ export interface Props extends HTMLAttributes<'time'> {
   label?: string;
 }
 
-const { icon, time, formatter = formatInstant, label, ...other } = Astro.props;
+const {
+  icon,
+  time,
+  formatter = formatInstant,
+  label,
+  class: className,
+  ...other
+} = Astro.props;
 ---
 
 {
   time && (
-    <time class="meta" datetime={time.toISOString()} {...other}>
+    <time
+      class:list={['meta', className]}
+      datetime={time.toISOString()}
+      {...other}
+    >
       <Icon class="padded-icon-svg" src={icon} />
       {label && <span>{label}:</span>}
       {formatter(time)}

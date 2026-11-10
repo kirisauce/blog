@@ -5,27 +5,37 @@
   import { type ColorSchemePreference } from '../../types/client';
   import { getAutoClose } from '../../client/toggler';
   import { onDestroy, onMount } from 'svelte';
+  import {
+    getGlobalPreferences,
+    preferencesReadyThen,
+  } from '../../client/utils';
 
   const props = $props();
-  const pref = window.__PREFERENCES__;
   let elSelf: HTMLDivElement;
 
-  let currentScheme: ColorSchemePreference = $state(pref.colorScheme.value);
+  let currentScheme: ColorSchemePreference = $state('auto');
 
   // Preference Synchronization
   const preferenceChangedListener = () => {
-    currentScheme = pref.colorScheme.value;
+    const prefs = getGlobalPreferences();
+    currentScheme = prefs.colorScheme.value;
   };
   onMount(() => {
-    pref.colorScheme.addEventListener('change', preferenceChangedListener);
+    preferencesReadyThen(() => {
+      const prefs = getGlobalPreferences();
+      preferenceChangedListener();
+      prefs.colorScheme.addEventListener('change', preferenceChangedListener);
+    });
   });
   onDestroy(() => {
-    pref.colorScheme.removeEventListener('change', preferenceChangedListener);
+    const prefs = getGlobalPreferences();
+    prefs.colorScheme.removeEventListener('change', preferenceChangedListener);
   });
 
   const switchColorScheme = (scheme: ColorSchemePreference) => {
-    if (pref.colorScheme.value !== scheme) {
-      pref.colorScheme.value = scheme;
+    const prefs = getGlobalPreferences();
+    if (prefs.colorScheme.value !== scheme) {
+      prefs.colorScheme.value = scheme;
       currentScheme = scheme;
     }
   };

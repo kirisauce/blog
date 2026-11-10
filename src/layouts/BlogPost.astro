@@ -3,6 +3,9 @@ import PostContent from '../components/PostContent.astro';
 import AuthorCard from '../components/Cards/AuthorCard.astro';
 import TocCard from '../components/Cards/TocCard.astro';
 import BasicLayout from './BasicLayout.astro';
+import Icon from '../components/Icon.astro';
+import MenuButton from '../components/NavBar/MenuButton.svelte';
+import TocDrawer from '../components/NavBar/TocDrawer.svelte';
 
 import type { CollectionEntry } from 'astro:content';
 import { render } from 'astro:content';
@@ -36,8 +39,28 @@ const layoutProps = {
     <BlogPosting post={Astro.props.post} />
   </Fragment>
 
+  <Fragment slot="right-extra">
+    {
+      headings.length > 0 && (
+        <MenuButton client:only target="#toc-drawer">
+          <Icon src="mingcute:menu-fill" />
+        </MenuButton>
+      )
+    }
+  </Fragment>
+
+  <Fragment slot="nav-extra">
+    {headings.length > 0 && <TocDrawer headings={headings} client:load />}
+  </Fragment>
+
   <Fragment slot="major">
-    <main transition:animate={fade({ duration: m3anim.standardDefaultSpatial.duration })} class="card article-content-card">
+    <main
+      transition:animate={fade({
+        duration: m3anim.standardDefaultSpatial.duration,
+      })}
+      class="card article-content-card"
+      data-enter-item
+    >
       <PostContent post={Astro.props.post} />
     </main>
   </Fragment>
@@ -67,4 +90,11 @@ const layoutProps = {
     }
   }
 
+  // <1640px 文章底部不再显示 TOC（由顶部抽屉接管，避免重复）；
+  // ≥1640px 侧边栏 TOC 保留。布局决策，写在文章页而非 TocCard 内。
+  :global(.page .toc-card) {
+    @media (max-width: 1639px) {
+      display: none;
+    }
+  }
 </style>

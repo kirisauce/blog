@@ -7,12 +7,12 @@ export interface Props extends HTMLAttributes<'div'> {
   content: any;
 }
 
-const { icon, content, ...other } = Astro.props;
+const { icon, content, class: className, ...other } = Astro.props;
 ---
 
 {
   content && (
-    <div class="meta" {...other}>
+    <div class:list={['meta', className]} {...other}>
       <Icon src={icon} class="padded-icon-svg" />
       {content}
     </div>

@@ -10,7 +10,9 @@ type StoredPreferenceOptionsBase<T> = {
 
 export type StoredPreferenceOptions<T> = T extends string
   ? {
-      [K in keyof StoredPreferenceOptionsBase<T>]?: StoredPreferenceOptionsBase<T>[K];
+      [
+        K in keyof StoredPreferenceOptionsBase<T>
+      ]?: StoredPreferenceOptionsBase<T>[K];
     }
   : StoredPreferenceOptionsBase<T>;
 

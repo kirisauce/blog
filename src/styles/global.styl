@@ -17,6 +17,9 @@ a.nodefault
 .padded-icon-svg
   font-size: 24px;
 
+body
+  color: var(--text)
+
 body::selection
   color: var(--selection-text)
   background-color: var(--selection-background)
@@ -67,6 +70,19 @@ body::selection
 
 ::view-transition-group(loading-indicator)
   z-index: 2200
+
+// 快照伪元素的盒子默认按位图宽高比撑开，拉满期间细条会被压成一根线；
+// 显式撑满 group 并拉伸位图，条形才全程保持真实粗细
+::view-transition-old(loading-indicator),
+::view-transition-new(loading-indicator)
+  width: 100%
+  height: 100%
+  object-fit: fill
+  animation: none
+  mix-blend-mode: normal
+
+::view-transition-old(loading-indicator)
+  opacity: 0
 
 ::view-transition-group(home-links)
   z-index: -100

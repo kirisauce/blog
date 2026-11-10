@@ -23,6 +23,7 @@ const props = Astro.props;
       <slot name="center" />
     </div>
     <div class="nav-part" style="flex-direction: row-reverse;">
+      <slot name="right-extra" />
       <slot name="right">
         <MenuButton client:only target="#nav-color-scheme-switch"
           ><Icon src="mingcute:sunflower-line" /></MenuButton
@@ -38,6 +39,8 @@ const props = Astro.props;
     <ColorSchemePanel class="dropdown right" client:only />
     <ThemeColorPanel class="dropdown right" client:only />
   </div>
+
+  <slot name="nav-extra" />
 </div>
 
 <style lang="stylus">
@@ -139,7 +142,7 @@ const props = Astro.props;
   }
 
   .dropdown {
-    background-color: unquote("color-mix(in oklch, var(--primary-container) 72%, transparent)");
+    background-color: var(--primary-container-72);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     padding: 12px;

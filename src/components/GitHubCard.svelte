@@ -84,8 +84,15 @@
 
   // ── 缓存 ──────────────────────────────────────────────────────────
 
-  interface CachedError { kind: ErrKind; status?: number; }
-  interface CacheEntry { t: number; d?: RepoData; e?: CachedError; }
+  interface CachedError {
+    kind: ErrKind;
+    status?: number;
+  }
+  interface CacheEntry {
+    t: number;
+    d?: RepoData;
+    e?: CachedError;
+  }
 
   const cache = {
     key: (r: string) => `gh-card:${r.toLowerCase()}`,
@@ -93,13 +100,28 @@
       try {
         const v = JSON.parse(localStorage.getItem(this.key(r)) ?? '');
         return v?.d || v?.e ? (v as CacheEntry) : null;
-      } catch { return null; }
+      } catch {
+        return null;
+      }
     },
     set(r: string, d: RepoData) {
-      try { localStorage.setItem(this.key(r), JSON.stringify({ t: Date.now(), d } satisfies CacheEntry)); } catch {}
+      try {
+        localStorage.setItem(
+          this.key(r),
+          JSON.stringify({ t: Date.now(), d } satisfies CacheEntry),
+        );
+      } catch {}
     },
     setError(r: string, e: CardError) {
-      try { localStorage.setItem(this.key(r), JSON.stringify({ t: Date.now(), e: { kind: e.kind, status: e.status } } satisfies CacheEntry)); } catch {}
+      try {
+        localStorage.setItem(
+          this.key(r),
+          JSON.stringify({
+            t: Date.now(),
+            e: { kind: e.kind, status: e.status },
+          } satisfies CacheEntry),
+        );
+      } catch {}
     },
     fresh(r: string): CacheEntry | null {
       const c = this.get(r);
@@ -127,7 +149,8 @@
       e.kind =
         res.status === 404
           ? 'notfound'
-          : res.status === 403 && res.headers.get('x-ratelimit-remaining') === '0'
+          : res.status === 403 &&
+              res.headers.get('x-ratelimit-remaining') === '0'
             ? 'ratelimit'
             : 'http';
       throw e;
@@ -163,7 +186,9 @@
   }
 
   function formatNum(n: number): string {
-    return n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : String(n);
+    return n >= 1000
+      ? (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k'
+      : String(n);
   }
 
   // ── 状态操作 ──────────────────────────────────────────────────────
@@ -174,7 +199,11 @@
 
     const fresh = cache.fresh(repo);
     if (fresh) {
-      if (fresh.d) { data = fresh.d; phase = 'loaded'; return; }
+      if (fresh.d) {
+        data = fresh.d;
+        phase = 'loaded';
+        return;
+      }
       if (fresh.e) {
         const ce = fresh.e;
         const er = new Error(ERR_MSG[ce.kind]) as CardError;
@@ -193,7 +222,12 @@
       // SWR: 过期缓存先渲染，后台刷新
       if (Date.now() - lastRefresh > 60_000) {
         lastRefresh = Date.now();
-        fetchRepo(repo).then((d) => { cache.set(repo, d); data = d; }).catch(() => {});
+        fetchRepo(repo)
+          .then((d) => {
+            cache.set(repo, d);
+            data = d;
+          })
+          .catch(() => {});
       }
       return;
     }
@@ -257,11 +291,17 @@
 
   $effect(() => {
     if (!el) return;
-    const obs = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) { obs.unobserve(entry.target); load(); }
-      }
-    }, { rootMargin: '200px 0px' });
+    const obs = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            obs.unobserve(entry.target);
+            load();
+          }
+        }
+      },
+      { rootMargin: '200px 0px' },
+    );
     obs.observe(el);
     return () => obs.disconnect();
   });
@@ -269,29 +309,42 @@
 
 <div class="gh-wrap" bind:this={el}>
   {#if phase === 'idle'}
-    <a class="placeholder" href="https://github.com/{repo}" target="_blank" rel="noopener noreferrer">
+    <a
+      class="placeholder"
+      href="https://github.com/{repo}"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       <GithubIcon class="icon" />
       <span class="name">{repo}</span>
       <span class="meta">N/A</span>
     </a>
-
   {:else if phase === 'loading'}
     <div class="loading">
       <span class="name">{repo}</span>
       <div class="spinner"></div>
     </div>
-
   {:else if phase === 'loaded' && data}
     <div class="loaded">
-      <a class="body" href={data.html_url} target="_blank" rel="noopener noreferrer">
+      <a
+        class="body"
+        href={data.html_url}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         <div class="head">
           <div class="head-left">
             {#if data.owner.avatar_url}
               <img
                 class="avatar"
                 src={data.owner.avatar_url}
-                alt="" width="20" height="20" loading="lazy"
-                onerror={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                alt=""
+                width="20"
+                height="20"
+                loading="lazy"
+                onerror={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
               />
             {/if}
             <span class="name">{data.full_name}</span>
@@ -306,18 +359,25 @@
         <div class="meta">
           {#if data.language && LANG_COLORS[data.language]}
             <span class="lang">
-              <span class="lang-dot" style="background-color:{LANG_COLORS[data.language]}"></span>
+              <span
+                class="lang-dot"
+                style="background-color:{LANG_COLORS[data.language]}"
+              ></span>
               {data.language}
             </span>
           {/if}
           {#if data.stargazers_count > 0}
-            <span class="stat"><StarIcon /> {formatNum(data.stargazers_count)}</span>
+            <span class="stat"
+              ><StarIcon /> {formatNum(data.stargazers_count)}</span
+            >
           {/if}
           {#if data.forks_count > 0}
             <span class="stat"><ForkIcon /> {formatNum(data.forks_count)}</span>
           {/if}
           {#if data.open_issues_count > 0}
-            <span class="stat"><IssueIcon /> {formatNum(data.open_issues_count)}</span>
+            <span class="stat"
+              ><IssueIcon /> {formatNum(data.open_issues_count)}</span
+            >
           {/if}
           {#if data.license}
             <span class="stat"><LicenseIcon /> {data.license}</span>
@@ -327,14 +387,18 @@
       </a>
 
       <button
-        class="refresh" class:spinning
-        type="button" aria-label="Refresh"
-        onclick={(e) => { e.stopPropagation(); doRefresh(); }}
+        class="refresh"
+        class:spinning
+        type="button"
+        aria-label="Refresh"
+        onclick={(e) => {
+          e.stopPropagation();
+          doRefresh();
+        }}
       >
         <RefreshIcon />
       </button>
     </div>
-
   {:else if phase === 'error' && err}
     <div class="error" role="status">
       <div class="error-main" class:static={err.kind === 'notfound'}>
@@ -343,13 +407,26 @@
         <span class="error-detail">
           <span class="error-text">{ERR_MSG[err.kind]}</span>
           {#if err.kind !== 'notfound'}
-            <button class="retry" type="button" aria-label="Retry" onclick={(e) => { e.stopPropagation(); retry(); }}>
+            <button
+              class="retry"
+              type="button"
+              aria-label="Retry"
+              onclick={(e) => {
+                e.stopPropagation();
+                retry();
+              }}
+            >
               <RefreshIcon />
             </button>
           {/if}
         </span>
       </div>
-      <a class="error-link" href="https://github.com/{repo}" target="_blank" rel="noopener noreferrer">
+      <a
+        class="error-link"
+        href="https://github.com/{repo}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         <ExternalLinkIcon />
       </a>
     </div>
@@ -394,7 +471,9 @@
   }
 
   @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   /* ── 共用 glass 背景 ──────────────────────────────────────── */
@@ -402,7 +481,7 @@
   .placeholder,
   .loading,
   .loaded {
-    background: color-mix(in oklch, var(--surface), transparent 22%);
+    background: var(--surface-78);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border: 1px solid var(--border);
@@ -683,9 +762,9 @@
     margin-left: auto;
     width: 36px;
     height: 36px;
-    border: 1px solid color-mix(in oklch, var(--on-error-container), transparent 35%);
+    border: 1px solid var(--on-error-container-65);
     border-radius: 10px;
-    background: color-mix(in oklch, var(--on-error-container), transparent 92%);
+    background: var(--on-error-container-8);
     padding: 0;
     color: inherit;
     cursor: pointer;
@@ -701,7 +780,7 @@
   }
 
   .retry:hover {
-    background: color-mix(in oklch, var(--on-error-container), transparent 78%);
+    background: var(--on-error-container-22);
     border-color: var(--on-error-container);
   }
 

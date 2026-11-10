@@ -1,36 +1,149 @@
-hue = var(--color-hue, 0)
-redhue = 25
-selectionhue = "calc(%s + 45)" % hue
+// ─────────────────────────────────────────────────────────────────
+// 调色板：一个颜色定义 → 两份输出
+//   palette          → OKLCH（现代浏览器）
+//   fallback-palette → HSL 回退（不支持 oklch 的旧浏览器）
+// 两份都由下方单一事实源 color-defs 生成。
+// ─────────────────────────────────────────────────────────────────
 
-palette = {
-  surface-hover: oklch(92% 1% hue)   oklch(24% 1% hue)
-  primary:    oklch(58% 22% hue)     oklch(72% 20% hue)
-  secondary:  oklch(55% 18% hue)     oklch(68% 16% hue)
-  background: oklch(99% 0.5% hue)    oklch(11% 1% hue)
-  surface:    oklch(97% 0.8% hue)    oklch(16% 1% hue)
-  border:     oklch(90% 1% hue)      oklch(28% 1.5% hue)
-  text:       oklch(25% 1.5% hue)    oklch(93% 1% hue)
-  text-muted: oklch(45% 2% hue)      oklch(72% 1.5% hue)
-  nav:        oklch(98% 0.6% hue)    oklch(14% 1% hue)
+// ── 色相输入 ─────────────────────────────────────────────────────
+hue = var(--color-hue, 0)                 // 用户色相滑块值（站点默认 0）
+redhue = 25                               // error 族固定色相
+selectionhue = "calc(%s + 45)" % hue      // 选区色相 = 滑块 + 45°
 
-  primary-container:    oklch(93% 3% hue)   oklch(26% 4% hue)
-  on-primary-container: oklch(35% 20% hue)  oklch(90% 12% hue)
-  secondary-container:  oklch(92% 3% hue)   oklch(22% 3.5% hue)
-  on-secondary-container: oklch(35% 20% hue) oklch(88% 10% hue)
-  surface-container:    oklch(96% 0.8% hue) oklch(20% 1% hue)
-  on-surface-container: oklch(25% 1.5% hue) oklch(92% 1% hue)
-  container:            oklch(99% 0.3% hue) oklch(13% 0.8% hue)
-  on-container:         oklch(25% 1.5% hue) oklch(92% 1% hue)
+// ── 一、源颜色定义（唯一需要修改的地方）───────────────────────────
+// 每行 1 个颜色，字段：
+//   light / dark：三元组 (L, C, α)
+//     L = OKLCH 亮度%（0–100）
+//     C = OKLCH 色度%（0.4 的百分比，如 22 = 0.088）
+//     α = 透明度（1 = 不透明）
+//   h   = 输出色相表达式（原样透传：var(--color-hue, 0) / redhue / selectionhue）
+//   ref = 参考色相：仅构建期换算 HSL 的 S/L 用（该色相下换算精确）。
+//         普通色 0（站点默认色相）、error 族 25、selection 族 45（默认 0+45）。
+color-defs = {
+  // ── 背景 / 表面 ──
+  surface-hover: {light: 92 1 1,  dark: 24 1 1,   h: hue, ref: 0}
+  primary:       {light: 58 22 1, dark: 72 20 1,  h: hue, ref: 0}
+  secondary:     {light: 55 18 1, dark: 68 16 1,  h: hue, ref: 0}
+  background:    {light: 99 0.5 1, dark: 11 1 1,  h: hue, ref: 0}
+  surface:       {light: 97 0.8 1, dark: 16 1 1,  h: hue, ref: 0}
+  border:        {light: 90 1 1,   dark: 28 1.5 1, h: hue, ref: 0}
+  text:          {light: 25 1.5 1, dark: 93 1 1,  h: hue, ref: 0}
+  text-muted:    {light: 45 2 1,   dark: 72 1.5 1, h: hue, ref: 0}
+  nav:           {light: 98 0.6 1, dark: 14 1 1,  h: hue, ref: 0}
 
-  error:            oklch(55% 18% redhue) oklch(70% 16% redhue)
-  error-container:  oklch(93% 3% redhue)  oklch(28% 6% redhue)
-  on-error:         oklch(100% 0% redhue) oklch(0% 0% redhue)
-  on-error-container: oklch(35% 14% redhue) oklch(92% 6% redhue)
+  // ── 容器（卡片 / 下拉 / 抽屉）──
+  primary-container:       {light: 93 3 1,   dark: 26 4 1,   h: hue, ref: 0}
+  on-primary-container:    {light: 35 20 1,  dark: 90 12 1,  h: hue, ref: 0}
+  secondary-container:     {light: 92 3 1,   dark: 22 3.5 1, h: hue, ref: 0}
+  on-secondary-container:  {light: 35 20 1,  dark: 88 10 1,  h: hue, ref: 0}
+  surface-container:       {light: 96 0.8 1, dark: 20 1 1,   h: hue, ref: 0}
+  on-surface-container:    {light: 25 1.5 1, dark: 92 1 1,   h: hue, ref: 0}
+  container:               {light: 99 0.3 1, dark: 13 0.8 1, h: hue, ref: 0}
+  on-container:            {light: 25 1.5 1, dark: 92 1 1,   h: hue, ref: 0}
 
-  selection-text:       oklch(45% 12% selectionhue) oklch(85% 10% selectionhue)
-  selection-background: oklch(90% 6% selectionhue)  oklch(32% 10% selectionhue)
+  // ── 错误（色相固定 25）──
+  error:              {light: 55 18 1, dark: 70 16 1, h: redhue, ref: 25}
+  error-container:    {light: 93 3 1,  dark: 28 6 1,  h: redhue, ref: 25}
+  on-error:           {light: 100 0 1, dark: 0 0 1,   h: redhue, ref: 25}
+  on-error-container: {light: 35 14 1, dark: 92 6 1,  h: redhue, ref: 25}
 
-  shadow: oklch(0% 0% hue \/ 0.08) oklch(0% 0% hue \/ 0.3)
+  // ── 选区（滑块 + 45°）──
+  selection-text:       {light: 45 12 1, dark: 85 10 1, h: selectionhue, ref: 45}
+  selection-background: {light: 90 6 1,  dark: 32 10 1, h: selectionhue, ref: 45}
 
-  meta-bg: oklch(94% 1% hue \/ 0.5) oklch(26% 2% hue \/ 0.4)
+  // ── 效果（自带宽透明度）──
+  shadow:  {light: 0 0 0.08,  dark: 0 0 0.3,  h: hue, ref: 0}
+  meta-bg: {light: 94 1 0.5,  dark: 26 2 0.4, h: hue, ref: 0}
+
+  // ── 半透明 token（原 color-mix 语义，α 即透明度）──
+  // primary-container 72% / text 15% / border 60% / surface 78%
+  // on-error-container 65%、8%、22%
+  primary-container-72: {light: 93 3 0.72,  dark: 26 4 0.72,  h: hue, ref: 0}
+  text-15:              {light: 25 1.5 0.15, dark: 93 1 0.15,  h: hue, ref: 0}
+  border-60:            {light: 90 1 0.6,   dark: 28 1.5 0.6, h: hue, ref: 0}
+  surface-78:           {light: 97 0.8 0.78, dark: 16 1 0.78, h: hue, ref: 0}
+  on-error-container-65: {light: 35 14 0.65, dark: 92 6 0.65,  h: redhue, ref: 25}
+  on-error-container-8:  {light: 35 14 0.08, dark: 92 6 0.08,  h: redhue, ref: 25}
+  on-error-container-22: {light: 35 14 0.22, dark: 92 6 0.22,  h: redhue, ref: 25}
 }
+
+// ── 二、OKLCH → HSL 换算 ────────────────────────────────────────
+// oklch → OKLab → 线性 sRGB（Björn Ottosson 矩阵）→ sRGB 伽马 → RGB→HSL。
+// 给定参考色相下为精确换算；输出 HSL 色相与 OKLCH 同角透传
+//（严格转换里两轴相差 -11°~-46°，旧浏览器回退场景可接受）。
+// stylus 注意事项：trig 用弧度制；min/max 只接受 2 个参数须嵌套；没有 pow()。
+
+gamma(c) // sRGB 伽马（0.4166667 = 1/2.4）
+  if c <= 0.0031308
+    12.92 * c
+  else
+    1.055 * math(math(c, 'log') * 0.4166666667, 'exp') - 0.055
+
+oklch-sl(L, C, ref) // (L%, C%, 参考色相) → (S%, L%)
+  L = L * 0.01
+  C = C * 0.004
+  rad = ref * 0.0174532925
+  a = C * cos(rad)
+  b = C * sin(rad)
+  l = L + 0.3963377774*a + 0.2158037573*b
+  m = L - 0.1055613458*a - 0.0638541728*b
+  s = L - 0.0894841775*a - 1.2914855480*b
+  l = l*l*l
+  m = m*m*m
+  s = s*s*s
+  r = 4.0767416621*l - 3.3077115913*m + 0.2309699292*s
+  g = -1.2684380046*l + 2.6097574011*m - 0.3413193965*s
+  b2 = -0.0041960863*l - 0.7034186147*m + 1.7076147010*s
+  if r < 0
+    r = 0
+  if r > 1
+    r = 1
+  if g < 0
+    g = 0
+  if g > 1
+    g = 1
+  if b2 < 0
+    b2 = 0
+  if b2 > 1
+    b2 = 1
+  r = gamma(r)
+  g = gamma(g)
+  b2 = gamma(b2)
+  mx = max(max(r, g), b2)
+  mn = min(min(r, g), b2)
+  d = mx - mn
+  lh = (mx + mn) / 2
+  if d == 0
+    s2 = 0
+  else
+    s2 = d / (1 - abs(2*lh - 1))
+    if s2 > 1
+      s2 = 1
+  (round(s2*100) round(lh*100))
+
+oklch-val(L, C, H, a) // 生成 oklch() 值（α = 1 时省略）
+  base = 'oklch(' + L + '% ' + C + '% ' + H
+  if a < 1
+    unquote(base + ' / ' + a + ')')
+  else
+    unquote(base + ')')
+
+hsl-val(H, S, L, a) // 生成 hsl()/hsla() 值
+  base = 'hsl(' + H + ', ' + S + '%, ' + L + '%)'
+  if a < 1
+    unquote('hsla(' + H + ', ' + S + '%, ' + L + '%, ' + a + ')')
+  else
+    unquote(base)
+
+// ── 三、生成两份调色板 ───────────────────────────────────────────
+palette = {}
+fallback-palette = {}
+for name, row in color-defs
+  light = row.light
+  dark = row.dark
+  h = row.h
+  ref = row.ref
+  sl1 = oklch-sl(light[0], light[1], ref)
+  sl2 = oklch-sl(dark[0], dark[1], ref)
+  palette[name] = (oklch-val(light[0], light[1], h, light[2]) oklch-val(dark[0], dark[1], h, dark[2]))
+  fallback-palette[name] = (hsl-val(h, sl1[0], sl1[1], light[2]) hsl-val(h, sl2[0], sl2[1], dark[2]))

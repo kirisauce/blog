@@ -114,22 +114,22 @@ astro-cakes/
 
 ## Key Files & Directories
 
-| 路径                            | 作用                                                                                                   |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `astro.config.mts`              | Astro 配置（集成、Vite 插件、字体、Markdown）                                                          |
-| `svelte.config.js`              | Svelte 预处理（vitePreprocess）                                                                        |
-| `ec.config.mjs`                 | Expressive Code 代码高亮配置（主题、行号）                                                             |
-| `src/config.ts`                 | **站点配置总入口**：修改站点标题/描述/作者/社交链接/布局                                               |
-| `src/content.config.ts`         | 博客 Frontmatter schema 定义                                                                           |
-| `src/astro.ts`                  | 构建时 HTML 后处理器（async script 注入）                                                              |
-| `src/vite/index.ts`             | `virtual:dynamic-style` 插件（JS 驱动 CSS）                                                            |
-| `src/server/icon-loader.ts`     | 共享图标加载工具（Icon.astro 和 remark 插件共用管道）                                                  |
-| `src/server/mdext/`             | 自定义 Markdown 扩展，提供 `::i[src]{attrs}` 内联图标语法和 `::github[owner/repo]` GitHub 仓库卡片语法 |
-| `src/components/GitHubCard.svelte` | GitHub 仓库卡片 Svelte 组件（编译为 `<github-card>` Web Component，懒加载 + 缓存）                    |
-| `src/styles/color.styl`         | OKLCH 调色板（修改主题色）                                                                             |
-| `src/styles/variables.styl`     | CSS 变量和动画曲线定义                                                                                 |
-| `fonts/config.json`             | 字体子集配置文件                                                                                       |
-| `.prettierrc`                   | Prettier 格式化配置                                                                                    |
+| 路径                               | 作用                                                                                                   |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `astro.config.mts`                 | Astro 配置（集成、Vite 插件、字体、Markdown）                                                          |
+| `svelte.config.js`                 | Svelte 预处理（vitePreprocess）                                                                        |
+| `ec.config.mjs`                    | Expressive Code 代码高亮配置（主题、行号）                                                             |
+| `src/config.ts`                    | **站点配置总入口**：修改站点标题/描述/作者/社交链接/布局                                               |
+| `src/content.config.ts`            | 博客 Frontmatter schema 定义                                                                           |
+| `src/astro.ts`                     | 构建时 HTML 后处理器（async script 注入）                                                              |
+| `src/vite/index.ts`                | `virtual:dynamic-style` 插件（JS 驱动 CSS）                                                            |
+| `src/server/icon-loader.ts`        | 共享图标加载工具（Icon.astro 和 remark 插件共用管道）                                                  |
+| `src/server/mdext/`                | 自定义 Markdown 扩展，提供 `::i[src]{attrs}` 内联图标语法和 `::github[owner/repo]` GitHub 仓库卡片语法 |
+| `src/components/GitHubCard.svelte` | GitHub 仓库卡片 Svelte 组件（编译为 `<github-card>` Web Component，懒加载 + 缓存）                     |
+| `src/styles/color.styl`            | OKLCH 调色板（修改主题色）                                                                             |
+| `src/styles/variables.styl`        | CSS 变量和动画曲线定义                                                                                 |
+| `fonts/config.json`                | 字体子集配置文件                                                                                       |
+| `.prettierrc`                      | Prettier 格式化配置                                                                                    |
 
 ---
 

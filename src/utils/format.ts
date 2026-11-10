@@ -48,6 +48,25 @@ export const formatInstant = (date: Date, options?: FormatInstantOptions) => {
   return part1.join('-') + (part2.length ? ` ${part2.join(':')}` : '');
 };
 
+export interface DisplayDate {
+  time?: Date;
+  updated: boolean;
+}
+
+/**
+ * 选取用于展示的日期：更新日晚于发布日时取更新日，否则取发布日
+ */
+export const resolveDisplayDate = (
+  pubDate?: Date,
+  updateDate?: Date,
+): DisplayDate => {
+  const updated =
+    updateDate !== undefined &&
+    (pubDate === undefined || updateDate.getTime() > pubDate.getTime());
+
+  return { time: updated ? updateDate : (pubDate ?? updateDate), updated };
+};
+
 export interface FormatDurationOptions {
   /**
    * The precision to use when formatting the duration.

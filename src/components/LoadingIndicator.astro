@@ -5,6 +5,14 @@
   // Astro 打包的 module script 全站只执行一次；不要在 astro:page-load 里重复注册
   // 事件，否则监听器随导航次数累积，多份闭包同时驱动同一元素导致进度条来回抖动
   let widthAnim: Animation | undefined;
+  // 导航轮次：动画回调绑定创建时的轮次，上一轮迟到的回调不能驱动新一轮的元素
+  let navRound = 0;
+  // 该轮导航是否还在进行：开始收尾后，本轮迟到的爬升回调一律丢弃
+  let roundActive = false;
+  // 该收尾的轮次，由 before-swap 标记；page-load 只有在轮次一致时才收尾
+  let finishingRound = -1;
+  // 过渡标记残留时的兜底上限，避免进度条永不收起
+  const settlePollLimit = 1000;
 
   const indicator = () => document.getElementById('loading-indicator');
 
@@ -14,9 +22,15 @@
     return (px / document.documentElement.clientWidth) * 100;
   };
 
-  const animateWidth = (to: number, duration: number, easing: string, onfinish?: () => void) => {
+  const animateWidth = (
+    to: number,
+    duration: number,
+    easing: string,
+    onfinish?: () => void,
+  ) => {
     const el = indicator();
     if (!el) return;
+    const round = navRound;
     const from = currentWidthPct(el);
     widthAnim?.cancel();
     widthAnim = el.animate([{ width: `${from}%` }, { width: `${to}%` }], {
@@ -24,36 +38,90 @@
       easing,
       fill: 'forwards',
     });
-    if (onfinish) widthAnim.addEventListener('finish', onfinish, { once: true });
+    if (!onfinish) return;
+    widthAnim.addEventListener(
+      'finish',
+      () => {
+        if (round !== navRound || !roundActive) return;
+        onfinish();
+      },
+      { once: true },
+    );
   };
 
   document.addEventListener('astro:before-preparation', () => {
+    navRound += 1;
+    roundActive = true;
+    finishingRound = -1;
+
     const el = indicator();
     if (!el) return;
-    // 上一轮残留的 fill:forwards 动画不清掉的话，进度条会带着旧宽度直接起跳
+    const from = currentWidthPct(el);
+    // 清掉上一轮的 fill:forwards 动画，基础宽度停在当前进度，回落动画才不会跳变
     el.getAnimations().forEach((a) => a.cancel());
-    el.style.width = '0%';
+    el.style.width = `${from}%`;
     el.style.opacity = '';
-    animateWidth(30, 400, 'ease-out', () => {
-      // 等待期缓慢爬升而不是停在原地，避免用户误以为页面卡死
-      animateWidth(90, 8000, 'linear');
-    });
+    const climb = () => {
+      animateWidth(30, 400, 'ease-out', () => {
+        // 等待期缓慢爬升而不是停在原地，避免用户误以为页面卡死
+        animateWidth(90, 8000, 'linear');
+      });
+    };
+    // 爬到一半改点别的链接时，先把这一轮的进度快速收回 0 再重新爬升
+    if (from > 1) animateWidth(0, 80, 'ease-out', climb);
+    else climb();
   });
 
-  document.addEventListener('astro:after-preparation', () => {
-    animateWidth(100, 250, 'ease-in-out', () => {
-      const el = indicator();
-      if (!el) return;
-      const fade = el.animate([{ opacity: 0 }], { duration: m3anim.expressiveSlowEffects.duration, easing: 'ease-in', fill: 'forwards' });
-      fade.addEventListener(
-        'finish',
-        () => {
-          el.getAnimations().forEach((a) => a.cancel());
-          el.style.width = '0%';
-        },
-        { once: true },
-      );
+  // 交换后的条以 100% 入场，视图过渡的形变会把它从爬升宽度平滑拉满，无需自己补动画
+  document.addEventListener('astro:before-swap', (event) => {
+    finishingRound = navRound;
+    const next = event.newDocument.getElementById('loading-indicator');
+    if (next) next.style.width = '100%';
+  });
+
+  const settle = (round: number) => {
+    const el = indicator();
+    if (!el) return;
+    // 过渡覆盖层退场后真实元素才可见，此时从 100% 淡出再复位
+    const fade = el.animate([{ opacity: 0 }], {
+      duration: m3anim.expressiveSlowEffects.duration,
+      easing: 'ease-in',
+      fill: 'forwards',
     });
+    fade.addEventListener(
+      'finish',
+      () => {
+        if (round !== navRound) return;
+        el.getAnimations().forEach((a) => a.cancel());
+        el.style.width = '0%';
+        el.style.opacity = '';
+      },
+      { once: true },
+    );
+  };
+
+  // page-load 只代表 DOM 交换完成、覆盖层还在，等 Astro 摘掉过渡标记再淡出
+  const settleAfterTransition = (round: number) => {
+    const started = performance.now();
+    const wait = () => {
+      if (round !== navRound || finishingRound !== round) return;
+      if (
+        document.documentElement.hasAttribute('data-astro-transition') &&
+        performance.now() - started < settlePollLimit
+      ) {
+        requestAnimationFrame(wait);
+        return;
+      }
+      finishingRound = -1;
+      roundActive = false;
+      settle(round);
+    };
+    requestAnimationFrame(wait);
+  };
+
+  document.addEventListener('astro:page-load', () => {
+    if (finishingRound !== navRound) return;
+    settleAfterTransition(navRound);
   });
 </script>
 

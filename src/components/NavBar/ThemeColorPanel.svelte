@@ -1,14 +1,18 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
   import { getAutoClose } from '../../client/toggler';
+  import {
+    getGlobalPreferences,
+    preferencesReadyThen,
+  } from '../../client/utils';
 
   const props = $props();
-  const prefs = window.__PREFERENCES__;
 
-  let displayNumHue = $state(prefs.themeHue.value);
+  let displayNumHue = $state(0);
 
   // Preference Synchronization
   const preferenceChangedListener = () => {
+    const prefs = getGlobalPreferences();
     displayNumHue = prefs.themeHue.value;
     if (elInput) {
       elInput.value = prefs.themeHue.value.toString();
@@ -17,14 +21,21 @@
     }
   };
   onMount(() => {
-    prefs.themeHue.addEventListener('change', preferenceChangedListener);
-    if (elInput) {
-      const pct = (prefs.themeHue.value / 359) * 100;
-      elInput.style.setProperty('--hue-pct', `${pct}%`);
-    }
+    preferencesReadyThen(() => {
+      const prefs = getGlobalPreferences();
+      preferenceChangedListener();
+      prefs.themeHue.addEventListener('change', preferenceChangedListener);
+      if (elInput) {
+        const pct = (prefs.themeHue.value / 359) * 100;
+        elInput.style.setProperty('--hue-pct', `${pct}%`);
+      }
+    });
   });
   onDestroy(() => {
-    prefs.themeHue.removeEventListener('change', preferenceChangedListener);
+    getGlobalPreferences().themeHue.removeEventListener(
+      'change',
+      preferenceChangedListener,
+    );
   });
 
   let elSelf: HTMLDivElement;
@@ -33,6 +44,7 @@
   let setPreferenceTimeout: ReturnType<typeof setTimeout> | null = null;
 
   const oninput = (e: Event) => {
+    const prefs = getGlobalPreferences();
     const pct = (Number(elInput.value) / 359) * 100;
     elInput.style.setProperty('--hue-pct', `${pct}%`);
     if (setPreferenceTimeout === null) {
@@ -58,15 +70,15 @@
     Hue: {displayNumHue.toString().padStart(3, '0')}
     <button
       onclick={() =>
-        (prefs.themeHue.value = window.__CONFIG__.theme.defaultHue)}
-      >Reset</button
+        (getGlobalPreferences().themeHue.value =
+          window.__CONFIG__.theme.defaultHue)}>Reset</button
     >
   </div>
   <input
     type="range"
     min="0"
     max="359"
-    value={prefs.themeHue.value}
+    value={displayNumHue}
     bind:this={elInput}
     {oninput}
   />

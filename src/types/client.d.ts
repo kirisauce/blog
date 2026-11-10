@@ -26,6 +26,7 @@ export type ConfigTable = {
 declare global {
   interface Window {
     __PREFERENCES__: PreferenceTable;
+    __PREFERENCES_READY_CALLBACKS__: (() => void)[] | undefined;
     __CAKES__: CakesTable;
     __CONFIG__: ConfigTable;
   }

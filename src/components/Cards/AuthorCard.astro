@@ -14,7 +14,7 @@ const { authorId, ...other } = Astro.props;
 const { avatar, name, bio, socialLinks } = authorConfig.authors[authorId] ?? {};
 ---
 
-<div class="card author-card" {...other}>
+<div class="card author-card" data-enter-item {...other}>
   <Label style="font-size: 1.6rem; align-self: flex-start; margin-left: -16px;"
     >作者</Label
   >
