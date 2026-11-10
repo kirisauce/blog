@@ -4,5 +4,5 @@
     "types": ["unplugin-icons/types/svelte"]
   },
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "exclude": ["dist", "externals/mlink-webui"]
 }
