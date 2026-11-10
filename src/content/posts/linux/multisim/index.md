@@ -2,7 +2,6 @@
 title: 'Multisim 安装&使用小记'
 pubDate: 2026-06-27
 updateDate: 2026-06-27
-category: Electronic
 coverImage: err-kb2919355.webp
 category: Linux
 tags: [multisim, electronic, wine]
